@@ -1,0 +1,313 @@
+library(shiny)
+library(bslib)
+library(purrr)
+
+source(file.path("R", "constants.R"))
+source(file.path("R", "utils", "helper_functions.R"))
+source(file.path("R", "utils", "validation.R"))
+
+sidebarInputModuleUI <- function(id, initial_config) {
+  ns <- NS(id)
+
+  # Helper function to create static inputs
+  createStaticInput <- function(input_item, section) {
+    input_id <- ns(paste0(section, "_", input_item$id))
+
+    input_element <- createInputElement(
+      input_item$type,
+      input_id,
+      input_item
+    )
+
+    info_icon <- createInfoIcon(input_item$description)
+
+    createInputContainer(input_item$label, input_element, info_icon)
+  }
+
+  # Create static UI elements
+  static_inputs <- if (!is.null(initial_config)) {
+    lapply(names(initial_config), function(section) {
+      section_inputs <- initial_config[[section]]$inputs
+      essential_params <- ESSENTIAL_PARAMS[[section]]
+
+      essential_inputs <- section_inputs[sapply(section_inputs,
+                                                function(x) x$id %in% essential_params)]
+      non_essential_inputs <- section_inputs[sapply(section_inputs,
+                                                    function(x) !x$id %in% essential_params)]
+
+      div(
+        h3(style = "font-size: 1.5rem; margin-top: 15px; margin-bottom: 10px;",
+           initial_config[[section]]$title),
+        div(id = ns(paste0(section, "_essential")),
+            lapply(essential_inputs, createStaticInput, section = section)),
+        if (length(non_essential_inputs) > 0) {
+          tagList(
+            actionButton(
+              inputId = ns(paste0(section, "_toggle")),
+              label = "Show more parameters",
+              class = "collapse-toggle",
+              style = "border: none; background: none; color: #007bff; padding: 0; font-size: 0.8rem;"
+            ),
+            div(
+              id = ns(paste0(section, "_non_essential")),
+              class = "collapse",
+              lapply(non_essential_inputs, createStaticInput, section = section)
+            )
+          )
+        }      )
+    })
+  }
+
+  tagList(
+    div(class = "sidebar-title", "Financial Evolution Scenario"),
+    # Scenario management buttons container
+    div(
+      style = "padding: 0;",
+      # Custom styling for file input and download button
+      tags$style(HTML(sprintf("
+        /* Container styling */
+        .scenario-buttons-container {
+          display: flex;
+          flex-direction: column;
+          gap: 0;
+          align-items: flex-start;
+          width: auto;
+        }
+
+        /* File input styling */
+        #%s {
+          margin: 0;
+          width: auto;
+        }
+        #%s .form-group {
+          margin: 0;
+          width: auto;
+        }
+        #%s .input-group {
+          margin: 0;
+          width: auto;
+        }
+        #%s label {
+          display: none;
+        }
+        #%s .form-control {
+          display: none;
+        }
+        /* Hide progress bar */
+        .shiny-file-input-progress {
+          display: none;
+        }
+        /* Target the actual button inside file input */
+        .btn-file {
+          padding: 1px 6px !important;
+          font-size: 0.8rem !important;
+          line-height: 1 !important;
+          height: 22px !important;
+          white-space: nowrap !important;
+          display: inline-flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          width: auto !important;
+          margin: 0 !important;
+        }
+
+        /* Save button styling */
+        .save-scenario-btn {
+          padding: 2px 8px;
+          font-size: 0.8rem;
+          white-space: nowrap;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 22px;
+          width: auto;
+          margin: 0;
+        }
+
+        /* Additional fixes for input group */
+        .input-group-btn, .input-group-prepend {
+          margin: 0;
+          padding: 0;
+          display: inline-block;
+        }
+
+        /* Remove any remaining spaces */
+        .shiny-input-container {
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+      ", ns("scenario_file"), ns("scenario_file"), ns("scenario_file"),
+                              ns("scenario_file"), ns("scenario_file")))),
+
+      div(
+        class = "scenario-buttons-container",
+        div(
+          style = "width: auto; margin: 0; padding: 0;",
+          fileInput(
+            ns("scenario_file"),
+            label = NULL,
+            accept = c(".yml", ".yaml"),
+            buttonLabel = "Load Scenario",
+            placeholder = NULL
+          )
+        ),
+        downloadButton(
+          ns("save_scenario"),
+          "Save Current Scenario",
+          class = "btn-default save-scenario-btn"
+        )
+      )
+    ),
+    # Thinner divider
+    tags$hr(style = "margin: 5px 0;"),
+    # Rest of the inputs
+    div(
+      id = ns("static_inputs_container"),
+      static_inputs,
+      propertyManagementUI(ns("property_management"), initial_config = initial_config)
+    )
+  )
+}
+
+sidebarInputModuleServer <- function(id, reactive_config) {
+  moduleServer(id, function(input, output, session) {
+    ns <- session$ns
+
+    # Initialize local_config
+    local_config <- reactiveVal(NULL)
+
+    # Set initial config
+    observe({
+      local_config(reactive_config())
+    })
+
+    # Create a debounced reactive for the config
+    debounced_config <- reactive({
+      local_config()
+    }) %>% debounce(1000)
+
+    # Handle input changes
+    observe({
+      req(local_config())
+
+      # Get all input values that have changed
+      current_inputs <- reactiveValuesToList(input)
+
+      # Isolate the update to prevent circular reactions
+      isolate({
+        updated_config <- local_config()
+        any_changes <- FALSE
+
+        # Handle regular inputs
+        for (section in names(updated_config)) {
+          if (section != "properties") {
+            for (i in seq_along(updated_config[[section]]$inputs)) {
+              input_item <- updated_config[[section]]$inputs[[i]]
+              input_id <- paste0(section, "_", input_item$id)
+              input_value <- current_inputs[[input_id]]
+
+              if (!is.null(input_value) && !identical(input_value, input_item$value)) {
+                updated_config[[section]]$inputs[[i]]$value <- input_value
+                any_changes <- TRUE
+              }
+            }
+          }
+        }
+
+        # Handle property inputs
+        if (!is.null(updated_config$properties)) {
+          for (i in seq_along(updated_config$properties)) {
+            property <- updated_config$properties[[i]]
+            for (j in seq_along(property$inputs)) {
+              input_item <- property$inputs[[j]]
+              input_id <- paste0(property$name, "_", input_item$id)
+              input_value <- current_inputs[[input_id]]
+
+              if (!is.null(input_value) && !identical(input_value, input_item$value)) {
+                updated_config$properties[[i]]$inputs[[j]]$value <- input_value
+                any_changes <- TRUE
+              }
+            }
+          }
+        }
+
+        if (any_changes) {
+          local_config(updated_config)
+          reactive_config(updated_config)
+        }
+      })
+    })
+
+    # Handle file upload
+    observeEvent(input$scenario_file, {
+      req(input$scenario_file)
+
+      tryCatch({
+        uploaded_config <- safelyLoadConfig(input$scenario_file$datapath)
+
+        if (!is.null(uploaded_config)) {
+          validation_result <- validateConfig(uploaded_config)
+
+          if (validation_result$is_valid) {
+            # Completely replace the configuration in one go
+            reactive_config(uploaded_config)
+
+            # Update regular inputs
+            for (section in names(uploaded_config)) {
+              if (section != "properties") {
+                for (input_item in uploaded_config[[section]]$inputs) {
+                  input_id <- paste0(section, "_", input_item$id)
+                  updateInput(session, input_id, input_item)
+                }
+              }
+            }
+
+            showNotification("Scenario configuration successfully loaded",
+                             type = "message", duration = 3)
+          } else {
+            showNotification(
+              paste("Invalid configuration:",
+                    paste(validation_result$messages, collapse = "; ")),
+              type = "error",
+              duration = 5
+            )
+          }
+        }
+      }, error = function(e) {
+        showNotification(
+          paste("Error loading scenario:", e$message),
+          type = "error",
+          duration = 5
+        )
+      })
+    }, ignoreInit = TRUE)
+
+    # Add download handler for scenario configuration
+    output$save_scenario <- downloadHandler(
+      filename = function() {
+        paste0("financial_scenario_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".yaml")
+      },
+      content = function(file) {
+        # Get current configuration
+        current_config <- isolate(reactive_config())
+
+        # Write to YAML file
+        yaml::write_yaml(current_config, file)
+      }
+    )
+
+    # Call the property management module server
+    propertyManagementServer("property_management", reactive_config)
+
+    return(local_config)
+  })
+}
+
+# Helper function to update inputs
+updateInput <- function(session, input_id, input_item) {
+  if (input_item$type == "sliderInput") {
+    updateSliderInput(session, input_id, value = input_item$value)
+  } else {
+    updateNumericInput(session, input_id, value = input_item$value)
+  }
+}

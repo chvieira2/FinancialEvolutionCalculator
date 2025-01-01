@@ -1,0 +1,139 @@
+/* Sidebar Panel Styles */
+.sidebar-panel {
+    font-size: 0.75rem;
+  }
+
+/* Reduce font size for headers in sidebar */
+.sidebar-panel h3 {
+font-size: 1.0rem !important;
+margin-top: 2px !important;
+margin-bottom: 2px !important;
+}
+
+/* Reduce font size for labels */
+.sidebar-panel label {
+font-size: 0.75rem;
+margin-bottom: 0 !important;
+}
+
+/* Reduce font size for inputs */
+.sidebar-panel .form-control {
+font-size: 0.75rem;
+padding: 0px 6px !important;
+height: auto !important;
+}
+
+/* Remove spinner buttons from numeric input */
+.sidebar-panel .form-control[type='number'] {
+-moz-appearance: textfield;
+}
+.sidebar-panel .form-control[type='number']::-webkit-outer-spin-button,
+.sidebar-panel .form-control[type='number']::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin: 0;
+}
+
+/* Slider styles */
+.irs-min, .irs-max, .irs-single, .irs-from, .irs-to {
+font-size: 9px !important;
+}
+
+.irs {
+margin-top: 0px !important;
+margin-bottom: 0px !important;
+height: 45px !important;
+}
+
+.irs-grid-text {
+display: none !important;
+}
+
+/* Form elements styles */
+.form-check-label {
+font-size: 10px !important;
+margin-bottom: 0 !important;
+}
+
+.form-check {
+margin-bottom: 0px !important;
+padding-top: 0 !important;
+padding-bottom: 0 !important;
+}
+
+/* Accordion styles */
+.accordion-button {
+font-size: 10px !important;
+padding: 2px !important;
+}
+
+/* Info icon styles */
+.info-icon {
+font-size: 10px !important;
+color: #007bff;
+cursor: help;
+}
+
+/* Input container styles */
+.sidebar-input-container {
+margin-bottom: 2px !important;
+}
+
+.sidebar-input-container .form-control {
+padding-top: 0px;
+padding-bottom: 0px;
+}
+
+/* Form group styles */
+.form-group {
+margin-bottom: 0px !important;
+}
+
+/* Property management section styles */
+#property_management .accordion-body {
+padding-top: 0px !important;
+padding-bottom: 0px !important;
+}
+
+/* Title styles */
+.sidebar-title {
+font-size: 1rem;
+font-weight: bold;
+margin-bottom: 5px;
+text-align: center;
+color: #2c3e50;
+}
+
+/* Tab styles */
+.nav-tabs {
+font-size: 0.8rem;
+}
+
+.nav-tabs .nav-link {
+padding: 2.5px 10px;
+}
+
+/* Upload button styles */
+.upload-btn {
+width: 100%;
+margin-top: 1px;
+}
+
+/* Tab content styles */
+.tab-content > .tab-pane {
+padding: 0 !important;
+margin: 0 !important;
+}
+
+/* Collapse toggle styles */
+.collapse-toggle {
+  font-size: 10px !important;
+  margin-top: 2px !important;
+  margin-bottom: 2px !important;
+  padding: 0 !important;
+  cursor: pointer;
+  color: #007bff;
+  }
+
+.collapse-toggle:hover {
+    text-decoration: underline;
+}
