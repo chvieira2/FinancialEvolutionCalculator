@@ -5,179 +5,91 @@ library(tidyr)
 library(bslib)
 library(shinyWidgets)
 
-
-
-# Base parameters (non-property ones)
-base_parameters <- list(
-  list(
-    id = "taxes_description.inflation",
-    name = "Average Annual Inflation",
-    color = "#E41A1C",
-    type = "percentage"
-  ),
-  list(
-    id = "general_life.living_style_costs",
-    name = "Average Annual Living Standard Costs",
-    color = "#377EB8",
-    type = "currency"
-  ),
-  list(
-    id = "general_life.salaries_growth_start_career",
-    name = "Average Annual Salary Growth",
-    color = "#4DAF4A",
-    type = "percentage"
-  ),
-  list(
-    id = "passive_investing.expected_return_on_investment",
-    name = "Average Annual Investment Returns",
-    color = "#984EA3",
-    type = "percentage"
-  ),
-  list(
-    id = "rental.rental_prices_growth",
-    name = "Average Annual Own Rent Growth",
-    color = "#FFFF33",
-    type = "percentage"
-  )
-)
-
-# Property parameter template
-property_parameter_template <- list(
-  value_growth = list(
-    id_suffix = "value_growth",
-    name_suffix = "Average Annual Property Value Growth",
-    color = "#FF7F00",
-    type = "percentage"
-  ),
-  value_today = list(
-    id_suffix = "value_today",
-    name_suffix = "Property Price Today",
-    color = "#8B4513",
-    type = "currency"
-  ),
-  purchase_year = list(
-    id_suffix = "purchase_year",
-    name_suffix = "Property Purchase Year",
-    color = "#2F4F4F",
-    type = "year"
-  ),
-  initial_interest_rate = list(
-    id_suffix = "initial_interest_rate",
-    name_suffix = "Mortgage Interest Rate at Purchase",
-    color = "#800080",
-    type = "percentage"
-  ),
-  cold_lease_today = list(
-    id_suffix = "cold_lease_today",
-    name_suffix = "Cold Rent per Month",
-    color = "#20B2AA",
-    type = "currency"
-  )
-)
-
 sensitivityAnalysisModuleUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    # Control panel in a single card
-    fluidRow(
-      column(
-        width = 12,
-        card(
-          card_header("Sensitivity Analysis Settings"),
-          card_body(
-            div(
-              class = "row",
-              # First column (wider) - Parameters
-              div(
-                class = "col-8",
-                # Base parameters
-                div(
-                  style = "margin-bottom: 20px;",
-                  h4("Base Parameters"),
-                  checkboxGroupInput(
-                    ns("base_parameters"),
-                    NULL,
-                    choices = setNames(
-                      sapply(base_parameters, `[[`, "id"),
-                      sapply(base_parameters, `[[`, "name")
-                    ),
-                    selected = sapply(base_parameters, `[[`, "id"),
-                    inline = TRUE
-                  )
-                ),
-                # Property parameters section
-                div(
-                  style = "margin-bottom: 20px;",
-                  div(
-                    style = "display: flex; justify-content: space-between; align-items: center;",
-                    h4("Property Parameters"),
-                    actionButton(
-                      ns("load_property_params"),
-                      "Load/Reload Property Parameters",
-                      class = "btn-sm btn-secondary"
-                    )
-                  ),
-                  # Property parameters will be loaded here
-                  uiOutput(ns("property_parameters"))
-                ),
-                # Run Analysis button below parameters
-                div(
-                  style = "text-align: left; margin-top: 20px;",
-                  actionButton(
-                    ns("run_analysis"),
-                    "Run Analysis",
-                    class = "btn-primary btn-lg"
-                  )
-                )
-              ),
-              # Second column (narrower) - Analysis Settings
-              div(
-                class = "col-4",
-                div(
-                  style = "background-color: #f8f9fa; padding: 15px; border-radius: 5px;",
-                  h4("Analysis Configuration"),
-                  div(
-                    style = "margin-bottom: 20px;",
-                    sliderInput(
-                      ns("variation_range"),
-                      "Parameter Variation Range (%)",
-                      min = -80, max = 80,
-                      value = c(-20, 20),
-                      step = 10,
-                      width = "100%"
-                    )
-                  ),
-                  div(
-                    numericInput(
-                      ns("steps"),
-                      "Number of Steps",
-                      value = 7,
-                      min = 3,
-                      max = 9,
-                      width = "100%"
-                    )
-                  )
-                )
-              )
+    # Control panel with more compact layout
+    div(
+      class = "row",
+      # First column (wider) - Parameters
+      div(
+        class = "col-8",
+        # Base parameters
+        div(
+          style = "margin-bottom: 10px;",
+          h5("Base Parameters"),
+          checkboxGroupInput(
+            ns("base_parameters"),
+            NULL,
+            choices = setNames(
+              sapply(base_parameters, `[[`, "id"),
+              sapply(base_parameters, `[[`, "name")
+            ),
+            selected = sapply(base_parameters, `[[`, "id"),
+            inline = TRUE
+          )
+        ),
+        # Property parameters section
+        div(
+          style = "margin-bottom: 10px;",
+          div(
+            style = "display: flex; justify-content: space-between; align-items: center;",
+            h5("Property Parameters"),
+          ),
+          uiOutput(ns("property_parameters"))
+        ),
+        # Run Analysis button
+        div(
+          style = "text-align: left; margin-top: 10px;",
+          actionButton(
+            ns("run_analysis"),
+            "Run/Re-run Analysis",
+            class = "btn-primary"
+          )
+        )
+      ),
+      # Second column (narrower) - Analysis Settings
+      div(
+        class = "col-4",
+        div(
+          style = "background-color: #f8f9fa; padding: 10px; border-radius: 5px;",
+          h5("Analysis Configuration"),
+          div(
+            style = "margin-bottom: 10px;",
+            sliderInput(
+              ns("variation_range"),
+              "Parameter Variation Range (%)",
+              min = -80, max = 80,
+              value = c(-20, 20),
+              step = 10,
+              width = "100%"
+            )
+          ),
+          div(
+            numericInput(
+              ns("steps"),
+              "Number of Steps",
+              value = 7,
+              min = 3,
+              max = 9,
+              width = "100%"
             )
           )
         )
       )
     ),
 
-    # Faceted plots
-    fluidRow(
-      column(
-        width = 12,
+    # Results section
+    div(
+      style = "margin-top: 20px;",
+      # Faceted plots
+      div(
+        style = "margin-bottom: 20px;",
         uiOutput(ns("sensitivity_plot_container"))
-      )
-    ),
-
-    # Combined tornado plot
-    fluidRow(
-      column(
-        width = 12,
+      ),
+      # Combined tornado plot
+      div(
         uiOutput(ns("tornado_plot_container"))
       )
     )
@@ -194,7 +106,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
     selected_parameters_snapshot <- reactiveVal(NULL)
 
     # Handler for loading property parameters
-    observeEvent(input$load_property_params, {
+    observe({
       req(reactive_config())
 
       # Get properties from config
@@ -219,7 +131,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
               name = sprintf("%s (%s - %s)",
                              template$name_suffix,
                              property$name,
-                             property$type),  # Add property type to parameter name
+                             property$type),
               color = template$color,
               type = template$type,
               property_type = property$type  # Store property type for faceting
@@ -243,8 +155,18 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       if (is.null(params)) {
         return(div(
           style = "color: #666; font-style: italic;",
-          "No property parameters loaded. Click 'Load/Reload Property Parameters' to include property parameters in the analysis."
+          "No properties configured in the current scenario."
         ))
+      }
+
+      # Get previous selections if they exist
+      previous_selections <- input$property_parameters_selection
+
+      # If there are previous selections, keep only those that still exist
+      selected <- if (!is.null(previous_selections)) {
+        intersect(previous_selections, sapply(params, `[[`, "id"))
+      } else {
+        sapply(params, `[[`, "id")  # Select all by default
       }
 
       checkboxGroupInput(
@@ -254,7 +176,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           sapply(params, `[[`, "id"),
           sapply(params, `[[`, "name")
         ),
-        selected = sapply(params, `[[`, "id"),
+        selected = selected,
         inline = TRUE
       )
     })
@@ -538,7 +460,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           high = "red",
           midpoint = 0
         ) +
-        coord_cartesian(ylim = y_limits_adjusted) +
+        coord_cartesian(ylim = y_limits_adjusted, xlim = year_range()) +
         scale_x_continuous(
           limits = c(initial_year, NA)
         ) +
@@ -570,7 +492,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
 
     # Render combined tornado plot
     output$tornado_plots <- renderPlot({
-      req(analysis_results(), selected_parameters_snapshot(), processed_data())
+      req(analysis_results(), selected_parameters_snapshot())
 
       # Get colors and order from snapshot
       param_data <- lapply(selected_parameters_snapshot(), function(param) {
@@ -589,8 +511,8 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       param_colors <- as.list(param_colors)
 
       # Get the year range from the data
-      min_year <- min(processed_data()$Year)
-      max_year <- max(processed_data()$Year)
+      min_year <- min(analysis_results()$Year)
+      max_year <- max(analysis_results()$Year)
 
       # Define the time points we want to analyze
       time_points <- c(5, 10, 20, 30, 45)
@@ -607,7 +529,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       }
 
       # Get baseline values for each year
-      baseline_values <- processed_data() %>%
+      baseline_values <- subset(analysis_results(), param_variation == 0) %>%
         filter(Year %in% existing_analysis_years) %>%
         select(Year, total_asset) %>%
         mutate(total_asset = total_asset/1000)

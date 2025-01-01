@@ -58,7 +58,17 @@ ui <- bslib::page_navbar(
                         min = 2025, max = 2075,
                         value = c(2025, 2075),
                         step = 1,
-                        sep = "")
+                        sep = ""),
+            # Add an invisible overlay to prevent interaction with the left handle
+            tags$div(
+              style = "position: absolute;
+                 left: 0;
+                 bottom: 0;
+                 width: 50px;  /* Adjust based on your layout */
+                 height: 35px; /* Adjust based on your layout */
+                 cursor: not-allowed;
+                 z-index: 1000;"
+            )
           ),
           column(
             width = 6,
@@ -106,16 +116,22 @@ ui <- bslib::page_navbar(
               stackedAreaPlotModuleUI("income_components", plot_type = "income")
             )
           )
+        ),
+        # Add new section for sensitivity analysis
+        fluidRow(
+          column(
+            width = 12,
+            card(
+              card_header("Sensitivity Analysis"),
+              sensitivityAnalysisModuleUI("sensitivity_analysis")
+            )
+          )
         )
       )
     )
   ),
 
-  nav_panel(
-    title = "Scenario Sensitivity Analysis",
-    sensitivityAnalysisModuleUI("sensitivity_analysis")
-  ),
-
+  # Remove the separate sensitivity analysis tab
   nav_panel(
     title = "Comparison",
     comparisonPlotsModuleUI("comparison_plots")
@@ -131,6 +147,10 @@ server <- function(input, output, session) {
 
   # Create a reactive expression for the year range
   year_range <- reactive({
+    if (input$global_year_range[1] != 2025) {
+      updateSliderInput(session, "global_year_range",
+                        value = c(2025, input$global_year_range[2]))
+    }
     input$global_year_range
   })
 
@@ -153,6 +173,7 @@ server <- function(input, output, session) {
   financialMetricsModuleServer("financial_metrics", processed_data, year_range)
   stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
   stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
+  sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range)
 
   # Download handler for financial calculations
   output$download_calculations <- downloadHandler(
@@ -167,9 +188,6 @@ server <- function(input, output, session) {
       write.csv(data, file, row.names = FALSE)
     }
   )
-
-  # Sensitivity analysis module
-  sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range)
 
   # Observer for add to comparison button (placeholder for now)
   observeEvent(input$add_to_comparison, {

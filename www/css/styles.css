@@ -48,6 +48,21 @@ height: 45px !important;
 display: none !important;
 }
 
+.irs-handle.from {
+  cursor: not-allowed !important;
+  background-color: #cccccc !important;
+  border-color: #999999 !important;
+}
+
+.irs-bar-edge {
+  cursor: not-allowed !important;
+}
+
+/* Optional: Style to indicate the fixed portion of the slider */
+.irs-line-left {
+  background-color: #f0f0f0 !important;
+}
+
 /* Form elements styles */
 .form-check-label {
 font-size: 10px !important;
@@ -136,4 +151,32 @@ margin: 0 !important;
 
 .collapse-toggle:hover {
     text-decoration: underline;
+}
+
+/* Sensitivity analysis specific styles */
+.sensitivity-analysis-card {
+  margin-top: 20px;
+}
+
+.sensitivity-analysis-card .checkbox {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.sensitivity-analysis-card .form-group {
+  margin-bottom: 10px;
+}
+
+.sensitivity-analysis-card h5 {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-size: 1rem;
+}
+
+/* Adjust plot containers for the card layout */
+.sensitivity-plot-container, .tornado-plot-container {
+  background: white;
+  border-radius: 4px;
+  padding: 10px;
+  margin-top: 10px;
 }

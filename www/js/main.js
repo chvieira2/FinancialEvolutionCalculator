@@ -34,3 +34,36 @@ $(document).ready(function() {
       setTimeout(initializeRegularToggles, 100);
   });
 });
+
+$(document).ready(function() {
+    // Existing code...
+  
+    // Function to enforce fixed start year for the range slider
+    function enforceFixedStartYear() {
+      var slider = $("#global_year_range").data("ionRangeSlider");
+      if (slider) {
+        // Store the original update method
+        var originalUpdate = slider.update;
+        
+        // Override the update method
+        slider.update = function(options) {
+          // If trying to change the from value, force it back to 2025
+          if (options && typeof options.from !== 'undefined') {
+            options.from = 2025;
+          }
+          // Call the original update method
+          originalUpdate.call(this, options);
+        };
+      }
+    }
+  
+    // Initialize the fixed start year enforcement
+    enforceFixedStartYear();
+  
+    // Also handle the case when Shiny updates the slider
+    $(document).on('shiny:value', function(event) {
+      if (event.name === 'global_year_range') {
+        setTimeout(enforceFixedStartYear, 100);
+      }
+    });
+  });
