@@ -1,5 +1,5 @@
 todo.txt
-*xslx
+*xlsx
 
 # History files
 .Rhistory
@@ -7,7 +7,7 @@ todo.txt
 
 # Session Data files
 .RData
-.RDataTmp
+.RDataTmpFinan
 
 # User-specific files
 .Ruserdata
