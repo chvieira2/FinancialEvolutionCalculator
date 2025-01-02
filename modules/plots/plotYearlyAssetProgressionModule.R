@@ -153,7 +153,7 @@ plotYearlyAssetProgressionModuleServer <- function(id, data, reactive_config, ye
                               by = year_step)
 
       # Calculate y-axis limits
-      min_y <- max(-500, min(plot_data$total_asset/1000))
+      min_y <- max(-100, min(plot_data$total_asset/1000))
       max_y <- max(50, max(plot_data$total_asset/1000))
 
       # Create base plot

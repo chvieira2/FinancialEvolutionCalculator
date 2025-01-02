@@ -1,5 +1,6 @@
 todo.txt
-*xlsx
+*.xlsx
+*.docx
 
 # History files
 .Rhistory

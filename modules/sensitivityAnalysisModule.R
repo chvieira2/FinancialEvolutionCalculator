@@ -361,7 +361,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
 
       # Find global y-axis limits
       y_limits <- range(analysis_results()$total_asset/1000)
-      y_limits[1] <- -500
+      y_limits[1] <- -100
       y_range <- diff(y_limits)
 
       # Calculate text spacing

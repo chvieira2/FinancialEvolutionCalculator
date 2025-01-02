@@ -11,7 +11,7 @@ general_life:
   - id: living_style_costs
     type: numericInput
     label: Living Standard costs (without housing costs) (EUR/month)
-    value: 900
+    value: 800
     description: Your monthly living expenses excluding housing. This include all
       other expenses, like holidays, clothes, dinning out, groceries, etc (NOT health
       insurance).
@@ -36,24 +36,24 @@ general_life:
   - id: salaries_growth_start_career
     type: numericInput
     label: Salaries growth at start career (% per year)
-    value: 4.5
+    value: 3.5
     description: The average expected salary growth rate at the start of your career.
       Salaries tend to grow faster at te beginning of the career. Also, different
       career paths have largely different career growth.
   - id: salaries_growth_end_career
     type: numericInput
     label: Salaries growth at end career (% per year)
-    value: 0
+    value: 2
     description: Expected salary growth rate at the end of your career.
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2064
+    value: 2065
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
     label: Expected salary reduction upon retirement (%)
-    value: 30
+    value: 40
     description: Expected percentage reduction in salary upon retirement.
 family:
   title: Family Size and Associated Costs
@@ -211,13 +211,13 @@ lump_sum:
   - id: lump_sum_2
     type: numericInput
     label: Lump sum 2 (EUR)
-    value: 0
+    value: -25000
     description: Second lump sum. This value refers to any major monetary gain or
       loss, e.g. inheritance, medical bills, car purchase, etc.
   - id: lump_sum_2_year
     type: numericInput
     label: Year receiving the second Lump Sum
-    value: 2100
+    value: 2050
     description: Year of second lump sum.
 property_tax:
   title: Costs Associated with Purchasing Property

@@ -24,7 +24,7 @@ general_life:
   - id: savings
     type: numericInput
     label: Savings (EUR)
-    value: 15000
+    value: 0
     description: Current savings amount.
   - id: savings_emergency_reserve
     type: numericInput
@@ -43,7 +43,7 @@ general_life:
   - id: salaries_growth_end_career
     type: numericInput
     label: Salaries growth at end career (% per year)
-    value: 0
+    value: 1
     description: Expected salary growth rate at the end of your career.
   - id: expected_year_retirement
     type: numericInput
@@ -53,7 +53,7 @@ general_life:
   - id: expected_salary_reduction_retirement
     type: numericInput
     label: Expected salary reduction upon retirement (%)
-    value: 50
+    value: 60
     description: Expected percentage reduction in salary upon retirement.
 family:
   title: Family Size and Associated Costs
@@ -124,7 +124,7 @@ rental:
   - id: rent_month
     type: numericInput
     label: Rent (EUR/month)
-    value: 1500
+    value: 0
     description: Monthly rent payment.
   - id: rental_prices_growth
     type: numericInput
@@ -135,7 +135,7 @@ rental:
   - id: fixed_housing_costs
     type: numericInput
     label: Fixed housing costs (Nebenkosten) (EUR/month)
-    value: 220
+    value: 0
     description: Monthly fixed housing costs.
   - id: fixed_housing_costs_change
     type: numericInput
