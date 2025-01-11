@@ -48,7 +48,7 @@ general_life:
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2064
+    value: 2065
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
@@ -124,7 +124,7 @@ rental:
   - id: rent_month
     type: numericInput
     label: Rent (EUR/month)
-    value: 0
+    value: 1500
     description: Monthly rent payment.
   - id: rental_prices_growth
     type: numericInput
@@ -135,7 +135,7 @@ rental:
   - id: fixed_housing_costs
     type: numericInput
     label: Fixed housing costs (Nebenkosten) (EUR/month)
-    value: 0
+    value: 220
     description: Monthly fixed housing costs.
   - id: fixed_housing_costs_change
     type: numericInput
@@ -211,13 +211,13 @@ lump_sum:
   - id: lump_sum_2
     type: numericInput
     label: Lump sum 2 (EUR)
-    value: 0
+    value: -25000
     description: Second lump sum. This value refers to any major monetary gain or
       loss, e.g. inheritance, medical bills, car purchase, etc.
   - id: lump_sum_2_year
     type: numericInput
     label: Year receiving the second Lump Sum
-    value: 2100
+    value: 2055
     description: Year of second lump sum.
 property_tax:
   title: Costs Associated with Purchasing Property
@@ -272,7 +272,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 320000
+    value: 300000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
@@ -294,6 +294,14 @@ properties:
     label: Principal repayment rate (% per year)
     value: 2
     description: Annual rate of mortgage principal repayment (Rückzahlungsrate).
+  - id: max_mortgage_amortization_rate
+    type: numericInput
+    label: Maximal mortgage principal amortization rate (% per year)
+    value: 5
+    description: Maximal annual rate of amortization allowed by your mortgage contract
+      for the principal. This is the maximum value (Percent of principal) your mortgage
+      contract with the bank will allow you to pay in extra installments every year
+      to speed-up the payment of your mortgage.
   - id: loan_family_friends
     type: numericInput
     label: Loan from family/friends (EUR)

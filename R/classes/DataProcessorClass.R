@@ -355,6 +355,7 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                     }
 
                                     self$calculate_property_mortgage_details(year)
+                                    self$results[self$results$Year == year, paste0(self$prefix, "additional_amortization")] <- 0
                                     self$calculate_property_loan_family_friends(year)
                                     self$calculate_property_costs(year)
 
@@ -392,6 +393,7 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                   private$calculate_property_mortgage_length_years(year)
                                   private$calculate_property_mortgage_principal_left(year)
                                   private$calculate_property_mortgage_interest_left(year)
+                                  private$calculate_property_max_mortgage_amortization(year)
                                 },
 
                                 calculate_property_loan_family_friends = function(year) {
@@ -461,6 +463,8 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                     "mortgage_length_years",
                                     "mortgage_principal_left",
                                     "mortgage_interest_left",
+                                    "max_mortgage_amortization",
+                                    "additional_amortization",
 
                                     "loan_family_friends_interest_rate",
                                     "loan_family_friends_principal_share",
@@ -596,7 +600,8 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                   } else if (year == self$property_params$purchase_year) {
                                     value <- self$property_params$principal_repayment_rate
                                   } else {
-                                    if (year - self$property_params$purchase_year < self$results[self$results$Year == self$property_params$purchase_year,                                                       paste0(self$prefix, "mortgage_length_years")]) {
+                                    previous_year <- year - 1
+                                    if (self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_principal_left")] < 0) {
                                       value <- self$property_params$principal_repayment_rate
                                     } else {
                                       value <- 0
@@ -611,8 +616,9 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                   } else if (year == self$property_params$purchase_year) {
                                     value <- self$property_params$initial_interest_rate
                                   } else {
+                                    previous_year <- year - 1
 
-                                    if (year - self$property_params$purchase_year < self$results[self$results$Year == self$property_params$purchase_year,                                                       paste0(self$prefix, "mortgage_length_years")]) {
+                                    if (self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_principal_left")] < 0) {
                                       value <- self$property_params$initial_interest_rate
                                     } else {
                                       value <- 0
@@ -629,10 +635,13 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                     value <- -self$results[self$results$Year == self$property_params$purchase_year,
                                                            paste0(self$prefix, "mortgage_principal")] * (self$property_params$principal_repayment_rate / 100)
                                   } else {
+                                    previous_year <- year - 1
                                     mortgage_payment <- private$calculate_property_mortgage_payment(year)
                                     interest_share <- private$calculate_property_mortgage_interest_share(year)
+                                    additional_amortization <- self$results[self$results$Year == previous_year,
+                                                                            paste0(self$prefix, "additional_amortization")]
                                     if (mortgage_payment <= 0) {
-                                      value <- mortgage_payment - interest_share
+                                      value <- mortgage_payment - interest_share - additional_amortization
                                     } else {
                                       value <- 0
                                     }
@@ -711,12 +720,13 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                                    paste0(self$prefix, "mortgage_principal")] == 0) {
                                     value <- 0
                                   } else if (year == self$property_params$purchase_year) {
-                                    value <- -self$results[self$results$Year == self$property_params$purchase_year,                                                       paste0(self$prefix, "mortgage_principal")] - self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_share")]
+                                    value <- -self$results[self$results$Year == self$property_params$purchase_year,
+                                                           paste0(self$prefix, "mortgage_principal")] - self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_share")]
                                   } else {
 
                                     previous_year <- year - 1
                                     previous_principal_left <- self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_principal_left")]
-                                    previous_principal_payment <-  self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_share")]
+                                    previous_principal_payment <-  self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_principal_share")]
                                     value <- min(0, previous_principal_left - previous_principal_payment)
                                   }
                                   self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_left")] <- self$round_to_2(value)
@@ -736,9 +746,34 @@ PropertyCalculator <- R6Class("PropertyCalculator",
                                     previous_year <- year - 1
                                     previous_interest_left <- self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_interest_left")]
                                     interest_payment <-  self$results[self$results$Year == year, paste0(self$prefix, "mortgage_interest_share")]
-                                    value <- min(0, previous_interest_left - interest_payment)
+                                    value <- ifelse(self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_left")] >= 0,
+                                                    0,
+                                                    min(0, previous_interest_left - interest_payment))
                                   }
                                   self$results[self$results$Year == year, paste0(self$prefix, "mortgage_interest_left")] <- self$round_to_2(value)
+                                },
+
+                                calculate_property_max_mortgage_amortization = function(year) {
+
+                                  if (year >= self$property_params$purchase_year &&
+                                      year < self$property_params$sale_year) {
+                                    previous_year <- year - 1
+                                    if (year > self$property_params$purchase_year &&
+                                        self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_principal_left")] >= 0) {
+                                      max_amortization <- 0
+
+                                    } else {
+                                      initial_principal <- abs(self$results[self$results$Year == self$property_params$purchase_year, paste0(self$prefix, "mortgage_principal")])
+
+                                      max_amortization <- initial_principal * (self$property_params$max_mortgage_amortization_rate / 100)
+                                    }
+
+                                  } else {
+
+                                  }
+
+                                  self$results[self$results$Year == year,
+                                               paste0(self$prefix, "max_mortgage_amortization")] <- self$round_to_2(max_amortization)
                                 },
 
 
@@ -1078,6 +1113,7 @@ FinancialBalanceCalculator <- R6Class("FinancialBalanceCalculator",
                                           self$calculate_total_expenses(year)
                                           self$calculate_total_income(year)
                                           self$calculate_cash_flow(year)
+                                          self$calculate_cash_flow_distribution(year)
                                           self$calculate_savings_emergency_reserve(year)
 
                                           return(self$results)
@@ -1149,6 +1185,88 @@ FinancialBalanceCalculator <- R6Class("FinancialBalanceCalculator",
                                           cash_flow <- self$results[self$results$Year == year, "total_income"] +
                                             self$results[self$results$Year == year, "total_expenses"] + sale_funds
                                           self$results[self$results$Year == year, "cash_flow"] <- self$round_to_2(cash_flow)
+                                        },
+
+                                        distribute_mortgage_amortization = function(year, total_amortization) {
+                                          # Get all properties with remaining mortgage
+                                          property_columns <- grep("mortgage_principal_left$", names(self$results), value = TRUE)
+
+
+                                          properties_with_mortgage <- data.frame(
+                                            property_name = gsub("_mortgage_principal_left$", "", property_columns),
+                                            remaining_principal = -as.numeric(self$results[self$results$Year == year, property_columns]),
+                                            max_amortization = as.numeric(self$results[self$results$Year == year,
+                                                                                       gsub("mortgage_principal_left$",
+                                                                                            "max_mortgage_amortization",
+                                                                                            property_columns)])
+                                          )
+
+                                          # Filter properties with actual remaining principal
+                                          properties_with_mortgage <- properties_with_mortgage[properties_with_mortgage$remaining_principal > 0, ]
+
+                                          if (nrow(properties_with_mortgage) == 0) {
+                                            return(0)
+                                          }
+
+                                          # Calculate equal distribution
+                                          equal_share <- total_amortization / nrow(properties_with_mortgage)
+
+                                          # Adjust for maximum amortization limits
+                                          for (i in 1:nrow(properties_with_mortgage)) {
+                                            property_name <- properties_with_mortgage$property_name[i]
+                                            max_amort <- properties_with_mortgage$max_amortization[i]
+
+                                            # Limit amortization to the maximum allowed
+                                            actual_amortization <- min(equal_share, max_amort)
+
+                                            # Store the additional amortization for this property
+                                            self$results[self$results$Year == year,
+                                                         paste0(property_name, "_additional_amortization")] <- self$round_to_2(actual_amortization)
+                                          }
+
+                                          # Return total actual amortization
+                                          return(sum(sapply(properties_with_mortgage$property_name, function(name) {
+                                            self$results[self$results$Year == year, paste0(name, "_additional_amortization")]
+                                          })))
+                                        },
+
+                                        calculate_cash_flow_distribution = function(year) {
+                                          cash_flow <- self$results[self$results$Year == year, "cash_flow"]
+
+                                          if (cash_flow <= 0) {
+                                            self$results[self$results$Year == year, "cash_flow_to_emergency_reserve"] <- cash_flow
+                                            self$results[self$results$Year == year, "cash_flow_to_mortgage_amortization"] <- 0
+                                            self$results[self$results$Year == year, "cash_flow_to_investment"] <- 0
+                                            return()
+                                          }
+
+                                          # First priority: Replenish emergency reserve
+                                          if (year == self$params$initial_year) {
+                                            emergency_reserve_deficit <- self$params$savings_emergency_reserve -
+                                              self$results[self$results$Year == year, "savings_emergency_reserve"]
+                                          } else {
+                                            previous_year <- year - 1
+                                            emergency_reserve_deficit <- self$params$savings_emergency_reserve -
+                                              self$results[self$results$Year == previous_year, "savings_emergency_reserve"]
+                                          }
+
+                                          emergency_reserve_allocation <- min(cash_flow, max(0, emergency_reserve_deficit))
+                                          remaining_cash_flow <- cash_flow - emergency_reserve_allocation
+
+                                          # Second priority: Mortgage amortization up to maximum allowed
+                                          actual_mortgage_allocation <- self$distribute_mortgage_amortization(year, remaining_cash_flow)
+                                          remaining_cash_flow <- remaining_cash_flow - actual_mortgage_allocation
+
+                                          # Third priority: Passive investment
+                                          investment_allocation <- remaining_cash_flow
+
+                                          # Store the allocations
+                                          self$results[self$results$Year == year, "cash_flow_to_emergency_reserve"] <-
+                                            self$round_to_2(emergency_reserve_allocation)
+                                          self$results[self$results$Year == year, "cash_flow_to_mortgage_amortization"] <-
+                                            self$round_to_2(actual_mortgage_allocation)
+                                          self$results[self$results$Year == year, "cash_flow_to_investment"] <-
+                                            self$round_to_2(investment_allocation)
                                         },
 
                                         calculate_savings_emergency_reserve = function(year) {
@@ -1307,19 +1425,11 @@ PassiveInvestingCalculator <- R6Class("PassiveInvestingCalculator",
                                           if (loan_taken > 0) {
                                             contribution <- 0
                                           } else {
-                                            cash_flow <- self$results[self$results$Year == year, "cash_flow"]
-                                            if (cash_flow > 0) {
-                                              if (year == self$params$initial_year) {
-                                                contribution <- max(0, cash_flow - self$params$savings_emergency_reserve)
-                                              } else {
-                                                previous_year <- year - 1
-                                                contribution <- max(0, cash_flow + self$results[self$results$Year == previous_year, "savings_emergency_reserve"] - self$params$savings_emergency_reserve)
-                                              }
-                                            } else {
-                                              contribution <- 0
-                                            }
+                                            contribution <- self$results[self$results$Year == year, "cash_flow_to_investment"]
                                           }
+
                                           self$results[self$results$Year == year, "passive_investment_yearly_contribution"] <- self$round_to_2(contribution)
+
                                         },
 
                                         calculate_passive_investment_contributions_accumulated = function(year) {
@@ -1596,6 +1706,10 @@ DataProcessor <- R6Class("DataProcessor",
                                sum(property_data[, grep("income_taxes_adjustment$",
                                                         names(property_data))],
                                    na.rm = TRUE)
+
+                             # Calculate maximal amortization for all properties
+                             self$results[self$results$Year == year, "properties_max_mortgage_amortization"] <-
+                               sum(property_data[, grep("max_mortgage_amortization$", names(property_data))], na.rm = TRUE)
                            }
                          ),
 
@@ -1606,7 +1720,8 @@ DataProcessor <- R6Class("DataProcessor",
 #### Test code ####
 if (sys.nframe() == 0) {
   cat("Running test code for DataProcessor class...\n")
-  input_config = yaml::read_yaml("config/inputs.yaml")
+  input_config = yaml::read_yaml(file.path("config", "defaults", "inputs.yaml"))
+  input_config = yaml::read_yaml(file.path("config", "templates", "high_wage_family_property_investment.yaml"))
 
 
   processor <- DataProcessor$new(config = input_config, scenario_name = "example")

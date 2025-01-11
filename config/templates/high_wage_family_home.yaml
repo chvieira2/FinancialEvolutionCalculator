@@ -294,6 +294,11 @@ properties:
     label: Principal repayment rate (% per year)
     value: 2
     description: Annual rate of mortgage principal repayment (Rückzahlungsrate).
+  - id: "max_mortgage_amortization_rate"
+    type: "numericInput"
+    label: "Maximal mortgage principal amortization rate (% per year)"
+    value: 5.00
+    description: "Maximal annual rate of amortization allowed by your mortgage contract for the principal. This is the maximum value (Percent of principal) your mortgage contract with the bank will allow you to pay in extra installments every year to speed-up the payment of your mortgage."
   - id: loan_family_friends
     type: numericInput
     label: Loan from family/friends (EUR)
