@@ -20,7 +20,7 @@ source(file.path("modules", "sensitivityAnalysisModule.R"))
 
 # Load configuration
 input_config <- safelyLoadConfig(file.path("config", "defaults", "inputs.yaml"))
-input_config <- safelyLoadConfig(file.path("config", "templates", "high_wage_family_home.yaml"))
+input_config <- safelyLoadConfig(file.path("config", "templates", "mid_wage_family_housepoor.yaml"))
 # input_config <- safelyLoadConfig(file.path("config", "templates", "high_wage_family_property_investment.yaml"))
 
 

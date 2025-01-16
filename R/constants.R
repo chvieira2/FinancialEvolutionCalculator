@@ -25,12 +25,12 @@ DEFAULT_YEARS <- list(
 
 # Base parameters (non-property ones)
 base_parameters <- list(
-  list(
-    id = "taxes_description.inflation",
-    name = "Average Annual Inflation",
-    color = "#E41A1C",
-    type = "percentage"
-  ),
+  # list(
+  #   id = "taxes_description.inflation",
+  #   name = "Average Annual Inflation",
+  #   color = "#E41A1C",
+  #   type = "percentage"
+  # ),
   list(
     id = "general_life.living_style_costs",
     name = "Average Annual Living Standard Costs",

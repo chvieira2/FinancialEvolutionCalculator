@@ -11,7 +11,7 @@ general_life:
   - id: living_style_costs
     type: numericInput
     label: Living Standard costs (without housing costs) (EUR/month)
-    value: 4000
+    value: 4200
     description: Your monthly living expenses excluding housing. This include all
       other expenses, like holidays, clothes, dinning out, groceries, etc (NOT health
       insurance).
@@ -81,7 +81,7 @@ family:
   - id: elterngeld
     type: numericInput
     label: Parental allowance (EUR/child/year)
-    value: 2400
+    value: 3060
     description: Parental allowance per child (Elterngeld).
   - id: living_costs_change_elternzeit
     type: numericInput
@@ -124,7 +124,7 @@ rental:
   - id: rent_month
     type: numericInput
     label: Rent (EUR/month)
-    value: 1800
+    value: 2000
     description: Monthly rent payment.
   - id: rental_prices_growth
     type: numericInput
@@ -211,13 +211,13 @@ lump_sum:
   - id: lump_sum_2
     type: numericInput
     label: Lump sum 2 (EUR)
-    value: 0
+    value: -25000
     description: Second lump sum. This value refers to any major monetary gain or
       loss, e.g. inheritance, medical bills, car purchase, etc.
   - id: lump_sum_2_year
     type: numericInput
     label: Year receiving the second Lump Sum
-    value: 2100
+    value: 2055
     description: Year of second lump sum.
 property_tax:
   title: Costs Associated with Purchasing Property
@@ -294,11 +294,14 @@ properties:
     label: Principal repayment rate (% per year)
     value: 2
     description: Annual rate of mortgage principal repayment (Rückzahlungsrate).
-  - id: "max_mortgage_amortization_rate"
-    type: "numericInput"
-    label: "Maximal mortgage principal amortization rate (% per year)"
-    value: 5.00
-    description: "Maximal annual rate of amortization allowed by your mortgage contract for the principal. This is the maximum value (Percent of principal) your mortgage contract with the bank will allow you to pay in extra installments every year to speed-up the payment of your mortgage."
+  - id: max_mortgage_amortization_rate
+    type: numericInput
+    label: Maximal mortgage principal amortization rate (% per year)
+    value: 5
+    description: Maximal annual rate of amortization allowed by your mortgage contract
+      for the principal. This is the maximum value (Percent of principal) your mortgage
+      contract with the bank will allow you to pay in extra installments every year
+      to speed-up the payment of your mortgage.
   - id: loan_family_friends
     type: numericInput
     label: Loan from family/friends (EUR)

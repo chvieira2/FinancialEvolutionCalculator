@@ -1721,7 +1721,7 @@ DataProcessor <- R6Class("DataProcessor",
 if (sys.nframe() == 0) {
   cat("Running test code for DataProcessor class...\n")
   input_config = yaml::read_yaml(file.path("config", "defaults", "inputs.yaml"))
-  input_config = yaml::read_yaml(file.path("config", "templates", "high_wage_family_property_investment.yaml"))
+  input_config = yaml::read_yaml(file.path("config", "templates", "mid_wage_family_housepoor.yaml"))
 
 
   processor <- DataProcessor$new(config = input_config, scenario_name = "example")

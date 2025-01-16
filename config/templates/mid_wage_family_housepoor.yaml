@@ -81,7 +81,7 @@ family:
   - id: elterngeld
     type: numericInput
     label: Parental allowance (EUR/child/year)
-    value: 2400
+    value: 3060
     description: Parental allowance per child (Elterngeld).
   - id: living_costs_change_elternzeit
     type: numericInput
