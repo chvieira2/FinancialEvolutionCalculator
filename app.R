@@ -1,13 +1,22 @@
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  shiny, bslib, yaml, R6, data.table, purrr, glue,
+  uuid, digest, shinyjs, shinyBS, DT, ggplot2
+)
+
 library(shiny)
 library(bslib)
 library(jsonlite)
 library(yaml)
 library(shinyBS)
 library(uuid)
+library(R6)
+library(data.table)
 
-source(file.path("R", "classes", "DataProcessorClass.R"))
-source(file.path("R", "utils", "helper_functions.R"))
+source(file.path("R", "DataProcessorClass.R"))
+source(file.path("R", "helper_functions.R"))
 source(file.path("R", "constants.R"))
+source(file.path("R", "validations.R"))
 
 # Module sources
 source(file.path("modules", "plots", "plotYearlyAssetProgressionModule.R"))
@@ -17,12 +26,6 @@ source(file.path("modules", "sidebar", "propertyManagementModule.R"))
 source(file.path("modules", "plots", "financialMetricsModule.R"))
 source(file.path("modules", "plots", "stackedAreaPlotModule.R"))
 source(file.path("modules", "sensitivityAnalysisModule.R"))
-
-# Load configuration
-input_config <- safelyLoadConfig(file.path("config", "defaults", "inputs.yaml"))
-input_config <- safelyLoadConfig(file.path("config", "templates", "mid_wage_family_housepoor.yaml"))
-# input_config <- safelyLoadConfig(file.path("config", "templates", "high_wage_family_property_investment.yaml"))
-
 
 ui <- bslib::page_navbar(
   title = "Financial Evolution Calculator",
@@ -152,7 +155,8 @@ server <- function(input, output, session) {
   })
 
   # Reactive expression for processed data
-  processed_data <- reactive({
+  processed_data <- eventReactive(
+    c(reactive_config(), input$global_year_range), {
     req(reactive_config(), year_range())
     data_processor <- DataProcessor$new(
       scenario_name = "example",
@@ -163,7 +167,9 @@ server <- function(input, output, session) {
     data_processor$calculate()
     results <- data_processor$get_results()
     return(results)
-  })
+  },
+  ignoreNULL = FALSE
+  )
 
   # Plot module
   plotYearlyAssetProgressionModuleServer("result_plot", processed_data, reactive_config, year_range)

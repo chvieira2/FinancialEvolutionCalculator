@@ -1,9 +1,6 @@
 library(shiny)
 library(bslib)
 
-source(file.path("R", "constants.R"))
-source(file.path("R", "utils", "helper_functions.R"))
-
 propertyManagementUI <- function(id, initial_config) {
   ns <- NS(id)
 

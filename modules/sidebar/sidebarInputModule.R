@@ -2,10 +2,6 @@ library(shiny)
 library(bslib)
 library(purrr)
 
-source(file.path("R", "constants.R"))
-source(file.path("R", "utils", "helper_functions.R"))
-source(file.path("R", "utils", "validation.R"))
-
 #' Sidebar Input Module UI
 #'
 #' @param id The module identifier
@@ -15,8 +11,7 @@ sidebarInputModuleUI <- function(id) {
 
   # Load default template configuration at UI creation
   default_template_file <- TEMPLATE_SCENARIOS[[DEFAULT_TEMPLATE]]
-  initial_config <- safelyLoadConfig(file.path(getwd(), # Uncomment for running locally
-                                               "config", "templates", default_template_file))
+  initial_config <- safelyLoadConfig(file.path("config", "templates", default_template_file))
 
   # Helper function to create static inputs
   createStaticInput <- function(input_item, section) {
@@ -139,8 +134,7 @@ sidebarInputModuleServer <- function(id) {
     # Initialize configuration with default template
     config <- reactiveVal({
       template_file <- TEMPLATE_SCENARIOS[[DEFAULT_TEMPLATE]]
-      safelyLoadConfig(file.path(getwd(), # Uncomment for running locally
-                                 "config", "templates", template_file))
+      safelyLoadConfig(file.path("config", "templates", template_file))
     })
 
     # Handle template selection
@@ -148,8 +142,7 @@ sidebarInputModuleServer <- function(id) {
       template_file <- TEMPLATE_SCENARIOS[[input$template_selector]]
 
       tryCatch({
-        template_config <- safelyLoadConfig(file.path(getwd(), # Uncomment for running locally
-                                                      "config", "templates", template_file))
+        template_config <- safelyLoadConfig(file.path("config", "templates", template_file))
 
         if (!is.null(template_config)) {
           validation_result <- validateConfig(template_config)
