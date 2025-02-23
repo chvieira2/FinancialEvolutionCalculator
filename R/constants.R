@@ -1,3 +1,17 @@
+# Add this to your constants.R file
+TEMPLATE_SCENARIOS <- list(
+  "Low-income family" = "low_wage_family.yaml",
+  "Mid-income family renting" = "mid_wage_family_rent.yaml",
+  "Mid-income family with home property" = "mid_wage_family_housepoor.yaml",
+  "Mid-income family with investment property" = "mid_wage_family_property_investment.yaml",
+  "High-income family renting" = "high_wage_family_rent.yaml",
+  "High-income family with home property" = "high_wage_family_home.yaml",
+  "High-income family with investment property" = "high_wage_family_property_investment.yaml"
+)
+
+DEFAULT_TEMPLATE <- "Mid-income family with home property"
+
+
 ESSENTIAL_PARAMS <- list(
   general_life = c("net_annual_income", "living_style_costs", "savings", "expected_year_retirement"),
   family = c("year_first_child_is_born", "year_second_child_is_born"),

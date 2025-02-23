@@ -6,8 +6,17 @@ source(file.path("R", "constants.R"))
 source(file.path("R", "utils", "helper_functions.R"))
 source(file.path("R", "utils", "validation.R"))
 
-sidebarInputModuleUI <- function(id, initial_config) {
+#' Sidebar Input Module UI
+#'
+#' @param id The module identifier
+#' @export
+sidebarInputModuleUI <- function(id) {
   ns <- NS(id)
+
+  # Load default template configuration at UI creation
+  default_template_file <- TEMPLATE_SCENARIOS[[DEFAULT_TEMPLATE]]
+  initial_config <- safelyLoadConfig(file.path(getwd(), # Uncomment for running locally
+                                               "config", "templates", default_template_file))
 
   # Helper function to create static inputs
   createStaticInput <- function(input_item, section) {
@@ -60,87 +69,34 @@ sidebarInputModuleUI <- function(id, initial_config) {
 
   tagList(
     div(class = "sidebar-title", "Financial Evolution Scenario"),
-    # Scenario management buttons container
+
+    # Template section
     div(
-      style = "padding: 0;",
-      # Custom styling for file input and download button
-      tags$style(HTML(sprintf("
-        /* Container styling */
-        .scenario-buttons-container {
-          display: flex;
-          flex-direction: column;
-          gap: 0;
-          align-items: flex-start;
-          width: auto;
-        }
+      style = "margin-bottom: 5px;",
+      div(
+        style = "margin-bottom: 5px; font-size: 0.9rem; color: #666;",
+        "Start from a template scenario:"
+      ),
+      selectInput(
+        ns("template_selector"),
+        label = NULL,
+        choices = names(TEMPLATE_SCENARIOS),
+        selected = DEFAULT_TEMPLATE,
+        width = "100%"
+      )
+    ),
 
-        /* File input styling */
-        #%s {
-          margin: 0;
-          width: auto;
-        }
-        #%s .form-group {
-          margin: 0;
-          width: auto;
-        }
-        #%s .input-group {
-          margin: 0;
-          width: auto;
-        }
-        #%s label {
-          display: none;
-        }
-        #%s .form-control {
-          display: none;
-        }
-        /* Hide progress bar */
-        .shiny-file-input-progress {
-          display: none;
-        }
-        /* Target the actual button inside file input */
-        .btn-file {
-          padding: 1px 6px !important;
-          font-size: 0.8rem !important;
-          line-height: 1 !important;
-          height: 22px !important;
-          white-space: nowrap !important;
-          display: inline-flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-          width: auto !important;
-          margin: 0 !important;
-        }
-
-        /* Save button styling */
-        .save-scenario-btn {
-          padding: 2px 8px;
-          font-size: 0.8rem;
-          white-space: nowrap;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 22px;
-          width: auto;
-          margin: 0;
-        }
-
-        /* Additional fixes for input group */
-        .input-group-btn, .input-group-prepend {
-          margin: 0;
-          padding: 0;
-          display: inline-block;
-        }
-
-        /* Remove any remaining spaces */
-        .shiny-input-container {
-          margin: 0 !important;
-          padding: 0 !important;
-        }
-      ", ns("scenario_file"), ns("scenario_file"), ns("scenario_file"),
-                              ns("scenario_file"), ns("scenario_file")))),
-
+    # Custom scenario section
+    div(
+      style = "margin-bottom: 5px;",
+      div(
+        style = "margin-bottom: 5px; font-size: 0.9rem; color: #666;",
+        "Or load your own scenario:"
+      ),
       div(
         class = "scenario-buttons-container",
+        style = "display: flex; flex-direction: column; gap: 5px;",
+        # File input for loading
         div(
           style = "width: auto; margin: 0; padding: 0;",
           fileInput(
@@ -151,6 +107,7 @@ sidebarInputModuleUI <- function(id, initial_config) {
             placeholder = NULL
           )
         ),
+        # Save button
         downloadButton(
           ns("save_scenario"),
           "Save Current Scenario",
@@ -158,8 +115,10 @@ sidebarInputModuleUI <- function(id, initial_config) {
         )
       )
     ),
+
     # Thinner divider
     tags$hr(style = "margin: 5px 0;"),
+
     # Rest of the inputs
     div(
       id = ns("static_inputs_container"),
@@ -169,33 +128,69 @@ sidebarInputModuleUI <- function(id, initial_config) {
   )
 }
 
-sidebarInputModuleServer <- function(id, reactive_config) {
+#' Sidebar Input Module Server
+#'
+#' @param id The module identifier
+#' @export
+sidebarInputModuleServer <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # Initialize local_config
-    local_config <- reactiveVal(NULL)
-
-    # Set initial config
-    observe({
-      local_config(reactive_config())
+    # Initialize configuration with default template
+    config <- reactiveVal({
+      template_file <- TEMPLATE_SCENARIOS[[DEFAULT_TEMPLATE]]
+      safelyLoadConfig(file.path(getwd(), # Uncomment for running locally
+                                 "config", "templates", template_file))
     })
 
-    # Create a debounced reactive for the config
-    debounced_config <- reactive({
-      local_config()
-    }) %>% debounce(1000)
+    # Handle template selection
+    observeEvent(input$template_selector, {
+      template_file <- TEMPLATE_SCENARIOS[[input$template_selector]]
+
+      tryCatch({
+        template_config <- safelyLoadConfig(file.path(getwd(), # Uncomment for running locally
+                                                      "config", "templates", template_file))
+
+        if (!is.null(template_config)) {
+          validation_result <- validateConfig(template_config)
+
+          if (validation_result$is_valid) {
+            config(template_config)
+
+            # Update UI inputs
+            updateInputs(template_config)
+
+            showNotification(
+              paste("Template scenario", input$template_selector, "successfully loaded"),
+              type = "message",
+              duration = 3
+            )
+          } else {
+            showNotification(
+              paste("Invalid template configuration:",
+                    paste(validation_result$messages, collapse = "; ")),
+              type = "error",
+              duration = 5
+            )
+          }
+        }
+      }, error = function(e) {
+        showNotification(
+          paste("Error loading template scenario:", e$message),
+          type = "error",
+          duration = 5
+        )
+      })
+    }, ignoreInit = TRUE)
 
     # Handle input changes
     observe({
-      req(local_config())
-
       # Get all input values that have changed
       current_inputs <- reactiveValuesToList(input)
 
       # Isolate the update to prevent circular reactions
       isolate({
-        updated_config <- local_config()
+        updated_config <- config()
         any_changes <- FALSE
 
         # Handle regular inputs
@@ -232,11 +227,22 @@ sidebarInputModuleServer <- function(id, reactive_config) {
         }
 
         if (any_changes) {
-          local_config(updated_config)
-          reactive_config(updated_config)
+          config(updated_config)
         }
       })
     })
+
+    # Helper function to update UI inputs
+    updateInputs <- function(new_config) {
+      for (section in names(new_config)) {
+        if (section != "properties") {
+          for (input_item in new_config[[section]]$inputs) {
+            input_id <- paste0(section, "_", input_item$id)
+            updateInput(session, input_id, input_item)
+          }
+        }
+      }
+    }
 
     # Handle file upload
     observeEvent(input$scenario_file, {
@@ -250,7 +256,7 @@ sidebarInputModuleServer <- function(id, reactive_config) {
 
           if (validation_result$is_valid) {
             # Completely replace the configuration in one go
-            reactive_config(uploaded_config)
+            config(uploaded_config)
 
             # Update regular inputs
             for (section in names(uploaded_config)) {
@@ -289,7 +295,7 @@ sidebarInputModuleServer <- function(id, reactive_config) {
       },
       content = function(file) {
         # Get current configuration
-        current_config <- isolate(reactive_config())
+        current_config <- isolate(config())
 
         # Write to YAML file
         yaml::write_yaml(current_config, file)
@@ -297,9 +303,10 @@ sidebarInputModuleServer <- function(id, reactive_config) {
     )
 
     # Call the property management module server
-    propertyManagementServer("property_management", reactive_config)
+    propertyManagementServer("property_management", config)
 
-    return(local_config)
+    # Return the config reactive value
+    return(config)
   })
 }
 
