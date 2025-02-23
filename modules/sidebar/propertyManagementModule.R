@@ -1,9 +1,6 @@
 library(shiny)
 library(bslib)
 
-source(file.path("R", "constants.R"))
-source(file.path("R", "utils", "helper_functions.R"))
-
 propertyManagementUI <- function(id, initial_config) {
   ns <- NS(id)
 
@@ -85,34 +82,10 @@ propertyManagementServer <- function(id, reactive_config) {
       return(property)
     }
 
-    # # Create a local reactive value to store property state
-    # local_properties <- reactiveVal(NULL)
-    #
-    # # Update local properties when reactive_config changes
-    # observeEvent(reactive_config(), {
-    #   # print("Updating local properties from reactive_config")
-    #   local_properties(reactive_config()$properties)
-    # }, ignoreInit = FALSE)
-
     # Render property list
     output$property_list <- renderUI({
       req(reactive_config())
       properties <- reactive_config()$properties
-
-      # For Debugging:
-      # print("\nRendering property list:")
-      # if (!is.null(properties)) {
-      #   for (prop in properties) {
-      #     print(sprintf("Property: %s (Type: %s)", prop$name, prop$type))
-      #     key_params <- c("value_today", "purchase_year", "sale_year", "loan_family_friends")
-      #     for (param_id in key_params) {
-      #       param <- Find(function(x) x$id == param_id, prop$inputs)
-      #       if (!is.null(param)) {
-      #         print(sprintf("  %s: %s", param_id, param$value))
-      #       }
-      #     }
-      #   }
-      # }
 
       if (is.null(properties) || length(properties) == 0) {
         return(div(
@@ -127,16 +100,6 @@ propertyManagementServer <- function(id, reactive_config) {
         if (is.null(property$id)) {
           property$id <- uuid::UUIDgenerate()
         }
-        # For Debugging
-        # print(paste("Creating card for property:", property$name))
-        # # Print only key input values
-        # key_params <- c("value_today", "purchase_year", "sale_year", "loan_family_friends")
-        # for (param_id in key_params) {
-        #   param <- Find(function(x) x$id == param_id, property$inputs)
-        #   if (!is.null(param)) {
-        #     print(sprintf("  %s: %s", param_id, param$value))
-        #   }
-        # }
 
         div(
           id = ns(paste0("property_", property$id)),

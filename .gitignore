@@ -1,6 +1,4 @@
-todo.txt
-*.xlsx
-*.docx
+ToIgnore/
 
 # History files
 .Rhistory

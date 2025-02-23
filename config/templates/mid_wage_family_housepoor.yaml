@@ -262,6 +262,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
+  id: bbfaa157-6cb6-447a-a4f0-b1a0fbf8f2d0
   type: home
   inputs:
   - id: value_growth
@@ -359,4 +360,3 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 30
     description: Monthly Hausgeld building insurance cost.
-  id: bbfaa157-6cb6-447a-a4f0-b1a0fbf8f2d0

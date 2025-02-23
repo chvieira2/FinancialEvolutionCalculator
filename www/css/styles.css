@@ -180,3 +180,9 @@ margin: 0 !important;
   padding: 10px;
   margin-top: 10px;
 }
+
+@media (max-width: 768px) {
+  .sidebar-panel { width: 100% !important; }
+  .main-panel { width: 100% !important; }
+  .card { height: auto !important; }
+}

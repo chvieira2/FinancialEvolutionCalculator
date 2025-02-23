@@ -20,13 +20,13 @@ sensitivityAnalysisModuleUI <- function(id) {
           style = "margin-bottom: 10px;",
           h5("Base Parameters"),
           checkboxGroupInput(
-            ns("base_parameters"),
+            ns("BASE_PARAMETERS"),
             NULL,
             choices = setNames(
-              sapply(base_parameters, `[[`, "id"),
-              sapply(base_parameters, `[[`, "name")
+              sapply(BASE_PARAMETERS, `[[`, "id"),
+              sapply(BASE_PARAMETERS, `[[`, "name")
             ),
-            selected = sapply(base_parameters, `[[`, "id"),
+            selected = sapply(BASE_PARAMETERS, `[[`, "id"),
             inline = TRUE
           )
         ),
@@ -87,10 +87,6 @@ sensitivityAnalysisModuleUI <- function(id) {
       div(
         style = "margin-bottom: 20px;",
         uiOutput(ns("sensitivity_plot_container"))
-      ),
-      # Combined tornado plot
-      div(
-        uiOutput(ns("tornado_plot_container"))
       )
     )
   )
@@ -183,10 +179,10 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
 
     # Reactive to combine both sets of parameters
     available_parameters <- reactive({
-      req(input$base_parameters)  # Only require base parameters
+      req(input$BASE_PARAMETERS)  # Only require base parameters
 
       # Get selected base parameters
-      selected_base <- base_parameters[sapply(base_parameters, function(p) p$id %in% input$base_parameters)]
+      selected_base <- BASE_PARAMETERS[sapply(BASE_PARAMETERS, function(p) p$id %in% input$BASE_PARAMETERS)]
 
       # Get selected property parameters if any
       selected_property <- NULL
@@ -331,14 +327,8 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       # Sensitivity plot: minimum 400px, then 150px per parameter row (3 columns)
       sensitivity_height <- max(400, ceiling(n_params/3) * 200)
 
-      # Tornado plot: minimum 300px, then 25px per parameter variation
-      # Multiply by number of parameters and steps for total variations
-      n_variations <- n_params * input$steps
-      tornado_height <- max(300, n_variations * 12)
-
       list(
-        sensitivity = sensitivity_height,
-        tornado = tornado_height
+        sensitivity = sensitivity_height
       )
     })
 
@@ -480,151 +470,6 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           ),
           panel.grid.minor = element_blank(),
           panel.border = element_rect(color = "gray", fill = NA)
-        )
-    })
-
-    # Render tornado plot container
-    output$tornado_plot_container <- renderUI({
-      req(plot_heights())
-      plotOutput(session$ns("tornado_plots"),
-                 height = sprintf("%dpx", plot_heights()$tornado))
-    })
-
-    # Render combined tornado plot
-    output$tornado_plots <- renderPlot({
-      req(analysis_results(), selected_parameters_snapshot())
-
-      # Get colors and order from snapshot
-      param_data <- lapply(selected_parameters_snapshot(), function(param) {
-        list(
-          color = param$color,
-          name = param$name
-        )
-      })
-
-      # Create ordered parameters vector and colors list
-      ordered_params <- sapply(param_data, `[[`, "name")
-      param_colors <- sapply(param_data, `[[`, "color")
-      names(param_colors) <- ordered_params
-
-      # Convert param_colors to a list to avoid jsonlite warning
-      param_colors <- as.list(param_colors)
-
-      # Get the year range from the data
-      min_year <- min(analysis_results()$Year)
-      max_year <- max(analysis_results()$Year)
-
-      # Define the time points we want to analyze
-      time_points <- c(5, 10, 20, 30, 45)
-      analysis_years <- min_year + time_points
-
-      # Filter only existing years
-      existing_analysis_years <- analysis_years[analysis_years <= max_year]
-
-      if(length(existing_analysis_years) == 0) {
-        return(ggplot() +
-                 annotate("text", x = 0.5, y = 0.5,
-                          label = "No analysis years available in the selected range") +
-                 theme_void())
-      }
-
-      # Get baseline values for each year
-      baseline_values <- subset(analysis_results(), param_variation == 0) %>%
-        filter(Year %in% existing_analysis_years) %>%
-        select(Year, total_asset) %>%
-        mutate(total_asset = total_asset/1000)
-
-      # Create year labels
-      year_labels <- sprintf("%d years (Year %d)",
-                             existing_analysis_years - min_year,
-                             existing_analysis_years)
-      names(year_labels) <- existing_analysis_years
-
-      # Prepare results for plotting with modified labels
-      results <- analysis_results() %>%
-        filter(Year %in% existing_analysis_years) %>%
-        group_by(parameter, param_variation, Year, param_type, param_value) %>%
-        summarise(
-          final_asset = first(total_asset)/1000,
-          parameter_color = first(parameter_color),
-          .groups = "drop"
-        ) %>%
-        filter(abs(param_variation) > 0.1) %>%
-        left_join(baseline_values, by = "Year", suffix = c("", "_baseline")) %>%
-        mutate(
-          # Format values based on parameter type
-          formatted_value = case_when(
-            param_type == "year" ~ sprintf("%.0f", param_value),
-            param_type == "percentage" ~ sprintf("%.1f%%", param_value),
-            param_type == "currency" ~ sprintf("%.0f €", param_value),
-            TRUE ~ sprintf("%.1f", param_value)
-          ),
-          # Create parameter label
-          parameter_label = sprintf("%s: %s", parameter, formatted_value),
-          # Create year label factor
-          year_label = factor(year_labels[as.character(Year)],
-                              levels = year_labels),
-          # Factor the parameter to maintain order
-          parameter = factor(parameter, levels = ordered_params)
-        ) %>%
-        # Create parameter label factor that maintains both parameter and value order
-        group_by(parameter) %>%
-        mutate(
-          parameter_label = factor(
-            parameter_label,
-            levels = unique(parameter_label[order(param_value)])
-          )
-        ) %>%
-        ungroup()
-
-      # Create the plot
-      ggplot(results) +
-        geom_vline(
-          aes(xintercept = total_asset),
-          color = "black",
-          linetype = "dashed",
-          linewidth = 0.5
-        ) +
-        geom_segment(
-          aes(
-            x = total_asset,
-            xend = final_asset,
-            y = parameter_label,
-            yend = parameter_label,
-            color = parameter
-          )
-        ) +
-        geom_point(
-          aes(
-            x = final_asset,
-            y = parameter_label,
-            color = parameter
-          ),
-          size = 3
-        ) +
-        facet_wrap(~year_label,
-                   scales = "free_x",
-                   ncol = length(existing_analysis_years)) +
-        scale_color_manual(values = param_colors) +
-        theme_minimal() +
-        scale_y_discrete(limits = rev) +
-        labs(
-          title = "Single Parameter Impact Range on Asset Value at Different Time Points",
-          subtitle = "All values are inflation-adjusted to today's euros",
-          x = "Total Assets (thousands, €)",
-          y = NULL,
-          color = "Parameter"
-        ) +
-        theme(
-          panel.grid.minor = element_blank(),
-          legend.position = "bottom",
-          strip.text = element_text(size = 14, face = "bold"),
-          strip.background = element_rect(
-            fill = "lightgray",
-            color = NA
-          ),
-          panel.spacing = unit(2, "lines"),
-          plot.subtitle = element_text(size = 12, color = "gray40")
         )
     })
   })
