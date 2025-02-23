@@ -144,6 +144,14 @@ sidebarInputModuleServer <- function(id) {
       tryCatch({
         template_config <- safelyLoadConfig(file.path("config", "templates", template_file))
 
+        if (!is.null(template_config$properties)) {
+          for (i in seq_along(template_config$properties)) {
+            if (is.null(template_config$properties[[i]]$id)) {
+              template_config$properties[[i]]$id <- uuid::UUIDgenerate()
+            }
+          }
+        }
+
         if (!is.null(template_config)) {
           validation_result <- validateConfig(template_config)
 
@@ -206,9 +214,16 @@ sidebarInputModuleServer <- function(id) {
         if (!is.null(updated_config$properties)) {
           for (i in seq_along(updated_config$properties)) {
             property <- updated_config$properties[[i]]
+            # Ensure property has an ID
+            if (is.null(property$id)) {
+              property$id <- uuid::UUIDgenerate()
+              updated_config$properties[[i]]$id <- property$id
+              any_changes <- TRUE
+            }
+
             for (j in seq_along(property$inputs)) {
               input_item <- property$inputs[[j]]
-              input_id <- paste0(property$name, "_", input_item$id)
+              input_id <- paste0(property$id, "_", input_item$id)
               input_value <- current_inputs[[input_id]]
 
               if (!is.null(input_value) && !identical(input_value, input_item$value)) {

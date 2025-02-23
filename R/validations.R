@@ -83,6 +83,9 @@ validateProperty <- function(property) {
         result <- validateYear(input$value)
         if (!result$is_valid) messages <- c(messages, result$message)
       }
+      if (input$id == "loan_family_friends") {
+        result <- validateCurrency(input$value, "Family loan amount")
+      }
     }
   }
 
@@ -127,4 +130,12 @@ validateConfig <- function(config) {
     is_valid = length(messages) == 0,
     messages = messages
   )
+}
+
+validateCurrency <- function(value, name = "Value") {
+  if (!is.numeric(value) || value < 0) {
+    return(list(is_valid = FALSE,
+                message = paste(name, "must be a positive number")))
+  }
+  list(is_valid = TRUE)
 }

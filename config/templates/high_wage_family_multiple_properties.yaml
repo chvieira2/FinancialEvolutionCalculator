@@ -262,6 +262,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
+  id: 0773e149-f79b-4b92-807a-6ad3560fa23a
   type: investment
   inputs:
   - id: value_growth
@@ -385,8 +386,8 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 35
     description: Monthly Hausgeld building insurance cost.
-  id: 0773e149-f79b-4b92-807a-6ad3560fa23a
 - name: property2
+  id: f34d106a-cdd4-4a80-9a13-2c1e55bc776d
   type: investment
   inputs:
   - id: value_growth
@@ -510,8 +511,8 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 35
     description: Monthly Hausgeld building insurance cost.
-  id: f34d106a-cdd4-4a80-9a13-2c1e55bc776d
 - name: property3
+  id: f7354524-653b-4879-a073-817af6776b76
   type: investment
   inputs:
   - id: value_growth
@@ -635,8 +636,8 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 35
     description: Monthly Hausgeld building insurance cost.
-  id: f7354524-653b-4879-a073-817af6776b76
 - name: property4
+  id: b1f5f02d-fc54-4b8d-a37c-253cdf05cfb8
   type: investment
   inputs:
   - id: value_growth
@@ -760,8 +761,8 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 35
     description: Monthly Hausgeld building insurance cost.
-  id: b1f5f02d-fc54-4b8d-a37c-253cdf05cfb8
 - name: property5
+  id: 71aae28d-6150-40e8-b97f-d9c82253ef33
   type: investment
   inputs:
   - id: value_growth
@@ -885,8 +886,8 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 35
     description: Monthly Hausgeld building insurance cost.
-  id: 71aae28d-6150-40e8-b97f-d9c82253ef33
 - name: property6
+  id: 4b551b42-c9d0-4dc1-8ac5-9fa71e8606bc
   type: investment
   inputs:
   - id: value_growth
@@ -1010,8 +1011,8 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 25
     description: Monthly Hausgeld building insurance cost.
-  id: 4b551b42-c9d0-4dc1-8ac5-9fa71e8606bc
 - name: property7
+  id: 0c2d8f95-1dda-405b-a41b-da1b9f3941cd
   type: investment
   inputs:
   - id: value_growth
@@ -1135,4 +1136,3 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 35
     description: Monthly Hausgeld building insurance cost.
-  id: 0c2d8f95-1dda-405b-a41b-da1b9f3941cd
