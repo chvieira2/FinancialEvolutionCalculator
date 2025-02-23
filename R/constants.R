@@ -1,6 +1,6 @@
 # Add this to your constants.R file
 TEMPLATE_SCENARIOS <- list(
-  "Low-income family" = "low_wage_family.yaml",
+  "Low-income family renting" = "low_wage_family.yaml",
   "Mid-income family renting" = "mid_wage_family_rent.yaml",
   "Mid-income family with home property" = "mid_wage_family_housepoor.yaml",
   "Mid-income family with investment property" = "mid_wage_family_property_investment.yaml",
@@ -35,7 +35,7 @@ DEFAULT_YEARS <- list(
 
 
 # Base parameters (non-property ones)
-base_parameters <- list(
+BASE_PARAMETERS <- list(
   # list(
   #   id = "taxes_description.inflation",
   #   name = "Average Annual Inflation",
