@@ -70,7 +70,7 @@ sensitivityAnalysisModuleUI <- function(id) {
             numericInput(
               ns("steps"),
               "Number of Steps",
-              value = 7,
+              value = 5,
               min = 3,
               max = 9,
               width = "100%"
@@ -343,6 +343,9 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
     output$sensitivity_plots <- renderPlot({
       req(analysis_results(), selected_parameters_snapshot())
 
+      # Mobile detection
+      mobile <- isTRUE(input$is_mobile)
+
       # Get initial year from the data
       initial_year <- min(analysis_results()$Year)
 
@@ -420,8 +423,8 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       y_limits_adjusted <- c(y_limits[1],
                              max_y + y_range * 0.1)  # Add small padding above headers
 
-      ggplot() +
-        # Add lines
+      p <- ggplot() +
+        # Add lines for each parameter variation
         geom_line(
           data = plot_data,
           aes(x = Year,
@@ -429,7 +432,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
               color = param_variation,
               group = param_variation)
         ) +
-        # Add text annotations
+        # Add text annotations for parameter values
         geom_text(
           data = text_data_combined,
           aes(x = text_x,
@@ -438,39 +441,55 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
               color = param_variation),
           hjust = 0,
           vjust = 0,
-          size = 4,
+          size = if(mobile) 3 else 4,
           show.legend = FALSE
         ) +
         # Modified faceting to include property type
-        facet_wrap(~parameter, ncol = 3,
-                   labeller = label_wrap_gen(width = 30)) +
+        facet_wrap(~parameter, ncol = if(mobile) 2 else 3,
+                   labeller = label_wrap_gen(width = if(mobile) 20 else 30)) +
         scale_color_gradient2(
           low = "blue",
           mid = "#2C3E50",
           high = "red",
-          midpoint = 0
+          midpoint = 0,
+          guide = guide_colorbar(
+            title.position = "top",
+            title.hjust = 0.5
+          )
         ) +
         coord_cartesian(ylim = y_limits_adjusted, xlim = year_range()) +
-        scale_x_continuous(
-          limits = c(initial_year, NA)
-        ) +
-        theme_minimal() +
+        scale_x_continuous(limits = c(initial_year, NA)) +
         labs(
           title = "Single Parameter Impact Range on Asset Value Evolution",
           subtitle = "All values are inflation-adjusted to today's euros",
           x = NULL,
           y = "Total Assets (thousands, €)",
           color = "Parameter\nVariation (% or years)"
-        ) +
-        theme(
-          strip.text = element_text(size = 12, face = "bold"),
-          strip.background = element_rect(
-            fill = "lightgray",
-            color = NA
-          ),
+        )
+
+      # Add mobile-specific theming
+      if(mobile) {
+        p <- p + theme(
+          legend.position = "top",
+          legend.direction = "horizontal",
+          legend.box = "horizontal",
+          legend.justification = "center",
+          strip.text = element_text(size = 10),
+          axis.text = element_text(size = 8),
+          plot.margin = margin(t = 10, r = 10, b = 40, l = 10)
+        )
+      } else {
+        p <- p + theme(
+          legend.position = "right",
+          strip.text = element_text(size = 12),
           panel.grid.minor = element_blank(),
           panel.border = element_rect(color = "gray", fill = NA)
         )
+
+      }
+
+      p + theme_minimal(base_size = if(mobile) 12 else 14)
     })
-  })
+
+    })
 }

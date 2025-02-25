@@ -186,3 +186,23 @@ margin: 0 !important;
   .main-panel { width: 100% !important; }
   .card { height: auto !important; }
 }
+
+/* Mobile-specific adjustments */
+@media (max-width: 768px) {
+  /* Asset Evolution Card */
+  #result_plot-card {
+    height: 200px !important;  /* Half height */
+  }
+
+  /* Financial Metrics, Expenses, Income Components */
+  #financial_metrics-card,
+  #expense_components-card,
+  #income_components-card {
+    height: 600px !important;  /* Triple height */
+  }
+
+  /* Sensitivity Analysis Card */
+  #sensitivity_analysis-card {
+    min-height: 700px;
+  }
+}

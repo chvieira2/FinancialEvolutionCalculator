@@ -36,6 +36,19 @@ ui <- bslib::page_navbar(
   ),
 
   header = tags$head(
+    # Add script to detect mobile devices
+    tags$script('
+    $(document).on("shiny:connected", function() {
+      var mobile = window.matchMedia("(max-width: 768px)").matches;
+      Shiny.setInputValue("is_mobile", mobile);
+    });
+    $(window).resize(function() {
+      var mobile = window.matchMedia("(max-width: 768px)").matches;
+      Shiny.setInputValue("is_mobile", mobile);
+    });
+  '),
+
+    # Add meta tags
     tags$link(rel = "stylesheet",
               href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"),
     tags$link(rel = "stylesheet", href = "css/styles.css"),
