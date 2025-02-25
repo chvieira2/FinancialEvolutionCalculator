@@ -1,29 +1,35 @@
-/* Sidebar Panel Styles */
-.sidebar-panel {
-    font-size: 0.75rem;
+/* ===== Core Sidebar Styles ===== */
+.sidebar-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-align: center;
+  color: #2c3e50;
   }
 
-/* Reduce font size for headers in sidebar */
+.sidebar-panel {
+  font-size: 0.75rem;
+  overflow-y: auto;
+  max-height: 80vh;
+}
+
 .sidebar-panel h3 {
-font-size: 1.0rem !important;
-margin-top: 2px !important;
-margin-bottom: 2px !important;
+  font-size: 1rem !important;
+  margin: 2px 0 !important;
 }
 
-/* Reduce font size for labels */
 .sidebar-panel label {
-font-size: 0.75rem;
-margin-bottom: 0 !important;
+  font-size: 0.75rem;
+  margin-bottom: 0 !important;
 }
 
-/* Reduce font size for inputs */
 .sidebar-panel .form-control {
-font-size: 0.75rem;
-padding: 0px 6px !important;
-height: auto !important;
+  font-size: 0.75rem;
+  padding: 0 6px !important;
+  height: auto !important;
 }
 
-/* Remove spinner buttons from numeric input */
+/* Numeric input spinner removal */
 .sidebar-panel .form-control[type='number'] {
 -moz-appearance: textfield;
 }
@@ -33,20 +39,30 @@ height: auto !important;
 margin: 0;
 }
 
-/* Slider styles */
-.irs-min, .irs-max, .irs-single, .irs-from, .irs-to {
-font-size: 9px !important;
+
+/* ===== Sidebar container styles ===== */
+.sidebar-input-container {
+margin-bottom: 2px !important;
 }
 
+.sidebar-input-container .form-control {
+padding-top: 0px;
+padding-bottom: 0px;
+}
+
+
+
+
+
+/* ===== Slider Styles ===== */
 .irs {
-margin-top: 0px !important;
-margin-bottom: 0px !important;
-height: 45px !important;
+  margin: 0 !important;
+  height: 45px !important;
 }
-
-.irs-grid-text {
-display: none !important;
+.irs-min, .irs-max, .irs-single, .irs-from, .irs-to {
+  font-size: 9px !important;
 }
+.irs-grid-text { display: none !important; }
 
 .irs-handle.from {
   cursor: not-allowed !important;
@@ -63,59 +79,38 @@ display: none !important;
   background-color: #f0f0f0 !important;
 }
 
-/* Form elements styles */
+
+
+
+/* ===== Form Elements ===== */
 .form-check-label {
-font-size: 10px !important;
-margin-bottom: 0 !important;
+  font-size: 10px !important;
+  margin-bottom: 0 !important;
 }
-
 .form-check {
-margin-bottom: 0px !important;
-padding-top: 0 !important;
-padding-bottom: 0 !important;
-}
-
-/* Accordion styles */
-.accordion-button {
-font-size: 10px !important;
-padding: 2px !important;
-}
-
-/* Info icon styles */
-.info-icon {
-font-size: 10px !important;
-color: #007bff;
-cursor: help;
-}
-
-/* Input container styles */
-.sidebar-input-container {
-margin-bottom: 2px !important;
-}
-
-.sidebar-input-container .form-control {
-padding-top: 0px;
-padding-bottom: 0px;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
 }
 
 /* Form group styles */
 .form-group {
-margin-bottom: 0px !important;
-}
+  margin-bottom: 0px !important;
+  }
+
+
+
+  
+/* ===== Component Specific Styles ===== */
+/* Info icon styles */
+.info-icon {
+  color: #007bff;
+  cursor: help;
+  }
 
 /* Property management section styles */
 #property_management .accordion-body {
 padding-top: 0px !important;
 padding-bottom: 0px !important;
-}
-
-/* Title styles */
-.sidebar-title {
-font-size: 1rem;
-font-weight: bold;
-margin-bottom: 5px;
-text-align: center;
-color: #2c3e50;
 }
 
 /* Tab styles */
@@ -153,24 +148,23 @@ margin: 0 !important;
     text-decoration: underline;
 }
 
-/* Sensitivity analysis specific styles */
+
+
+/* ===== Sensitivity Analysis Specific Styles ===== */
+.sensitivity-analysis-card .checkbox {
+  margin: 0;
+}
+.sensitivity-analysis-card h5 {
+  margin: 5px 0;
+  font-size: 1rem;
+}
+
 .sensitivity-analysis-card {
   margin-top: 20px;
 }
 
-.sensitivity-analysis-card .checkbox {
-  margin-top: 0;
-  margin-bottom: 0;
-}
-
 .sensitivity-analysis-card .form-group {
   margin-bottom: 10px;
-}
-
-.sensitivity-analysis-card h5 {
-  margin-top: 5px;
-  margin-bottom: 5px;
-  font-size: 1rem;
 }
 
 /* Adjust plot containers for the card layout */
@@ -181,46 +175,35 @@ margin: 0 !important;
   margin-top: 10px;
 }
 
-@media (max-width: 768px) {
-  .sidebar-panel { width: 100% !important; }
-  .main-panel { width: 100% !important; }
-  .card { height: auto !important; }
+
+
+
+/* ===== Card Layout Improvements ===== */
+.card {
+  margin-bottom: 1rem;
 }
 
-/* Mobile-specific adjustments */
-@media (max-width: 768px) {
-  /* Asset Evolution Card */
-  #result_plot-card {
-    height: 200px !important;  /* Half height */
-  }
-
-  /* Financial Metrics, Expenses, Income Components */
-  #financial_metrics-card,
-  #expense_components-card,
-  #income_components-card {
-    height: 600px !important;  /* Triple height */
-  }
-
-  /* Sensitivity Analysis Card */
-  #sensitivity_analysis-card {
-    min-height: 700px;
-  }
+/* Plot containers */
+.plot_container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 300px;
 }
 
 
-/* Improve touch targets */
+/* ===== Mobile Optimizations ===== */
 @media (max-width: 768px) {
+  .sidebar-panel, .main-panel {
+    width: 100% !important;
+  }
+  
   .btn {
     padding: 12px 20px;
     margin: 5px 0;
   }
   
   .form-control {
-    font-size: 16px;  /* Prevent zoom on focus */
-  }
-  
-  .sidebar-panel {
-    overflow-y: auto;
-    max-height: 80vh;
+    font-size: 16px; /* Prevent iOS zoom */
   }
 }

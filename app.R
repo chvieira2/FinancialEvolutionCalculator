@@ -102,7 +102,7 @@ ui <- bslib::page_navbar(
             width = 12,  # Full width on mobile
             class = "col-lg-6",  # Half width on large screens
             card(
-              id = "result_plot-card",
+              id = "asset_plot_card",
               card_header("Asset Evolution"),
               plotYearlyAssetProgressionModuleUI("result_plot")
             )
@@ -111,25 +111,28 @@ ui <- bslib::page_navbar(
             width = 12,
             class = "col-lg-6",
             card(
-              id = "financial_metrics-card",
+              id = "financial_metrics_card",
               card_header("Financial Metrics"),
               financialMetricsModuleUI("financial_metrics")
             )
           )
         ),
         fluidRow(
+          # Stacked Area Plots
           column(
-            width = 6,
+            width = 12,
+            class = "col-lg-6",
             card(
-              style = "height: 400px;",
+              id = "stacked_area_card_expenses",
               card_header("Expenses Components"),
               stackedAreaPlotModuleUI("expense_components", plot_type = "expenses")
             )
           ),
           column(
-            width = 6,
+            width = 12,
+            class = "col-lg-6",
             card(
-              style = "height: 400px;",
+              id = "stacked_area_card_income",
               card_header("Income Components"),
               stackedAreaPlotModuleUI("income_components", plot_type = "income")
             )
@@ -140,6 +143,7 @@ ui <- bslib::page_navbar(
           column(
             width = 12,
             card(
+              id = "sensitivity_analysis_card",
               card_header("Sensitivity Analysis"),
               sensitivityAnalysisModuleUI("sensitivity_analysis")
             )

@@ -75,26 +75,12 @@ stackedAreaPlotModuleUI <- function(id, plot_type) {
   )
 
   tagList(
-    tags$head(
-      tags$style(HTML(paste0("
-        /* Container styling */
-        #", ns("stacked_area_container"), " {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-      ")))
-    ),
-
-    # Main container with flex layout
     div(
-      id = ns("stacked_area_container"),
-      style = "height: 100%;",
-
+      class = "plot_container stacked-area-container",
       # Plot container
       div(
-        style = "flex: 1; min-height: 0;",
-        plotOutput(ns("stacked_area_plot"), height = "100%")
+        class = "plot_container",
+        plotOutput(ns("stacked_area_plot"))
       ),
 
       # Custom checkbox group

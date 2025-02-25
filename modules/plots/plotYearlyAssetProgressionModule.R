@@ -6,7 +6,8 @@ library(tidyr)
 plotYearlyAssetProgressionModuleUI <- function(id) {
   ns <- NS(id)
   tagList(
-    plotOutput(ns("result_plot"), height = "600px")
+    div(class = "plot_container",
+        plotOutput(ns("result_plot")))
   )
 }
 

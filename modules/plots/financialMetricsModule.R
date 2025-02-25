@@ -34,26 +34,12 @@ financialMetricsModuleUI <- function(id) {
   )
 
   tagList(
-    tags$head(
-      tags$style(HTML(paste0("
-        /* Container styling */
-        #", ns("metrics_container"), " {
-          height: 100%;
-          display: flex;
-          flex-direction: column;
-        }
-      ")))
-    ),
-
-    # Main container with flex layout
     div(
-      id = ns("metrics_container"),
-      style = "height: 100%;",
-
+      class = "plot_container metrics-container",
       # Plot container
       div(
-        style = "flex: 1; min-height: 0;",
-        plotOutput(ns("metrics_plot"), height = "100%")
+        class = "plot_container",
+        plotOutput(ns("metrics_plot"))
       ),
 
       # Custom checkbox group
