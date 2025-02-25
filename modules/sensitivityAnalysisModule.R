@@ -9,12 +9,48 @@ sensitivityAnalysisModuleUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    # Control panel with more compact layout
+    # Analysis Configuration at the top
+    div(
+      class = "row mb-3",  # Added margin-bottom
+      div(
+        class = "col-12",  # Full width
+        div(
+          style = "background-color: #f8f9fa; padding: 10px; border-radius: 5px;",
+          h5("Analysis Configuration"),
+          div(
+            class = "row",
+            div(
+              class = "col-md-8",  # Wider on medium+ screens
+              sliderInput(
+                ns("variation_range"),
+                "Parameter Variation Range (%)",
+                min = -50, max = 50,
+                value = c(-20, 20),
+                step = 5,
+                width = "100%"
+              )
+            ),
+            div(
+              class = "col-md-4",  # Narrower on medium+ screens
+              numericInput(
+                ns("steps"),
+                "Number of Steps",
+                value = 5,
+                min = 3,
+                max = 9,
+                width = "100%"
+              )
+            )
+          )
+        )
+      )
+    ),
+
+    # Parameters section
     div(
       class = "row",
-      # First column (wider) - Parameters
       div(
-        class = "col-8",
+        class = "col-12",  # Full width for parameters
         # Base parameters
         div(
           style = "margin-bottom: 10px;",
@@ -48,35 +84,6 @@ sensitivityAnalysisModuleUI <- function(id) {
             class = "btn-primary"
           )
         )
-      ),
-      # Second column (narrower) - Analysis Settings
-      div(
-        class = "col-4",
-        div(
-          style = "background-color: #f8f9fa; padding: 10px; border-radius: 5px;",
-          h5("Analysis Configuration"),
-          div(
-            style = "margin-bottom: 10px;",
-            sliderInput(
-              ns("variation_range"),
-              "Parameter Variation Range (%)",
-              min = -80, max = 80,
-              value = c(-20, 20),
-              step = 10,
-              width = "100%"
-            )
-          ),
-          div(
-            numericInput(
-              ns("steps"),
-              "Number of Steps",
-              value = 5,
-              min = 3,
-              max = 9,
-              width = "100%"
-            )
-          )
-        )
       )
     ),
 
@@ -90,7 +97,7 @@ sensitivityAnalysisModuleUI <- function(id) {
       )
     )
   )
-}
+  }
 
 sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data, year_range) {
   moduleServer(id, function(input, output, session) {
@@ -430,7 +437,8 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           aes(x = Year,
               y = total_asset/1000,
               color = param_variation,
-              group = param_variation)
+              group = param_variation),
+          show.legend = FALSE
         ) +
         # Add text annotations for parameter values
         geom_text(
@@ -465,28 +473,15 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           x = NULL,
           y = "Total Assets (thousands, €)",
           color = "Parameter\nVariation (% or years)"
-        )
-
-      # Add mobile-specific theming
-      if(mobile) {
-        p <- p + theme(
-          legend.position = "top",
-          legend.direction = "horizontal",
-          legend.box = "horizontal",
-          legend.justification = "center",
-          strip.text = element_text(size = 10),
-          axis.text = element_text(size = 8),
-          plot.margin = margin(t = 10, r = 10, b = 40, l = 10)
-        )
-      } else {
-        p <- p + theme(
-          legend.position = "right",
-          strip.text = element_text(size = 12),
-          panel.grid.minor = element_blank(),
-          panel.border = element_rect(color = "gray", fill = NA)
-        )
-
-      }
+        ) + theme(
+        legend.position = "none",
+        legend.direction = "horizontal",
+        legend.box = "horizontal",
+        legend.justification = "center",
+        strip.text = element_text(size = 10),
+        axis.text = element_text(size = 8),
+        plot.margin = margin(t = 10, r = 10, b = 40, l = 10)
+      )
 
       p + theme_minimal(base_size = if(mobile) 12 else 14)
     })

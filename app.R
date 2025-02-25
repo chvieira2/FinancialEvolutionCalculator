@@ -99,17 +99,19 @@ ui <- bslib::page_navbar(
         ),
         fluidRow(
           column(
-            width = 6,
+            width = 12,  # Full width on mobile
+            class = "col-lg-6",  # Half width on large screens
             card(
-              style = "height: 400px;",
+              id = "result_plot-card",
               card_header("Asset Evolution"),
               plotYearlyAssetProgressionModuleUI("result_plot")
             )
           ),
           column(
-            width = 6,
+            width = 12,
+            class = "col-lg-6",
             card(
-              style = "height: 400px;",
+              id = "financial_metrics-card",
               card_header("Financial Metrics"),
               financialMetricsModuleUI("financial_metrics")
             )
@@ -155,6 +157,16 @@ ui <- bslib::page_navbar(
 )
 
 server <- function(input, output, session) {
+
+  # Debuggin helper for mobile
+  observe({
+    cat("Mobile detection:", input$is_mobile, "\n")
+    output$debug_info <- renderText({
+      glue::glue("Screen: {input$dimension[1]}x{input$dimension[2]}")
+    })
+  })
+
+
   # Let the module handle the configuration
   reactive_config <- sidebarInputModuleServer("sidebar_inputs")
 
