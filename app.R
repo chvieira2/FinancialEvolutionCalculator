@@ -201,11 +201,14 @@ server <- function(input, output, session) {
   )
 
   # Plot module
-  plotYearlyAssetProgressionModuleServer("result_plot", processed_data, reactive_config, year_range)
-  financialMetricsModuleServer("financial_metrics", processed_data, year_range)
-  stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
-  stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
-  sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range)
+  observeEvent(input$is_mobile, {
+    plotYearlyAssetProgressionModuleServer("result_plot", processed_data, reactive_config, year_range)
+    financialMetricsModuleServer("financial_metrics", processed_data, year_range)
+    stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
+    stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
+    sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range, isolate(input$is_mobile))
+  })
+
 
   # Download handler for financial calculations
   output$download_calculations <- downloadHandler(

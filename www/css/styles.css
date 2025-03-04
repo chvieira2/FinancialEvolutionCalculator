@@ -175,6 +175,32 @@ margin: 0 !important;
   margin-top: 10px;
 }
 
+/* Sensitivity Analysis Layout */
+.sensitivity-analysis-container {
+  width: 100%;
+  height: 100%;
+}
+
+.sensitivity-results {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.plot-grid {
+  width: 100%;
+}
+
+/* Adjust spacing for mobile */
+@media (max-width: 768px) {
+  .sensitivity-results {
+    margin-top: 10px;
+  }
+  
+  .plot-grid {
+    padding: 0;
+  }
+}
+
 
 
 
@@ -197,12 +223,10 @@ margin: 0 !important;
   .sidebar-panel, .main-panel {
     width: 100% !important;
   }
-  
   .btn {
     padding: 12px 20px;
     margin: 5px 0;
   }
-  
   .form-control {
     font-size: 16px; /* Prevent iOS zoom */
   }

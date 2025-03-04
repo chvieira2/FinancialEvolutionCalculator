@@ -11,9 +11,10 @@ sensitivityAnalysisModuleUI <- function(id) {
   tagList(
     # Analysis Configuration at the top
     div(
-      class = "row mb-3",  # Added margin-bottom
+      class = "sensitivity-analysis-container",
+      # class = "row mb-3",  # Added margin-bottom
       div(
-        class = "col-12",  # Full width
+        class = "col-12",
         div(
           style = "background-color: #f8f9fa; padding: 10px; border-radius: 5px;",
           h5("Analysis Configuration"),
@@ -89,18 +90,20 @@ sensitivityAnalysisModuleUI <- function(id) {
 
     # Results section
     div(
-      style = "margin-top: 20px;",
+      class = "sensitivity-results",
+      # style = "margin-top: 20px;",
       # Faceted plots
       div(
-        style = "margin-bottom: 20px;",
+        # style = "margin-bottom: 20px;",
         uiOutput(ns("sensitivity_plot_container"))
       )
     )
   )
   }
 
-sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data, year_range) {
+sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data, year_range, is_mobile) {
   moduleServer(id, function(input, output, session) {
+    cat("Mobile detection (sensitivity):", is_mobile, "\n")
 
     # Reactive value to store property parameters
     property_params <- reactiveVal(NULL)
@@ -331,27 +334,29 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
 
       n_params <- length(selected_parameters_snapshot())
 
-      # Sensitivity plot: minimum 400px, then 150px per parameter row (3 columns)
-      sensitivity_height <- max(400, ceiling(n_params/3) * 200)
+      # Calculate base height per parameter
+      base_height_per_param <- if(is_mobile) 400 else 300
 
-      list(
-        sensitivity = sensitivity_height
-      )
+      # Calculate total height based on number of parameters and columns
+      n_cols <- if(is_mobile) 1 else 3
+      n_rows <- ceiling(n_params / n_cols)
+
+      # Minimum height of 400px, then add height for each row
+      sensitivity_height <- max(400, n_rows * base_height_per_param)
+
+      sensitivity_height
     })
 
     # Render sensitivity plot container
     output$sensitivity_plot_container <- renderUI({
       req(plot_heights())
       plotOutput(session$ns("sensitivity_plots"),
-                 height = sprintf("%dpx", plot_heights()$sensitivity))
+                 height = sprintf("%dpx", plot_heights()))
     })
 
     # Render faceted sensitivity plots
     output$sensitivity_plots <- renderPlot({
       req(analysis_results(), selected_parameters_snapshot())
-
-      # Mobile detection
-      mobile <- isTRUE(input$is_mobile)
 
       # Get initial year from the data
       initial_year <- min(analysis_results()$Year)
@@ -430,7 +435,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       y_limits_adjusted <- c(y_limits[1],
                              max_y + y_range * 0.1)  # Add small padding above headers
 
-      p <- ggplot() +
+      ggplot() +
         # Add lines for each parameter variation
         geom_line(
           data = plot_data,
@@ -442,28 +447,23 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
         ) +
         # Add text annotations for parameter values
         geom_text(
-          data = text_data_combined,
+          data = text_data, #text_data_combined to include the headers
           aes(x = text_x,
               y = text_y,
               label = value_text,
               color = param_variation),
           hjust = 0,
           vjust = 0,
-          size = if(mobile) 3 else 4,
+          size = 4,
           show.legend = FALSE
         ) +
-        # Modified faceting to include property type
-        facet_wrap(~parameter, ncol = if(mobile) 2 else 3,
-                   labeller = label_wrap_gen(width = if(mobile) 20 else 30)) +
+        facet_wrap(~parameter, ncol = if(is_mobile) 1 else 3,
+                   labeller = label_wrap_gen(width = if(is_mobile) 20 else 30)) +
         scale_color_gradient2(
           low = "blue",
           mid = "#2C3E50",
           high = "red",
-          midpoint = 0,
-          guide = guide_colorbar(
-            title.position = "top",
-            title.hjust = 0.5
-          )
+          midpoint = 0
         ) +
         coord_cartesian(ylim = y_limits_adjusted, xlim = year_range()) +
         scale_x_continuous(limits = c(initial_year, NA)) +
@@ -473,17 +473,14 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           x = NULL,
           y = "Total Assets (thousands, €)",
           color = "Parameter\nVariation (% or years)"
-        ) + theme(
-        legend.position = "none",
-        legend.direction = "horizontal",
-        legend.box = "horizontal",
-        legend.justification = "center",
-        strip.text = element_text(size = 10),
-        axis.text = element_text(size = 8),
-        plot.margin = margin(t = 10, r = 10, b = 40, l = 10)
+        ) +
+        theme_minimal(base_size = if(is_mobile) 14 else 16) +
+        theme(
+        axis.text = element_text(size = if(is_mobile) 9 else 11),
+        plot.margin = margin(t = 20, r = 10, b = 40, l = 10),
+        plot.title = element_text(size = if(is_mobile) 14 else 18),
+        plot.subtitle = element_text(size = if(is_mobile) 12 else 16)
       )
-
-      p + theme_minimal(base_size = if(mobile) 12 else 14)
     })
 
     })
