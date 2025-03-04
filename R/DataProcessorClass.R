@@ -1147,8 +1147,8 @@ FinancialBalanceCalculator <-
               # Salary
               salary <- self$results[self$results$Year == year, "net_annual_salary"]
 
-              # Passive Investment Income
-              returns <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
+              # Passive Investment Income - REMOVED from income calculation since it will be reinvested
+              # returns <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
 
               # Lump sums
               lump_sums <- self$results[self$results$Year == year, "lump_sums"]
@@ -1166,7 +1166,7 @@ FinancialBalanceCalculator <-
                                 na.rm = TRUE)
 
 
-              income <- salary + returns + lump_sums + rental_income + deductions
+              income <- salary + lump_sums + rental_income + deductions# + returns
 
               self$results[self$results$Year == year, "total_income"] <- self$round_to_2(income)
             },
@@ -1472,6 +1472,9 @@ PassiveInvestingCalculator <-
                                                       "passive_investment_money_taken_out_from_capital_gains"]
                 taken_from_contributions <- self$results[self$results$Year == year, "passive_investment_money_taken_out_from_contributions"]
 
+                # Add returns to be reinvested
+                return_previous_year <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
+
                 # previous total invested
                 if (year == self$params$initial_year) {
                   previous_total_invested <- self$results[self$results$Year == year,
@@ -1482,7 +1485,7 @@ PassiveInvestingCalculator <-
                 }
 
                 # Subtract the amount taken for loan
-                total_invested <- max(0,previous_total_invested + yearly_contribution + taken_from_investment + taken_from_contributions)
+                total_invested <- max(0, previous_total_invested + yearly_contribution + taken_from_investment + taken_from_contributions + return_previous_year)
 
 
               }
