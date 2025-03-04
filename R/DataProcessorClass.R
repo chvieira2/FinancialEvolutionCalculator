@@ -1137,7 +1137,9 @@ FinancialBalanceCalculator <-
                   "properties_maintenance_cost",
                   "properties_hausgeld_fees_total",
                   "properties_property_management_fee",
-                  "properties_vacancy_months_cost"
+                  "properties_vacancy_months_cost",
+
+                  "vorabpauschale_tax_paid"
                 )],
                 na.rm = TRUE)
               self$results[self$results$Year == year, "total_expenses"] <- expenses
@@ -1322,14 +1324,75 @@ PassiveInvestingCalculator <-
 
 
               self$calculate_passive_investment_money_needed_from_liquid(year)
-              self$calculate_passive_investment_money_taken_out_from_capital_gains(year)
-              self$calculate_passive_investment_money_taken_out_from_contributions(year)
+              self$calculate_passive_investment_money_withdrawn_from_capital_gains(year)
+              self$calculate_passive_investment_money_withdrawn_from_contributions(year)
               self$calculate_passive_investment_yearly_contribution(year)
               self$calculate_passive_investment_contributions_accumulated(year)
+
+              # Calculate Vorabpauschale tax if enabled
+              if (self$params$apply_vorabpauschale &&
+                  year != self$params$initial_year) {
+                self$calculate_vorabpauschale_tax(year)
+              } else {
+                # Set to zero if not enabled
+                self$results[self$results$Year == year, "vorabpauschale_amount"] <- 0
+                self$results[self$results$Year == year, "vorabpauschale_tax_paid"] <- 0
+              }
+
               self$calculate_passive_investment_total_invested(year)
               self$calculate_passive_investment_total_invested_liquid(year)
 
               return(self$results)
+            },
+
+            calculate_vorabpauschale_tax = function(year) {
+              # Get the investment factor based on investment type
+              # In a real scenario, we would need to track all investment types separately
+              # For simplicity, we're assuming all investments are of the same type
+              investment_factor <- switch(self$params$investment_type,
+                                          "equity_fund" = 0.7,
+                                          "mixed_fund" = 0.85,
+                                          "domestic_real_estate_fund" = 0.4,
+                                          "foreign_real_estate_fund" = 0.2,
+                                          0.7) # Default to equity fund
+
+              # Get the tax-free allowance
+              tax_free_allowance <- switch(self$params$tax_free_allowance_type,
+                                           "single" = 1000,
+                                           "married" = 2000,
+                                           1000) # Default to single
+
+              # Get base interest rate
+              base_interest_rate <- self$params$base_interest_rate_vorabpauschale / 100
+
+              # Subsequent years
+              previous_year <- year - 1
+              previous_total_invested <- self$results[self$results$Year == previous_year, "passive_investment_total_invested"]
+              return_on_investment <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
+
+              # Step 1: Calculate Vorabpauschale
+              vorabpauschale <- previous_total_invested * 0.7 * base_interest_rate * investment_factor
+
+              # Step 2: Compare with actual return
+              taxable_amount <- min(vorabpauschale, return_on_investment)
+
+              # Step 3: Apply tax-free allowance
+              taxable_amount_after_allowance <- max(0, taxable_amount - tax_free_allowance)
+
+              # Step 4: Calculate tax
+              tax_rate <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
+              vorabpauschale_tax <- taxable_amount_after_allowance * tax_rate
+
+
+              # Store the values
+              self$results[self$results$Year == year, "vorabpauschale_tax_paid"] <- self$round_to_2(vorabpauschale_tax)
+
+              # Track accumulated Vorabpauschale tax paid
+              accumulated_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"] + vorabpauschale_tax
+              self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- self$round_to_2(accumulated_tax)
+
+
+
             },
 
             calculate_passive_investment_money_needed_from_liquid = function(year) {
@@ -1368,16 +1431,51 @@ PassiveInvestingCalculator <-
                 -self$round_to_2(money_taken_out)
             },
 
-            calculate_passive_investment_money_taken_out_from_capital_gains = function(year) {
+            calculate_passive_investment_money_withdrawn_from_capital_gains = function(year) {
               previous_year <- year - 1
               previous_total_invested <- self$results[self$results$Year == previous_year, "passive_investment_total_invested"]
               previous_contributions_accumulated <- self$results[self$results$Year == previous_year, "passive_investment_contributions_accumulated"]
-              previous_capital_gains_tax_rate <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
+              previous_capital_gains_tax_rate <- self$results[self$results$Year == previous_year, "capital_gains_tax_rate"] / 100
               money_needed <- self$results[self$results$Year == year,
                                            "passive_investment_money_needed_from_liquid"]
 
-              # Correct money needed from liquid to brutto
-              money_needed_brutto <- money_needed / (1 - previous_capital_gains_tax_rate)
+              # Calculate capital gains
+              capital_gains <- previous_total_invested - previous_contributions_accumulated
+
+              # Apply German-specific tax rules if enabled
+              if (!is.null(self$params$apply_vorabpauschale) && self$params$apply_vorabpauschale) {
+                # Only 70% of capital gains are taxable in Germany
+                taxable_percentage <- 0.7
+
+                # Get the accumulated Vorabpauschale tax already paid
+                accumulated_vorabpauschale_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"]
+
+                # Calculate the tax rate
+                tax_rate <- self$results[self$results$Year == previous_year, "capital_gains_tax_rate"] / 100
+
+                # Adjust the money needed based on the modified tax calculation
+                if (money_needed < 0 && capital_gains > 0) {
+                  # Calculate what portion of the withdrawal is from capital gains
+                  withdrawal_ratio <- min(1, abs(money_needed) / previous_total_invested)
+                  capital_gains_withdrawn <- capital_gains * withdrawal_ratio
+
+                  # Calculate tax on withdrawn capital gains with German rules
+                  tax_on_capital_gains <- capital_gains_withdrawn * taxable_percentage * tax_rate
+
+                  # Deduct already paid Vorabpauschale tax (proportionally)
+                  vorabpauschale_tax_deduction <- accumulated_vorabpauschale_tax * withdrawal_ratio
+                  final_tax <- max(0, tax_on_capital_gains - vorabpauschale_tax_deduction)
+
+                  # Adjust the money needed to account for the modified tax calculation
+                  money_needed_brutto <- money_needed - final_tax
+                } else {
+                  money_needed_brutto <- money_needed
+                }
+              } else {
+                # Standard tax calculation if Vorabpauschale is not enabled
+                previous_capital_gains_tax_rate <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
+                money_needed_brutto <- money_needed / (1 - previous_capital_gains_tax_rate)
+              }
 
               # Adjust the money taken out based on accumulated contributions and capital gains tax
               if (money_needed_brutto < 0) {
@@ -1392,10 +1490,21 @@ PassiveInvestingCalculator <-
                 money_taken_out <- 0
               }
 
-              self$results[self$results$Year == year, "passive_investment_money_taken_out_from_capital_gains"] <- self$round_to_2(money_taken_out)
+              # Update accumulated Vorabpauschale tax if money is withdrawn
+              if (!is.null(self$params$apply_vorabpauschale) && self$params$apply_vorabpauschale && money_taken_out < 0) {
+                # Calculate what portion of the investment is being withdrawn
+                withdrawal_ratio <- min(1, abs(money_taken_out) / previous_total_invested)
+
+                # Reduce the accumulated Vorabpauschale tax proportionally
+                previous_accumulated_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"]
+                new_accumulated_tax <- previous_accumulated_tax * (1 - withdrawal_ratio)
+                self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- self$round_to_2(new_accumulated_tax)
+              }
+
+              self$results[self$results$Year == year, "passive_investment_money_withdrawn_from_capital_gains"] <- self$round_to_2(money_taken_out)
             },
 
-            calculate_passive_investment_money_taken_out_from_contributions = function(year) {
+            calculate_passive_investment_money_withdrawn_from_contributions = function(year) {
 
               previous_year <- year - 1
               previous_total_invested <- self$results[self$results$Year == previous_year, "passive_investment_total_invested"]
@@ -1422,7 +1531,7 @@ PassiveInvestingCalculator <-
                 money_taken_out <- 0
               }
 
-              self$results[self$results$Year == year, "passive_investment_money_taken_out_from_contributions"] <- self$round_to_2(money_taken_out)
+              self$results[self$results$Year == year, "passive_investment_money_withdrawn_from_contributions"] <- self$round_to_2(money_taken_out)
             },
 
             calculate_passive_investment_yearly_contribution = function(year) {
@@ -1442,7 +1551,7 @@ PassiveInvestingCalculator <-
                 accumulated <- 0
               } else {
                 yearly_contribution <- self$results[self$results$Year == year, "passive_investment_yearly_contribution"]
-                taken_from_contributions <- self$results[self$results$Year == year, "passive_investment_money_taken_out_from_contributions"]
+                taken_from_contributions <- self$results[self$results$Year == year, "passive_investment_money_withdrawn_from_contributions"]
 
                 # previous total invested
                 if (year == self$params$initial_year) {
@@ -1469,8 +1578,8 @@ PassiveInvestingCalculator <-
               } else {
                 yearly_contribution <- self$results[self$results$Year == year, "passive_investment_yearly_contribution"]
                 taken_from_investment <- self$results[self$results$Year == year,
-                                                      "passive_investment_money_taken_out_from_capital_gains"]
-                taken_from_contributions <- self$results[self$results$Year == year, "passive_investment_money_taken_out_from_contributions"]
+                                                      "passive_investment_money_withdrawn_from_capital_gains"]
+                taken_from_contributions <- self$results[self$results$Year == year, "passive_investment_money_withdrawn_from_contributions"]
 
                 # Add returns to be reinvested
                 return_previous_year <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
@@ -1547,6 +1656,8 @@ DataProcessor <-
 
               # Initialize the results dataframe
               self$results <- data.frame(Year = self$params$initial_year:self$params$final_year)
+              self$results$vorabpauschale_tax_paid <- 0
+              self$results$accumulated_vorabpauschale_tax <- 0
             },
 
             calculate = function() {

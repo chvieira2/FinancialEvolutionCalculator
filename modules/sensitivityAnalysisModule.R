@@ -103,7 +103,6 @@ sensitivityAnalysisModuleUI <- function(id) {
 
 sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data, year_range, is_mobile) {
   moduleServer(id, function(input, output, session) {
-    cat("Mobile detection (sensitivity):", is_mobile, "\n")
 
     # Reactive value to store property parameters
     property_params <- reactiveVal(NULL)
