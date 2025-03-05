@@ -1149,8 +1149,8 @@ FinancialBalanceCalculator <-
               # Salary
               salary <- self$results[self$results$Year == year, "net_annual_salary"]
 
-              # Passive Investment Income - REMOVED from income calculation since it will be reinvested
-              # returns <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
+              # Passive Investment Income - Later REMOVED from cash flow calculation since it will be automatically reinvested
+              returns <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
 
               # Lump sums
               lump_sums <- self$results[self$results$Year == year, "lump_sums"]
@@ -1168,7 +1168,7 @@ FinancialBalanceCalculator <-
                                 na.rm = TRUE)
 
 
-              income <- salary + lump_sums + rental_income + deductions# + returns
+              income <- salary + lump_sums + rental_income + deductions + returns
 
               self$results[self$results$Year == year, "total_income"] <- self$round_to_2(income)
             },
@@ -1189,6 +1189,9 @@ FinancialBalanceCalculator <-
 
               cash_flow <- self$results[self$results$Year == year, "total_income"] +
                 self$results[self$results$Year == year, "total_expenses"] + sale_funds
+              # Passive Investment Income is REMOVED from cash flow calculation since it will be automatically reinvested
+              cash_flow <- cash_flow - self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
+
               self$results[self$results$Year == year, "cash_flow"] <- self$round_to_2(cash_flow)
             },
 

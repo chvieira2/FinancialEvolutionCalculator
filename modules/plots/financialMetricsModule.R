@@ -3,11 +3,11 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-# Define fixed colors for metrics (using Set2 palette as before)
+# Define fixed colors for metrics
 METRIC_COLORS <- c(
   "Total Expenses" = "#66C2A5",
   "Total Income" = "#FC8D62",
-  "Cash Flow" = "#8DA0CB",
+  "Cash Flow" = "#2F4F4F",
   "Emergency Reserve" = "#E78AC3",
   "Investment Withdrawals" = "#A6D854",
   "Total Invested" = "#FFD92F"
@@ -99,8 +99,8 @@ financialMetricsModuleServer <- function(id, data, year_range) {
       data() %>%
         mutate(
           passive_investment_money_needed =
-            passive_investment_money_taken_out_from_capital_gains +
-            passive_investment_money_taken_out_from_contributions
+            passive_investment_money_withdrawn_from_capital_gains +
+            passive_investment_money_withdrawn_from_contributions
         ) %>%
         filter(Year >= year_range()[1] & Year <= year_range()[2])
     })

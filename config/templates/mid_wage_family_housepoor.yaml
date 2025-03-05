@@ -181,10 +181,10 @@ passive_investing:
       - mixed_fund: Mixed Fund
       - domestic_real_estate_fund: Domestic Real Estate Fund
       - foreign_real_estate_fund: Foreign Real Estate Fund
-    description: Type of passive investment. Different types of funds are taxed differently, affecting the Vorabpauschale calculation
+    description: Type of passive investment. Different types of funds are taxed differently.
   - id: tax_free_allowance_type
     type: selectInput
-    label: Tax-free allowance type
+    label: Vorabpauschale tax-free allowance type
     value: single
     choices:
       - single: Single Person (1000€)
