@@ -36,6 +36,9 @@ ui <- bslib::page_navbar(
   ),
 
   header = tags$head(
+    # Add shinyjs initialization
+    shinyjs::useShinyjs(),
+
     # Add script to detect mobile devices
     tags$script('
     $(document).on("shiny:connected", function() {

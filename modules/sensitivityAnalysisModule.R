@@ -12,7 +12,6 @@ sensitivityAnalysisModuleUI <- function(id) {
     # Analysis Configuration at the top
     div(
       class = "sensitivity-analysis-container",
-      # class = "row mb-3",  # Added margin-bottom
       div(
         class = "col-12",
         div(
@@ -90,11 +89,10 @@ sensitivityAnalysisModuleUI <- function(id) {
 
     # Results section
     div(
+      id = ns("sensitivity_results_container"),  # Add this ID for targeting
       class = "sensitivity-results",
-      # style = "margin-top: 20px;",
       # Faceted plots
       div(
-        # style = "margin-bottom: 20px;",
         uiOutput(ns("sensitivity_plot_container"))
       )
     )
@@ -325,6 +323,9 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           analysis_results(final_results)
         }
       )
+
+      # Show the container after analysis completes
+      shinyjs::show("sensitivity_results_container")
     })
 
     # Calculate plot heights based on number of parameters
@@ -482,5 +483,16 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       )
     })
 
+    # Hide sensitivity analysis results when inputs change
+    observe({
+      input$BASE_PARAMETERS
+      input$property_parameters_selection
+      input$variation_range
+      input$steps
+      reactive_config()
+
+      # Hide only the results section
+      shinyjs::hide("sensitivity_results_container")
+    })
     })
 }

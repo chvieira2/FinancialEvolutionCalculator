@@ -35,9 +35,7 @@ $(document).ready(function() {
   });
 });
 
-$(document).ready(function() {
-    // Existing code...
-  
+$(document).ready(function() {  
     // Function to enforce fixed start year for the range slider
     function enforceFixedStartYear() {
       var slider = $("#global_year_range").data("ionRangeSlider");
@@ -67,3 +65,8 @@ $(document).ready(function() {
       }
     });
   });
+
+$(document).ready(function() {
+  // Initially hide just the sensitivity analysis results container
+  $(".sensitivity-results").hide();
+});
