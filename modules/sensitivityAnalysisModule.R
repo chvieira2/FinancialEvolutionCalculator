@@ -9,12 +9,49 @@ sensitivityAnalysisModuleUI <- function(id) {
   ns <- NS(id)
 
   tagList(
-    # Control panel with more compact layout
+    # Analysis Configuration at the top
+    div(
+      class = "sensitivity-analysis-container",
+      # class = "row mb-3",  # Added margin-bottom
+      div(
+        class = "col-12",
+        div(
+          style = "background-color: #f8f9fa; padding: 10px; border-radius: 5px;",
+          h5("Analysis Configuration"),
+          div(
+            class = "row",
+            div(
+              class = "col-md-8",  # Wider on medium+ screens
+              sliderInput(
+                ns("variation_range"),
+                "Parameter Variation Range (%)",
+                min = -50, max = 50,
+                value = c(-20, 20),
+                step = 5,
+                width = "100%"
+              )
+            ),
+            div(
+              class = "col-md-4",  # Narrower on medium+ screens
+              numericInput(
+                ns("steps"),
+                "Number of Steps",
+                value = 5,
+                min = 3,
+                max = 9,
+                width = "100%"
+              )
+            )
+          )
+        )
+      )
+    ),
+
+    # Parameters section
     div(
       class = "row",
-      # First column (wider) - Parameters
       div(
-        class = "col-8",
+        class = "col-12",  # Full width for parameters
         # Base parameters
         div(
           style = "margin-bottom: 10px;",
@@ -48,51 +85,23 @@ sensitivityAnalysisModuleUI <- function(id) {
             class = "btn-primary"
           )
         )
-      ),
-      # Second column (narrower) - Analysis Settings
-      div(
-        class = "col-4",
-        div(
-          style = "background-color: #f8f9fa; padding: 10px; border-radius: 5px;",
-          h5("Analysis Configuration"),
-          div(
-            style = "margin-bottom: 10px;",
-            sliderInput(
-              ns("variation_range"),
-              "Parameter Variation Range (%)",
-              min = -80, max = 80,
-              value = c(-20, 20),
-              step = 10,
-              width = "100%"
-            )
-          ),
-          div(
-            numericInput(
-              ns("steps"),
-              "Number of Steps",
-              value = 7,
-              min = 3,
-              max = 9,
-              width = "100%"
-            )
-          )
-        )
       )
     ),
 
     # Results section
     div(
-      style = "margin-top: 20px;",
+      class = "sensitivity-results",
+      # style = "margin-top: 20px;",
       # Faceted plots
       div(
-        style = "margin-bottom: 20px;",
+        # style = "margin-bottom: 20px;",
         uiOutput(ns("sensitivity_plot_container"))
       )
     )
   )
-}
+  }
 
-sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data, year_range) {
+sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data, year_range, is_mobile) {
   moduleServer(id, function(input, output, session) {
 
     # Reactive value to store property parameters
@@ -324,19 +333,24 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
 
       n_params <- length(selected_parameters_snapshot())
 
-      # Sensitivity plot: minimum 400px, then 150px per parameter row (3 columns)
-      sensitivity_height <- max(400, ceiling(n_params/3) * 200)
+      # Calculate base height per parameter
+      base_height_per_param <- if(is_mobile) 400 else 300
 
-      list(
-        sensitivity = sensitivity_height
-      )
+      # Calculate total height based on number of parameters and columns
+      n_cols <- if(is_mobile) 1 else 3
+      n_rows <- ceiling(n_params / n_cols)
+
+      # Minimum height of 400px, then add height for each row
+      sensitivity_height <- max(400, n_rows * base_height_per_param)
+
+      sensitivity_height
     })
 
     # Render sensitivity plot container
     output$sensitivity_plot_container <- renderUI({
       req(plot_heights())
       plotOutput(session$ns("sensitivity_plots"),
-                 height = sprintf("%dpx", plot_heights()$sensitivity))
+                 height = sprintf("%dpx", plot_heights()))
     })
 
     # Render faceted sensitivity plots
@@ -421,17 +435,18 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
                              max_y + y_range * 0.1)  # Add small padding above headers
 
       ggplot() +
-        # Add lines
+        # Add lines for each parameter variation
         geom_line(
           data = plot_data,
           aes(x = Year,
               y = total_asset/1000,
               color = param_variation,
-              group = param_variation)
+              group = param_variation),
+          show.legend = FALSE
         ) +
-        # Add text annotations
+        # Add text annotations for parameter values
         geom_text(
-          data = text_data_combined,
+          data = text_data, #text_data_combined to include the headers
           aes(x = text_x,
               y = text_y,
               label = value_text,
@@ -441,9 +456,8 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           size = 4,
           show.legend = FALSE
         ) +
-        # Modified faceting to include property type
-        facet_wrap(~parameter, ncol = 3,
-                   labeller = label_wrap_gen(width = 30)) +
+        facet_wrap(~parameter, ncol = if(is_mobile) 1 else 3,
+                   labeller = label_wrap_gen(width = if(is_mobile) 20 else 30)) +
         scale_color_gradient2(
           low = "blue",
           mid = "#2C3E50",
@@ -451,10 +465,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           midpoint = 0
         ) +
         coord_cartesian(ylim = y_limits_adjusted, xlim = year_range()) +
-        scale_x_continuous(
-          limits = c(initial_year, NA)
-        ) +
-        theme_minimal() +
+        scale_x_continuous(limits = c(initial_year, NA)) +
         labs(
           title = "Single Parameter Impact Range on Asset Value Evolution",
           subtitle = "All values are inflation-adjusted to today's euros",
@@ -462,15 +473,14 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
           y = "Total Assets (thousands, €)",
           color = "Parameter\nVariation (% or years)"
         ) +
+        theme_minimal(base_size = if(is_mobile) 14 else 16) +
         theme(
-          strip.text = element_text(size = 12, face = "bold"),
-          strip.background = element_rect(
-            fill = "lightgray",
-            color = NA
-          ),
-          panel.grid.minor = element_blank(),
-          panel.border = element_rect(color = "gray", fill = NA)
-        )
+        axis.text = element_text(size = if(is_mobile) 9 else 11),
+        plot.margin = margin(t = 20, r = 10, b = 40, l = 10),
+        plot.title = element_text(size = if(is_mobile) 14 else 18),
+        plot.subtitle = element_text(size = if(is_mobile) 12 else 16)
+      )
     })
-  })
+
+    })
 }

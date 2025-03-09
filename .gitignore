@@ -1,4 +1,4 @@
-ToIgnore/
+*.docx
 
 # History files
 .Rhistory

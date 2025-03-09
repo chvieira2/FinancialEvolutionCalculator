@@ -23,17 +23,30 @@ safelyLoadConfig <- function(file_path) {
 createInputElement <- function(input_type, input_id, input_config) {
   switch(input_type,
          "numericInput" = numericInput(
-           input_id,
+           inputId = input_id,
            label = NULL,
            value = input_config$value
          ),
          "sliderInput" = sliderInput(
-           input_id,
+           inputId = input_id,
            label = NULL,
            min = input_config$min,
            max = input_config$max,
            value = input_config$value,
            step = input_config$step
+         ),
+         "checkboxInput" = checkboxInput(
+           inputId = input_id,
+           label = NULL,
+           value = input_config$value
+         ),
+         "selectInput" = selectInput(
+           inputId = input_id,
+           label = NULL,
+           choices = unlist(lapply(input_config$choices, function(x) x[[1]])),
+           selected = unlist(lapply(input_config$choices, function(x) x[[1]]))[1],
+           multiple = FALSE,
+           selectize = FALSE
          ),
          # Default to numericInput
          numericInput(

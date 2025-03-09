@@ -36,6 +36,19 @@ ui <- bslib::page_navbar(
   ),
 
   header = tags$head(
+    # Add script to detect mobile devices
+    tags$script('
+    $(document).on("shiny:connected", function() {
+      var mobile = window.matchMedia("(max-width: 768px)").matches;
+      Shiny.setInputValue("is_mobile", mobile);
+    });
+    $(window).resize(function() {
+      var mobile = window.matchMedia("(max-width: 768px)").matches;
+      Shiny.setInputValue("is_mobile", mobile);
+    });
+  '),
+
+    # Add meta tags
     tags$link(rel = "stylesheet",
               href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"),
     tags$link(rel = "stylesheet", href = "css/styles.css"),
@@ -86,35 +99,40 @@ ui <- bslib::page_navbar(
         ),
         fluidRow(
           column(
-            width = 6,
+            width = 12,  # Full width on mobile
+            class = "col-lg-6",  # Half width on large screens
             card(
-              style = "height: 400px;",
+              id = "asset_plot_card",
               card_header("Asset Evolution"),
               plotYearlyAssetProgressionModuleUI("result_plot")
             )
           ),
           column(
-            width = 6,
+            width = 12,
+            class = "col-lg-6",
             card(
-              style = "height: 400px;",
+              id = "financial_metrics_card",
               card_header("Financial Metrics"),
               financialMetricsModuleUI("financial_metrics")
             )
           )
         ),
         fluidRow(
+          # Stacked Area Plots
           column(
-            width = 6,
+            width = 12,
+            class = "col-lg-6",
             card(
-              style = "height: 400px;",
+              id = "stacked_area_card_expenses",
               card_header("Expenses Components"),
               stackedAreaPlotModuleUI("expense_components", plot_type = "expenses")
             )
           ),
           column(
-            width = 6,
+            width = 12,
+            class = "col-lg-6",
             card(
-              style = "height: 400px;",
+              id = "stacked_area_card_income",
               card_header("Income Components"),
               stackedAreaPlotModuleUI("income_components", plot_type = "income")
             )
@@ -125,6 +143,7 @@ ui <- bslib::page_navbar(
           column(
             width = 12,
             card(
+              id = "sensitivity_analysis_card",
               card_header("Sensitivity Analysis"),
               sensitivityAnalysisModuleUI("sensitivity_analysis")
             )
@@ -142,6 +161,16 @@ ui <- bslib::page_navbar(
 )
 
 server <- function(input, output, session) {
+
+  # Debuggin helper for mobile
+  observe({
+    cat("Mobile detection:", input$is_mobile, "\n")
+    output$debug_info <- renderText({
+      glue::glue("Screen: {input$dimension[1]}x{input$dimension[2]}")
+    })
+  })
+
+
   # Let the module handle the configuration
   reactive_config <- sidebarInputModuleServer("sidebar_inputs")
 
@@ -172,11 +201,14 @@ server <- function(input, output, session) {
   )
 
   # Plot module
-  plotYearlyAssetProgressionModuleServer("result_plot", processed_data, reactive_config, year_range)
-  financialMetricsModuleServer("financial_metrics", processed_data, year_range)
-  stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
-  stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
-  sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range)
+  observeEvent(input$is_mobile, {
+    plotYearlyAssetProgressionModuleServer("result_plot", processed_data, reactive_config, year_range)
+    financialMetricsModuleServer("financial_metrics", processed_data, year_range)
+    stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
+    stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
+    sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range, isolate(input$is_mobile))
+  })
+
 
   # Download handler for financial calculations
   output$download_calculations <- downloadHandler(

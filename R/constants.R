@@ -38,31 +38,31 @@ DEFAULT_YEARS <- list(
 BASE_PARAMETERS <- list(
   # list(
   #   id = "taxes_description.inflation",
-  #   name = "Average Annual Inflation",
+  #   name = "Annual Inflation",
   #   color = "#E41A1C",
   #   type = "percentage"
   # ),
   list(
     id = "general_life.living_style_costs",
-    name = "Average Annual Living Standard Costs",
+    name = "Annual Living Standard Costs",
     color = "#377EB8",
     type = "currency"
   ),
   list(
     id = "general_life.salaries_growth_start_career",
-    name = "Average Annual Salary Growth",
+    name = "Annual Salary Growth",
     color = "#4DAF4A",
     type = "percentage"
   ),
   list(
     id = "passive_investing.expected_return_on_investment",
-    name = "Average Annual Investment Returns",
+    name = "Annual Investment Returns",
     color = "#984EA3",
     type = "percentage"
   ),
   list(
     id = "rental.rental_prices_growth",
-    name = "Average Annual Own Rent Growth",
+    name = "Annual Own Rent Growth",
     color = "#FFFF33",
     type = "percentage"
   )
@@ -72,7 +72,7 @@ BASE_PARAMETERS <- list(
 property_parameter_template <- list(
   value_growth = list(
     id_suffix = "value_growth",
-    name_suffix = "Average Annual Property Value Growth",
+    name_suffix = "Annual Property Value Growth",
     color = "#FF7F00",
     type = "percentage"
   ),
