@@ -155,7 +155,7 @@ passive_investing:
   - id: expected_conservative_return_on_investment
     type: numericInput
     label: Expected return on investment by retirement age (% per year)
-    value: 4
+    value: 6
     description: Expected annual return on investments at age of retirement. It is sometimes recommended
       to reduce risk over the years by shifting to a more conservative investment approach,
       with reduced returns.

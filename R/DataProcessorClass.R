@@ -1483,45 +1483,49 @@ PassiveInvestingCalculator <-
               money_needed <- self$results[self$results$Year == year,
                                            "passive_investment_money_needed_from_liquid"]
 
-              # Only 70% of capital gains are taxable in Germany
-              taxable_percentage <- 0.7
+              # Calculate the tax rate
+              tax_rate <- self$results[self$results$Year == previous_year, "capital_gains_tax_rate"] / 100
 
               if (money_needed != 0) browser()
 
-              # Calculate capital gains
+              # Calculate capital gains from previous year
               capital_gains <- previous_total_invested - previous_contributions_accumulated
 
               # Apply German-specific tax rules if enabled
-              if (!is.null(self$params$apply_vorabpauschale) && self$params$apply_vorabpauschale) {
+              if (self$params$apply_vorabpauschale) {
+
+                # Only 70% of capital gains are taxable in advance in Germany
+                taxable_percentage <- 0.7
 
                 # Get the accumulated Vorabpauschale tax already paid
                 accumulated_vorabpauschale_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"]
 
-                # Calculate the tax rate
-                tax_rate <- self$results[self$results$Year == previous_year, "capital_gains_tax_rate"] / 100
-
                 # Adjust the money needed based on the modified tax calculation
                 if (money_needed < 0 && capital_gains > 0) {
                   # Calculate what portion of the withdrawal is from capital gains
-                  withdrawal_ratio <- min(1, abs(money_needed) / previous_total_invested)
-                  capital_gains_withdrawn <- capital_gains * withdrawal_ratio
+                  # This assumes withdraw from invested money is proportional to how much is capital gains and direct contributions
+                  # Only a fraction of withdraw from capital gains is taxed (taxable_percentage)
+                  # Withdraw from contributions is not taxed
+                  capital_gains_ratio <- abs(capital_gains) / previous_total_invested
+                  capital_gains_withdrawn <- money_needed * capital_gains_ratio
+                  contributions_withdrawn <- money_needed * (1 - capital_gains_ratio)
 
                   # Calculate tax on withdrawn capital gains with German rules
                   tax_on_capital_gains <- capital_gains_withdrawn * taxable_percentage * tax_rate
 
                   # Deduct already paid Vorabpauschale tax (proportionally)
-                  vorabpauschale_tax_deduction <- accumulated_vorabpauschale_tax * withdrawal_ratio
-                  final_tax <- max(0, tax_on_capital_gains + vorabpauschale_tax_deduction)
+                  final_tax <- min(0, tax_on_capital_gains - accumulated_vorabpauschale_tax)
 
                   # Adjust the money needed to account for the modified tax calculation
-                  money_needed_brutto <- money_needed - final_tax
+                  money_needed_brutto <- contributions_withdrawn + capital_gains_withdrawn - final_tax
                 } else {
                   money_needed_brutto <- money_needed
                 }
               } else {
-                # Standard tax calculation if Vorabpauschale is not enabled
-                previous_capital_gains_tax_rate <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
-                money_needed_brutto <- money_needed / (1 - previous_capital_gains_tax_rate)
+
+                # Standard tax calculation if Vorabpauschale is not enabled 100
+                # Money needed brutto will be the netto amount plus the tax on the gains
+                money_needed_brutto <- money_needed * (1 + tax_rate)
               }
 
               # Adjust the money taken out based on accumulated contributions and capital gains tax
@@ -1538,13 +1542,13 @@ PassiveInvestingCalculator <-
               }
 
               # Update accumulated Vorabpauschale tax if money is withdrawn
-              if (!is.null(self$params$apply_vorabpauschale) && self$params$apply_vorabpauschale && money_taken_out < 0) {
+              if (self$params$apply_vorabpauschale && money_taken_out < 0) {
                 # Calculate what portion of the investment is being withdrawn
                 withdrawal_ratio <- min(1, abs(money_taken_out) / previous_total_invested)
 
                 # Reduce the accumulated Vorabpauschale tax proportionally
                 previous_accumulated_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"]
-                new_accumulated_tax <- previous_accumulated_tax * (1 - withdrawal_ratio)
+                new_accumulated_tax <- previous_accumulated_tax - tax_on_capital_gains
                 self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- self$round_to_2(new_accumulated_tax)
               }
 

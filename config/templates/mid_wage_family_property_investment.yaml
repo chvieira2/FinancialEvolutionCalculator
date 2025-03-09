@@ -155,10 +155,42 @@ passive_investing:
   - id: expected_conservative_return_on_investment
     type: numericInput
     label: Expected return on investment by retirement age (% per year)
-    value: 4
-    description: Expected annual return on investments at age of retirement. It is
-      common practice to shift over the years to less risky and more conservative
-      investments, with reduced returns.
+    value: 6
+    description: Expected annual return on investments at age of retirement. It is sometimes recommended
+      to reduce risk over the years by shifting to a more conservative investment approach,
+      with reduced returns.
+  - id: apply_vorabpauschale
+    type: checkboxInput
+    label: Apply German advance lump-sum taxation? (Germany only)
+    value: true
+    description: Apply the German-specific advanced taxation based on the Vorabpauschale for accumulating funds.
+      This tax is mandatory since 2018 in Germany.
+      For more information, please visit https://www.finanztip.de/indexfonds-etf/etf-steuern/vorabpauschale/
+  - id: base_interest_rate_vorabpauschale
+    type: numericInput
+    label: Base interest rate for Vorabpauschale (%)
+    value: 2.63
+    description: The base interest rate used for Vorabpauschale calculation (Basiszins).
+      Find the current value by the Federal Bank https://www.bundesbank.de/dynamic/action/de/statistiken/zeitreihen-datenbanken/zeitreihen-datenbank/723452/723452?tsId=BBSSY.D.REN.EUR.A615.000000WT1515.A&dateSelect=2024
+  - id: investment_type
+    type: selectInput
+    label: Type of passive investment
+    value: equity_fund
+    choices:
+      - equity_fund: Equity Fund
+      - mixed_fund: Mixed Fund
+      - domestic_real_estate_fund: Domestic Real Estate Fund
+      - foreign_real_estate_fund: Foreign Real Estate Fund
+    description: Type of passive investment. Different types of funds are taxed differently.
+  - id: tax_free_allowance_type
+    type: selectInput
+    label: Vorabpauschale tax-free allowance type
+    value: single
+    choices:
+      - single: Single Person (1000€)
+      - married: Married Couple (2000€)
+    description: Yearly tax-free allowance for advanced tax on accumulating investment.
+      For more information, please visit https://www.finanztip.de/indexfonds-etf/investmentsteuerreformgesetz/
 taxes_description:
   title: Taxes and Inflation
   inputs:
