@@ -170,7 +170,6 @@ server <- function(input, output, session) {
     })
   })
 
-
   # Let the module handle the configuration
   reactive_config <- sidebarInputModuleServer("sidebar_inputs")
 

@@ -1426,8 +1426,13 @@ PassiveInvestingCalculator <-
 
               # Core passive investment calculations
               private$calculate_passive_investment_money_needed_from_liquid(year)
-              private$calculate_passive_investment_money_withdrawn_from_capital_gains(year)
-              private$calculate_passive_investment_money_withdrawn_from_contributions(year)
+              if (year != self$params$initial_year) {
+                private$calculate_passive_investment_money_withdrawn_from_capital_gains(year)
+                private$calculate_passive_investment_money_withdrawn_from_contributions(year)
+              } else {
+                self$results[self$results$Year == year, "passive_investment_money_withdrawn_from_capital_gains"] <- 0
+                self$results[self$results$Year == year, "passive_investment_money_withdrawn_from_contributions"] <- 0
+              }
               private$calculate_passive_investment_yearly_contribution(year)
               private$calculate_passive_investment_contributions_accumulated(year)
               private$calculate_passive_investment_total_invested(year)
@@ -1485,8 +1490,6 @@ PassiveInvestingCalculator <-
 
               # Calculate the tax rate
               tax_rate <- self$results[self$results$Year == previous_year, "capital_gains_tax_rate"] / 100
-
-              if (money_needed != 0) browser()
 
               # Calculate capital gains from previous year
               capital_gains <- previous_total_invested - previous_contributions_accumulated
@@ -1901,6 +1904,7 @@ if (sys.nframe() == 0) {
 
   cat("Running test code for DataProcessor class...\n")
   input_config = yaml::read_yaml(file.path("config", "templates", "high_wage_family_rent.yaml"))
+  # input_config$passive_investing$inputs[[3]]$value <- FALSE
 
 
   processor <- DataProcessor$new(config = input_config, scenario_name = "example")
