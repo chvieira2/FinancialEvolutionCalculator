@@ -8,11 +8,11 @@ PLOT_CONFIGS <- list(
   income = list(
     title = "Income Components Over The Years, inflation-corrected (thousands, €)",
     colors = c(
-      "Net Salary" = "#66C2A5",
-      "Passive Investment Returns" = "#E78AC3",
-      "Rental Income" = "#FC8D62",
-      "Income Taxes Deduction" = "#8DA0CB",
-      "Lump sums" = "#A6D854"
+      "Net Salary" = "#1A8754",                   # Rich Green - primary income
+      "Passive Investment Returns" = "#4361EE",    # Royal Blue - investment theme
+      "Rental Income" = "#F4A261",                # Sandy Orange - property theme
+      "Income Taxes Deduction" = "#9D4EDD",       # Purple - tax related
+      "Lump sums" = "#E63946"                     # Red - one-time/special income
     ),
     components = list(
       list(id = "lump_sums", label = "Lump sums"),
@@ -20,26 +20,30 @@ PLOT_CONFIGS <- list(
       list(id = "properties_warm_lease_income", label = "Rental Income"),
       list(id = "passive_investment_return_from_previous_year", label = "Passive Investment Returns"),
       list(id = "net_annual_salary", label = "Net Salary")
-
     )
   ),
   expenses = list(
     title = "Expense Components Over The Years, inflation-corrected (thousands, €)",
     colors = c(
-      # Home Expenses (Blues)
-      "Living Standard Costs" = "#A6CEE3",
-      "Kids-related living Costs" = "#1F78B4",
-      "Rent" = "#B2DF8A",
-      "Housing Costs (Nebenkosten)" = "#33A02C",
+      # Living Expenses (warm orange/red family)
+      "Living Standard Costs" = "#FF7F50",         # Coral
+      "Kids-related living Costs" = "#E34234",     # Vermilion
 
-      # Investment Property Costs
-      "Properties Mortgage/Loan Principal Share" = "#B15928",
-      "Properties Mortgage/Loan Interest Share" = "#D6604D",
-      "Properties Property Taxes" = "#2166AC",
-      "Properties Maintenance" = "#B2182B",
-      "Properties Hausgeld" = "#D1E5F0",
-      "Investment Properties Management Fees" = "#F4A582",
-      "Investment Properties Vacancy Costs" = "#053061"
+      # Renting Costs (blue family)
+      "Rent" = "#4169E1",                          # Royal Blue
+      "Housing Costs (Nebenkosten)" = "#1E90FF",   # Dodger Blue
+
+      # Passive investment taxes (purple family)
+      "Advanced taxes on Passice Investment (Vorabpauschale)" = "#9370DB", # Medium Purple
+
+      # Investment Property Costs (green and brown family)
+      "Properties Mortgage/Loan Principal Share" = "#2E8B57",  # Sea Green
+      "Properties Mortgage/Loan Interest Share" = "#3CB371",   # Medium Sea Green
+      "Properties Property Taxes" = "#8FBC8F",                 # Dark Sea Green
+      "Properties Maintenance" = "#6B8E23",                    # Olive Drab
+      "Properties Hausgeld" = "#BDB76B",                       # Dark Khaki
+      "Investment Properties Management Fees" = "#A0522D",     # Sienna
+      "Investment Properties Vacancy Costs" = "#CD853F"        # Peru
     ),
     components = list(
       # Investment Property Costs
@@ -50,6 +54,9 @@ PLOT_CONFIGS <- list(
       list(id = "properties_property_taxes", label = "Properties Property Taxes"),
       list(id = "properties_interest_share", label = "Properties Mortgage/Loan Interest Share"),
       list(id = "properties_principal_share", label = "Properties Mortgage/Loan Principal Share"),
+
+      # Passive investment taxes
+      list(id = "vorabpauschale_tax_paid", label = "Advanced taxes on Passice Investment (Vorabpauschale)"),
 
       # Rent
       list(id = "rental_housing_cost", label = "Housing Costs (Nebenkosten)"),

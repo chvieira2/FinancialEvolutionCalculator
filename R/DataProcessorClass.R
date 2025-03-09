@@ -1189,6 +1189,7 @@ FinancialBalanceCalculator <-
 
               cash_flow <- self$results[self$results$Year == year, "total_income"] +
                 self$results[self$results$Year == year, "total_expenses"] + sale_funds
+
               # Passive Investment Income is REMOVED from cash flow calculation since it will be automatically reinvested
               cash_flow <- cash_flow - self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
 
@@ -1333,13 +1334,11 @@ PassiveInvestingCalculator <-
               self$calculate_passive_investment_contributions_accumulated(year)
 
               # Calculate Vorabpauschale tax if enabled
-              if (self$params$apply_vorabpauschale &&
-                  year != self$params$initial_year) {
-                self$calculate_vorabpauschale_tax(year)
-              } else {
-                # Set to zero if not enabled
-                self$results[self$results$Year == year, "vorabpauschale_amount"] <- 0
-                self$results[self$results$Year == year, "vorabpauschale_tax_paid"] <- 0
+              if (self$params$apply_vorabpauschale) {
+                if (year != self$params$initial_year) {
+                  # Apply only if not in the first year, as standard value is already zero
+                  self$calculate_passive_investment_vorabpauschale_tax(year)
+                }
               }
 
               self$calculate_passive_investment_total_invested(year)
@@ -1348,7 +1347,7 @@ PassiveInvestingCalculator <-
               return(self$results)
             },
 
-            calculate_vorabpauschale_tax = function(year) {
+            calculate_passive_investment_vorabpauschale_tax = function(year) {
               # Get the investment factor based on investment type
               # In a real scenario, we would need to track all investment types separately
               # For simplicity, we're assuming all investments are of the same type
@@ -1384,7 +1383,7 @@ PassiveInvestingCalculator <-
 
               # Step 4: Calculate tax
               tax_rate <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
-              vorabpauschale_tax <- taxable_amount_after_allowance * tax_rate
+              vorabpauschale_tax <- -taxable_amount_after_allowance * tax_rate
 
 
               # Store the values
@@ -1844,7 +1843,7 @@ DataProcessor <-
 if (sys.nframe() == 0) {
 
   cat("Running test code for DataProcessor class...\n")
-  input_config = yaml::read_yaml(file.path("config", "templates", "mid_wage_family_housepoor.yaml"))
+  input_config = yaml::read_yaml(file.path("config", "templates", "high_wage_family_rent.yaml"))
 
 
   processor <- DataProcessor$new(config = input_config, scenario_name = "example")

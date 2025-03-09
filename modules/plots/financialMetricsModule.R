@@ -5,12 +5,12 @@ library(tidyr)
 
 # Define fixed colors for metrics
 METRIC_COLORS <- c(
-  "Total Expenses" = "#66C2A5",
-  "Total Income" = "#FC8D62",
-  "Cash Flow" = "#2F4F4F",
-  "Emergency Reserve" = "#E78AC3",
-  "Investment Withdrawals" = "#A6D854",
-  "Total Invested" = "#FFD92F"
+  "Total Expenses" = "#E63946",       # Bright red - represents outflow/costs
+  "Total Income" = "#2A9D8F",         # Teal green - represents inflow/earnings
+  "Cash Flow" = "#5E60CE",            # Vibrant purple - represents net financial movement
+  "Emergency Reserve" = "#F4A261",    # Orange amber - represents safety/caution
+  "Investment Withdrawals" = "#8338EC", # Deep purple - represents drawing from investments
+  "Total Invested" = "#FFD700"        # Bright gold - represents wealth/investment
 )
 
 # Define fixed order and labels for metrics

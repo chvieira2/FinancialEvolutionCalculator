@@ -24,7 +24,7 @@ general_life:
   - id: savings
     type: numericInput
     label: Savings (EUR)
-    value: 0
+    value: 50000
     description: Current savings amount.
   - id: savings_emergency_reserve
     type: numericInput
