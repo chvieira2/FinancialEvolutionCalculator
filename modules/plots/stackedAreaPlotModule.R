@@ -34,7 +34,7 @@ PLOT_CONFIGS <- list(
       "Housing Costs (Nebenkosten)" = "#1E90FF",   # Dodger Blue
 
       # Passive investment taxes (purple family)
-      "Advanced taxes on Passice Investment (Vorabpauschale)" = "#9370DB", # Medium Purple
+      "advance lump-sum taxation (Vorabpauschale)" = "#9370DB", # Medium Purple
 
       # Investment Property Costs (green and brown family)
       "Properties Mortgage/Loan Principal Share" = "#2E8B57",  # Sea Green

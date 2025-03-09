@@ -161,7 +161,7 @@ passive_investing:
       investments, with reduced returns.
   - id: apply_vorabpauschale
     type: checkboxInput
-    label: Apply advance taxation on accumulating investments? (Germany only)
+    label: Apply German advance lump-sum taxation? (Germany only)
     value: true
     description: Apply the German-specific advanced taxation based on the Vorabpauschale for accumulating funds.
       This tax is mandatory since 2018 in Germany.

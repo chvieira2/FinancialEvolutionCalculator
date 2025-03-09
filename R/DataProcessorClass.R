@@ -50,26 +50,39 @@ GeneralCalculator <-
               self$results$inflation <- self$round_to_2(self$params$inflation)
 
               # General calculations (always performed)
-              self$calculate_salaries_growth(year)
-              self$calculate_salary(year)
-              self$calculate_living_costs_change_elternzeit(year)
-              self$calculate_living_costs_family(year)
-              self$calculate_living_costs(year)
-              self$calculate_expected_money_for_investment_savings(year)
-              self$calculate_net_annual_salary(year)
-              self$calculate_lump_sums(year)
-              self$calculate_expected_yearly_return_on_passive_investment_inflation_corrected(year)
-              self$calculate_total_taxes_on_income(year)
-              self$calculate_capital_gains_tax_rate(year)
+              private$calculate_salaries_growth(year)
+              private$calculate_salary(year)
+              private$calculate_living_costs_change_elternzeit(year)
+              private$calculate_living_costs_family(year)
+              private$calculate_living_costs(year)
+              private$calculate_expected_money_for_investment_savings(year)
+              private$calculate_net_annual_salary(year)
+              private$calculate_lump_sums(year)
+              private$calculate_expected_yearly_return_on_passive_investment_inflation_corrected(year)
+              private$calculate_total_taxes_on_income(year)
+              private$calculate_capital_gains_tax_rate(year)
 
 
-              self$calculate_passive_investment_return_from_previous_year(year)
+              private$calculate_passive_investment_return_from_previous_year(year)
 
-              self$calculate_housing_cost_growth_inflation_corrected(year)
-              self$calculate_housing_cost(year)
+              # Calculate Vorabpauschale tax if enabled
+              if (self$params$apply_vorabpauschale && year != params$initial_year) {
+                private$calculate_passive_investment_vorabpauschale(year)
+                private$calculate_passive_investment_vorabpauschale_tax_from_previous_year(year)
+              } else {
+                private$calculate_passive_investment_vorabpauschale(year)
+                self$results[self$results$Year == year, "vorabpauschale_tax_from_previous_year"] <- 0
+                self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- 0
+              }
+
+              private$calculate_housing_cost_growth_inflation_corrected(year)
+              private$calculate_housing_cost(year)
 
               return(self$results)
-            },
+            }
+          ),
+
+          private = list(
 
             calculate_salaries_growth = function(year) {
               # Salary growth decreases linearly from start of career to retirement
@@ -138,10 +151,10 @@ GeneralCalculator <-
 
               # Calculate costs for each child
               if (!is.null(self$params$year_first_child_is_born) && year >= self$params$year_first_child_is_born) {
-                total_cost <- total_cost + self$calculate_child_cost(year, self$params$year_first_child_is_born)
+                total_cost <- total_cost + private$calculate_child_cost(year, self$params$year_first_child_is_born)
               }
               if (!is.null(self$params$year_second_child_is_born) && year >= self$params$year_second_child_is_born) {
-                total_cost <- total_cost + self$calculate_child_cost(year, self$params$year_second_child_is_born)
+                total_cost <- total_cost + private$calculate_child_cost(year, self$params$year_second_child_is_born)
               }
               # Add similar calculations for extra children if needed
 
@@ -258,6 +271,78 @@ GeneralCalculator <-
                 )
               }
               self$results[self$results$Year == year, "passive_investment_return_from_previous_year"] <- self$round_to_2(return_value)
+            },
+
+            calculate_passive_investment_vorabpauschale = function(year) {
+              # Get the tax-free allowance
+              tax_free_allowance <- switch(self$params$tax_free_allowance_type,
+                                           "single" = 1000,
+                                           "married" = 2000,
+                                           1000) # Default to single
+
+
+              if (year == self$params$initial_year) {
+                self$results[self$results$Year == year, "passive_investment_vorabpauschale"] <-
+                  self$round_to_2(tax_free_allowance)
+
+              } else {
+                previous_year <- year - 1
+
+                inflation_previous_year <-
+                  self$results[self$results$Year == previous_year, "inflation"]
+
+                passive_investment_vorabpauschale_previous_year <-
+                  self$results[self$results$Year == previous_year, "passive_investment_vorabpauschale"]
+
+                self$results[self$results$Year == year, "passive_investment_vorabpauschale"] <-
+                  self$round_to_2(passive_investment_vorabpauschale_previous_year * (1 + inflation_previous_year / 100))
+              }
+            },
+
+            calculate_passive_investment_vorabpauschale_tax_from_previous_year = function(year) {
+              # Get the investment factor based on investment type
+              # In a real scenario, we would need to track all investment types separately
+              # For simplicity, we're assuming all investments are of the same type
+              investment_factor <- switch(self$params$investment_type,
+                                          "equity_fund" = 0.7,
+                                          "mixed_fund" = 0.85,
+                                          "domestic_real_estate_fund" = 0.4,
+                                          "foreign_real_estate_fund" = 0.2,
+                                          0.7) # Default to equity fund
+
+              # Get the tax-free allowance
+              tax_free_allowance <- self$results[self$results$Year == year, "passive_investment_vorabpauschale"]
+
+
+              # Get base interest rate
+              base_interest_rate <- self$params$base_interest_rate_vorabpauschale / 100
+
+              # Subsequent years
+              previous_year <- year - 1
+              previous_total_invested <- self$results[self$results$Year == previous_year, "passive_investment_total_invested"]
+              return_on_investment <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
+
+              # Step 1: Calculate Vorabpauschale
+              vorabpauschale <- previous_total_invested * 0.7 * base_interest_rate * investment_factor
+
+              # Step 2: Compare with actual return
+              taxable_amount <- min(vorabpauschale, return_on_investment)
+
+              # Step 3: Apply tax-free allowance
+              taxable_amount_after_allowance <- max(0, taxable_amount - tax_free_allowance)
+
+              # Step 4: Calculate tax
+              tax_rate <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
+              vorabpauschale_tax <- -taxable_amount_after_allowance * tax_rate
+
+
+              # Store the values
+              self$results[self$results$Year == year, "vorabpauschale_tax_from_previous_year"] <- self$round_to_2(vorabpauschale_tax)
+
+              # Track accumulated Vorabpauschale tax paid
+              accumulated_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"] + vorabpauschale_tax
+              self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- self$round_to_2(accumulated_tax)
+
             },
 
             calculate_housing_cost_growth_inflation_corrected = function(year) {
@@ -1109,24 +1194,34 @@ FinancialBalanceCalculator <-
           inherit = BaseCalculator,
           public = list(
             calculate_financial_balance = function(year, params, results, properties) {
+              #' Main financial balance calculation entry point
+              #' @param year Calculation year
+              #' @param params Input parameters
+              #' @param results Results data frame
+              #' @param properties Property configurations
+              #'
               self$params <- params
               self$results <- results
               self$properties <- properties
 
-              self$calculate_total_expenses(year)
-              self$calculate_total_income(year)
-              self$calculate_cash_flow(year)
-              self$calculate_cash_flow_distribution(year)
-              self$calculate_savings_emergency_reserve(year)
+              private$calculate_total_expenses(year)
+              private$calculate_total_income(year)
+              private$calculate_cash_flow(year)
+              private$calculate_cash_flow_distribution(year)
+              private$calculate_savings_emergency_reserve(year)
 
               return(self$results)
-            },
+            }
+          ),
 
+          private = list(
 
             calculate_total_expenses = function(year) {
               expenses <- sum(
                 self$results[self$results$Year == year, c(
                   "living_costs",
+
+                  "vorabpauschale_tax_from_previous_year",
 
                   "rental_cost",
                   "rental_housing_cost",
@@ -1137,9 +1232,7 @@ FinancialBalanceCalculator <-
                   "properties_maintenance_cost",
                   "properties_hausgeld_fees_total",
                   "properties_property_management_fee",
-                  "properties_vacancy_months_cost",
-
-                  "vorabpauschale_tax_paid"
+                  "properties_vacancy_months_cost"
                 )],
                 na.rm = TRUE)
               self$results[self$results$Year == year, "total_expenses"] <- expenses
@@ -1263,7 +1356,7 @@ FinancialBalanceCalculator <-
               remaining_cash_flow <- cash_flow - emergency_reserve_allocation
 
               # Second priority: Mortgage amortization up to maximum allowed
-              actual_mortgage_allocation <- self$distribute_mortgage_amortization(year, remaining_cash_flow)
+              actual_mortgage_allocation <- private$distribute_mortgage_amortization(year, remaining_cash_flow)
               remaining_cash_flow <- remaining_cash_flow - actual_mortgage_allocation
 
               # Third priority: Passive investment
@@ -1320,82 +1413,31 @@ PassiveInvestingCalculator <-
   R6Class("PassiveInvestingCalculator",
           inherit = BaseCalculator,
           public = list(
+            calculate_passive_investment = function(year, params, results, properties) {
+              #' Calculate passive investment components after financial balance
+              #' @param year Calculation year
+              #' @param params Input parameters
+              #' @param results Results data frame
+              #' @param properties Property configurations
 
-            calculate_passive_investments = function(year, params, results, properties) {
               self$params <- params
               self$results <- results
               self$properties <- properties
 
-
-              self$calculate_passive_investment_money_needed_from_liquid(year)
-              self$calculate_passive_investment_money_withdrawn_from_capital_gains(year)
-              self$calculate_passive_investment_money_withdrawn_from_contributions(year)
-              self$calculate_passive_investment_yearly_contribution(year)
-              self$calculate_passive_investment_contributions_accumulated(year)
-
-              # Calculate Vorabpauschale tax if enabled
-              if (self$params$apply_vorabpauschale) {
-                if (year != self$params$initial_year) {
-                  # Apply only if not in the first year, as standard value is already zero
-                  self$calculate_passive_investment_vorabpauschale_tax(year)
-                }
-              }
-
-              self$calculate_passive_investment_total_invested(year)
-              self$calculate_passive_investment_total_invested_liquid(year)
+              # Core passive investment calculations
+              private$calculate_passive_investment_money_needed_from_liquid(year)
+              private$calculate_passive_investment_money_withdrawn_from_capital_gains(year)
+              private$calculate_passive_investment_money_withdrawn_from_contributions(year)
+              private$calculate_passive_investment_yearly_contribution(year)
+              private$calculate_passive_investment_contributions_accumulated(year)
+              private$calculate_passive_investment_total_invested(year)
+              private$calculate_passive_investment_total_invested_liquid(year)
 
               return(self$results)
-            },
+            }
+          ),
 
-            calculate_passive_investment_vorabpauschale_tax = function(year) {
-              # Get the investment factor based on investment type
-              # In a real scenario, we would need to track all investment types separately
-              # For simplicity, we're assuming all investments are of the same type
-              investment_factor <- switch(self$params$investment_type,
-                                          "equity_fund" = 0.7,
-                                          "mixed_fund" = 0.85,
-                                          "domestic_real_estate_fund" = 0.4,
-                                          "foreign_real_estate_fund" = 0.2,
-                                          0.7) # Default to equity fund
-
-              # Get the tax-free allowance
-              tax_free_allowance <- switch(self$params$tax_free_allowance_type,
-                                           "single" = 1000,
-                                           "married" = 2000,
-                                           1000) # Default to single
-
-              # Get base interest rate
-              base_interest_rate <- self$params$base_interest_rate_vorabpauschale / 100
-
-              # Subsequent years
-              previous_year <- year - 1
-              previous_total_invested <- self$results[self$results$Year == previous_year, "passive_investment_total_invested"]
-              return_on_investment <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
-
-              # Step 1: Calculate Vorabpauschale
-              vorabpauschale <- previous_total_invested * 0.7 * base_interest_rate * investment_factor
-
-              # Step 2: Compare with actual return
-              taxable_amount <- min(vorabpauschale, return_on_investment)
-
-              # Step 3: Apply tax-free allowance
-              taxable_amount_after_allowance <- max(0, taxable_amount - tax_free_allowance)
-
-              # Step 4: Calculate tax
-              tax_rate <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
-              vorabpauschale_tax <- -taxable_amount_after_allowance * tax_rate
-
-
-              # Store the values
-              self$results[self$results$Year == year, "vorabpauschale_tax_paid"] <- self$round_to_2(vorabpauschale_tax)
-
-              # Track accumulated Vorabpauschale tax paid
-              accumulated_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"] + vorabpauschale_tax
-              self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- self$round_to_2(accumulated_tax)
-
-
-
-            },
+          private = list(
 
             calculate_passive_investment_money_needed_from_liquid = function(year) {
               if (year == self$params$initial_year) {
@@ -1441,13 +1483,16 @@ PassiveInvestingCalculator <-
               money_needed <- self$results[self$results$Year == year,
                                            "passive_investment_money_needed_from_liquid"]
 
+              # Only 70% of capital gains are taxable in Germany
+              taxable_percentage <- 0.7
+
+              if (money_needed != 0) browser()
+
               # Calculate capital gains
               capital_gains <- previous_total_invested - previous_contributions_accumulated
 
               # Apply German-specific tax rules if enabled
               if (!is.null(self$params$apply_vorabpauschale) && self$params$apply_vorabpauschale) {
-                # Only 70% of capital gains are taxable in Germany
-                taxable_percentage <- 0.7
 
                 # Get the accumulated Vorabpauschale tax already paid
                 accumulated_vorabpauschale_tax <- self$results[self$results$Year == previous_year, "accumulated_vorabpauschale_tax"]
@@ -1466,7 +1511,7 @@ PassiveInvestingCalculator <-
 
                   # Deduct already paid Vorabpauschale tax (proportionally)
                   vorabpauschale_tax_deduction <- accumulated_vorabpauschale_tax * withdrawal_ratio
-                  final_tax <- max(0, tax_on_capital_gains - vorabpauschale_tax_deduction)
+                  final_tax <- max(0, tax_on_capital_gains + vorabpauschale_tax_deduction)
 
                   # Adjust the money needed to account for the modified tax calculation
                   money_needed_brutto <- money_needed - final_tax
@@ -1658,8 +1703,6 @@ DataProcessor <-
 
               # Initialize the results dataframe
               self$results <- data.frame(Year = self$params$initial_year:self$params$final_year)
-              self$results$vorabpauschale_tax_paid <- 0
-              self$results$accumulated_vorabpauschale_tax <- 0
             },
 
             calculate = function() {
@@ -1669,32 +1712,42 @@ DataProcessor <-
             },
 
             calculate_year = function(year) {
-              # General calculations (always performed)
-              self$results <- self$general_calculator$calculate_general(year, self$params, self$results)
+              #' Orchestrate yearly calculations with proper dependency order
+              #' @param year Calculation year
 
-              # Rental costs (assuming these are always calculated)
-              # Relevant rental values are zeroed out when home property is owned
-              self$results <- self$rental_calculator$calculate_rental(year, self$params, self$results)
+              # Phase 1: Core parameters and rental costs
+              self$results <-
+                self$general_calculator$calculate_general(year, self$params, self$results)
+              self$results <-
+                self$rental_calculator$calculate_rental(year, self$params, self$results)
 
-              # Property calculations
+              # Phase 2: Property calculations
               for (property_name in names(self$properties)) {
-                self$results <- self$property_calculator$calculate_property(year, self$params, self$results, self$properties[[property_name]], property_name)
-                rm(property_name)
+                self$results <-
+                  self$property_calculator$calculate_property(year,
+                                                              self$params,
+                                                              self$results,
+                                                              self$properties[[property_name]],
+                                                              property_name)
               }
-
-              # Add property expense summaries
               private$calculate_property_expense_summaries(year)
 
-              # Financial balance calculations
+              # Phase 3: Financial balance on that year
               self$results <-
-                self$financial_balance_calculator$calculate_financial_balance(year, self$params, self$results, self$properties)
+                self$financial_balance_calculator$calculate_financial_balance(year,
+                                                                              self$params,
+                                                                              self$results,
+                                                                              self$properties)
 
-              # Passive investments calculations
+              # Phase 4: Passive investments contributions calculations
               self$results <-
-                self$passive_investing_calculator$calculate_passive_investments(year, self$params, self$results, self$properties)
+                self$passive_investing_calculator$calculate_passive_investment(year,
+                                                                          self$params,
+                                                                          self$results,
+                                                                          self$properties)
 
+              # Final asset calculation
               private$calculate_total_asset(year)
-
             },
 
             get_results = function() {
