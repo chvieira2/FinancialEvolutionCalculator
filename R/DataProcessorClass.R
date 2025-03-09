@@ -469,14 +469,9 @@ PropertyCalculator <-
 
               private$calculate_property_principal_repayment_rate(year)
               private$calculate_property_mortgage_interest_rate(year)
+              private$calculate_property_mortgage_interest_share(year)
+              private$calculate_property_mortgage_payment(year)
               private$calculate_property_mortgage_principal_share(year)
-              self$results[self$results$Year == year,
-                           paste0(self$prefix, "mortgage_interest_share")] <-
-                private$calculate_property_mortgage_interest_share(year)
-
-              self$results[self$results$Year == year,
-                           paste0(self$prefix, "mortgage_payment")] <-
-                private$calculate_property_mortgage_payment(year)
               private$calculate_property_mortgage_length_years(year)
               private$calculate_property_mortgage_principal_left(year)
               private$calculate_property_mortgage_interest_left(year)
@@ -714,28 +709,6 @@ PropertyCalculator <-
               self$results[self$results$Year == year, paste0(self$prefix,  "mortgage_interest_rate")] <- self$round_to_2(value)
             },
 
-            calculate_property_mortgage_principal_share = function(year) {
-              if (self$results[self$results$Year == self$property_params$purchase_year,
-                               paste0(self$prefix, "mortgage_principal")] == 0) {
-                value <- 0
-              } else if (year == self$property_params$purchase_year) {
-                value <- -self$results[self$results$Year == self$property_params$purchase_year,
-                                       paste0(self$prefix, "mortgage_principal")] * (self$property_params$principal_repayment_rate / 100)
-              } else {
-                previous_year <- year - 1
-                mortgage_payment <- private$calculate_property_mortgage_payment(year)
-                interest_share <- private$calculate_property_mortgage_interest_share(year)
-                additional_amortization <- self$results[self$results$Year == previous_year,
-                                                        paste0(self$prefix, "additional_amortization")]
-                if (mortgage_payment <= 0) {
-                  value <- mortgage_payment - interest_share - additional_amortization
-                } else {
-                  value <- 0
-                }
-              }
-              self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_share")] <- self$round_to_2(value)
-            },
-
             calculate_property_mortgage_interest_share = function(year) {
               if (self$results[self$results$Year == self$property_params$purchase_year,
                                paste0(self$prefix, "mortgage_principal")] == 0) {
@@ -749,7 +722,8 @@ PropertyCalculator <-
                 interest_rate <- self$results[self$results$Year == year, paste0(self$prefix, "mortgage_interest_rate")] / 100
                 value <- previous_principal * interest_rate
               }
-              return(self$round_to_2(value))
+              self$results[self$results$Year == year,
+                           paste0(self$prefix, "mortgage_interest_share")] <- self$round_to_2(value)
             },
 
             calculate_property_mortgage_payment = function(year) {
@@ -758,21 +732,22 @@ PropertyCalculator <-
                 value <- 0
               } else if (year == self$property_params$purchase_year) {
                 # Initial mortgage payment is the sum of principal and interest payments
-                principal_share <- self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_share")]
+                principal_share <- -self$results[self$results$Year == self$property_params$purchase_year,
+                                                 paste0(self$prefix, "mortgage_principal")] * (self$property_params$principal_repayment_rate / 100)
+
                 interest_share <- self$results[self$results$Year == year, paste0(self$prefix, "mortgage_interest_share")]
                 value <- principal_share + interest_share
               } else {
                 # For subsequent years, calculate based on remaining principal and interest rate
                 previous_year <- year - 1
                 previous_principal_left <- self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_principal_left")]
-                previous_interest_rate <- self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_interest_rate")] / 100
-                previous_payment <- self$results[self$results$Year == previous_year, paste0(self$prefix, "mortgage_payment")]
+                interest_rate <- self$results[self$results$Year == year, paste0(self$prefix, "mortgage_interest_rate")] / 100
                 initial_payment <- self$results[self$results$Year == self$property_params$purchase_year, paste0(self$prefix, "mortgage_payment")]
 
                 if (previous_principal_left < 0) {
                   if (previous_principal_left > initial_payment) {
                     # If remaining principal is greater than initial payment, recalculate payment
-                    value <- previous_principal_left * (1 + previous_interest_rate)
+                    value <- previous_principal_left * (1 + interest_rate)
                   } else {
                     # Otherwise, maintain the same payment as the first year
                     value <- initial_payment
@@ -782,7 +757,34 @@ PropertyCalculator <-
                   value <- 0
                 }
               }
-              return(self$round_to_2(value))
+
+              self$results[self$results$Year == year,
+                           paste0(self$prefix, "mortgage_payment")] <- self$round_to_2(value)
+            },
+
+            calculate_property_mortgage_principal_share = function(year) {
+              if (self$results[self$results$Year == self$property_params$purchase_year,
+                               paste0(self$prefix, "mortgage_principal")] == 0) {
+                value <- 0
+              } else if (year == self$property_params$purchase_year) {
+                value <- -self$results[self$results$Year == self$property_params$purchase_year,
+                                       paste0(self$prefix, "mortgage_principal")] * (self$property_params$principal_repayment_rate / 100)
+              } else {
+                previous_year <- year - 1
+                mortgage_payment <- self$results[self$results$Year == year,
+                                                 paste0(self$prefix, "mortgage_payment")]
+                interest_share <- self$results[self$results$Year == year,
+                                               paste0(self$prefix, "mortgage_interest_share")]
+                additional_amortization <- -self$results[self$results$Year == previous_year,
+                                                         paste0(self$prefix, "additional_amortization")]
+
+                if (mortgage_payment <= 0) {
+                  value <- mortgage_payment - interest_share + additional_amortization
+                } else {
+                  value <- 0
+                }
+              }
+              self$results[self$results$Year == year, paste0(self$prefix, "mortgage_principal_share")] <- self$round_to_2(value)
             },
 
             calculate_property_mortgage_length_years = function(year) {
@@ -799,7 +801,8 @@ PropertyCalculator <-
                 value <- 0
               }
 
-              self$results[self$results$Year == year,                                                       paste0(self$prefix, "mortgage_length_years")] <- self$round_to_2(value)
+              self$results[self$results$Year == year,
+                           paste0(self$prefix, "mortgage_length_years")] <- self$round_to_2(value)
             },
 
             calculate_property_mortgage_principal_left = function(year) {
@@ -1903,7 +1906,7 @@ DataProcessor <-
 if (sys.nframe() == 0) {
 
   cat("Running test code for DataProcessor class...\n")
-  input_config = yaml::read_yaml(file.path("config", "templates", "high_wage_family_rent.yaml"))
+  input_config = yaml::read_yaml(file.path("config", "templates", "mid_wage_family_housepoor.yaml"))
   # input_config$passive_investing$inputs[[3]]$value <- FALSE
 
 
