@@ -4,6 +4,15 @@ GeneralCalculator <-
   R6Class("GeneralCalculator",
           inherit = BaseCalculator,
           public = list(
+            # Performs general calculations for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which calculations are performed.
+            #   params: A list of parameters required for the calculations.
+            #   results: A data frame to store the results of the calculations.
+            #
+            # Returns:
+            #   A data frame with updated results after performing the calculations.
             calculate_general = function(year, params, results) {
               self$params <- params
               self$results <- results
@@ -22,7 +31,6 @@ GeneralCalculator <-
               private$calculate_expected_yearly_return_on_passive_investment_inflation_corrected(year)
               private$calculate_total_taxes_on_income(year)
               private$calculate_capital_gains_tax_rate(year)
-
 
               private$calculate_passive_investment_return_from_previous_year(year)
 
@@ -45,8 +53,14 @@ GeneralCalculator <-
 
           private = list(
 
+            # Calculates the growth rate of salaries adjusted for inflation.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the inflation-corrected salary growth rate.
             calculate_salaries_growth = function(year) {
-              # Salary growth decreases linearly from start of career to retirement
               if (year == self$params$initial_year) {
                 growth <- self$params$salaries_growth_start_career
               } else if (year > self$params$expected_year_retirement) {
@@ -58,21 +72,24 @@ GeneralCalculator <-
                 growth <- self$params$salaries_growth_start_career - yearly_decrease * (year - self$params$initial_year)
               }
 
-              # Adjust growth rate for inflation
               inflation <- self$results[self$results$Year == year, "inflation"]
               inflation_corrected_growth <- self$correct_by_inflation(growth, inflation)
 
-              # Reduce salary upon retirement
               if (year == self$params$expected_year_retirement) {
                 inflation_corrected_growth <- -self$params$expected_salary_reduction_retirement/100
               }
 
-              self$results[self$results$Year == year, "salaries_growth_inflation_corrected"] <-
-                self$round_to_2(inflation_corrected_growth * 100)  # Convert back to percentage
+              self$results[self$results$Year == year, "salaries_growth_inflation_corrected"] <- self$round_to_2(inflation_corrected_growth * 100)
             },
 
+            # Calculates the salary for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the calculated salary.
             calculate_salary = function(year) {
-              # Apply inflation-corrected growth rate to previous year's salary
               if (year == self$params$initial_year) {
                 self$results[self$results$Year == year, "salary"] <- self$params$net_annual_income * 12
               } else {
@@ -84,19 +101,32 @@ GeneralCalculator <-
               }
             },
 
+            # Calculates the change in living costs due to Elternzeit (parental leave).
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the change in living costs due to Elternzeit.
             calculate_living_costs_change_elternzeit = function(year) {
               change <- 0
               if ((!is.null(self$params$year_first_child_is_born) && year == self$params$year_first_child_is_born) ||
                   (!is.null(self$params$year_second_child_is_born) && year == self$params$year_second_child_is_born)) {
                 change <- self$params$living_costs_change_elternzeit
               }
-              # Add similar checks for extra children if needed
 
               self$results[self$results$Year == year, "living_costs_change_elternzeit"] <- self$round_to_2(change)
             },
 
+            # Calculates the cost for a single child based on their age.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #   child_birth_year: An integer representing the birth year of the child.
+            #
+            # Returns:
+            #   A numeric value representing the cost for the child.
             calculate_child_cost = function(year, child_birth_year) {
-              # Function to calculate cost for a single child
               if (is.null(child_birth_year)) return(0)
               child_age <- year - child_birth_year
               if (child_age < 0) return(0)
@@ -107,21 +137,33 @@ GeneralCalculator <-
               return(0)
             },
 
+            # Calculates the total living costs for the family.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the total living costs for the family.
             calculate_living_costs_family = function(year) {
               total_cost <- 0
 
-              # Calculate costs for each child
               if (!is.null(self$params$year_first_child_is_born) && year >= self$params$year_first_child_is_born) {
                 total_cost <- total_cost + private$calculate_child_cost(year, self$params$year_first_child_is_born)
               }
               if (!is.null(self$params$year_second_child_is_born) && year >= self$params$year_second_child_is_born) {
                 total_cost <- total_cost + private$calculate_child_cost(year, self$params$year_second_child_is_born)
               }
-              # Add similar calculations for extra children if needed
 
               self$results[self$results$Year == year, "living_costs_family"] <- self$round_to_2(total_cost)
             },
 
+            # Calculates the total living costs for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the total living costs.
             calculate_living_costs = function(year) {
               base_living_costs <- -self$params$living_style_costs * 12
               change_elternzeit <- self$results[self$results$Year == year, "living_costs_change_elternzeit"] / 100
@@ -133,6 +175,13 @@ GeneralCalculator <-
               self$results[self$results$Year == year, "living_costs"] <- self$round_to_2(total_living_costs)
             },
 
+            # Calculates the expected money for investment savings for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the expected money for investment savings.
             calculate_expected_money_for_investment_savings = function(year) {
               if (year == self$params$initial_year) {
                 value <- self$params$percent_income_investing/100*self$params$net_annual_income*12
@@ -143,6 +192,13 @@ GeneralCalculator <-
               self$results[self$results$Year == year, "expected_money_for_investment_savings"] <- self$round_to_2(value)
             },
 
+            # Calculates the net annual salary for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the net annual salary.
             calculate_net_annual_salary = function(year) {
               if (year == self$params$initial_year) {
                 base_salary <- self$params$net_annual_income * 12
@@ -150,7 +206,6 @@ GeneralCalculator <-
                 base_salary <- self$results[self$results$Year == year, "salary"]
               }
 
-              # Apply salary reduction for Elternzeit
               reduction <- 1
               if (!is.null(self$params$year_first_child_is_born) && year == self$params$year_first_child_is_born) {
                 reduction <- 1 - (self$params$salary_reduction_elternzeit / 100)
@@ -159,13 +214,18 @@ GeneralCalculator <-
               }
               reduced_salary <- base_salary * reduction
 
-              # Remove the expected money for passive investing
               net_salary <- reduced_salary - self$results[self$results$Year == year, "expected_money_for_investment_savings"]
 
-              # Add similar checks for extra children if needed
               self$results[self$results$Year == year, "net_annual_salary"] <- self$round_to_2(net_salary)
             },
 
+            # Calculates the lump sums for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the lump sums.
             calculate_lump_sums = function(year) {
               total_lump_sum <- 0
 
@@ -177,16 +237,20 @@ GeneralCalculator <-
                 total_lump_sum <- total_lump_sum + self$params$lump_sum_2
               }
 
-              # Add more lump sums here if needed
-
               self$results[self$results$Year == year, "lump_sums"] <- self$round_to_2(total_lump_sum)
             },
 
+            # Calculates the expected yearly return on passive investment adjusted for inflation.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the expected yearly return on passive investment adjusted for inflation.
             calculate_expected_yearly_return_on_passive_investment_inflation_corrected = function(year) {
               inflation <- self$results[self$results$Year == year, "inflation"]
               expected_return_on_investment_inflation_corrected <- self$correct_by_inflation(self$params$expected_return_on_investment, inflation)
               expected_conservative_return_on_investment_inflation_corrected <- self$correct_by_inflation(self$params$expected_conservative_return_on_investment, inflation)
-
 
               years_until_retirement <- self$params$expected_year_retirement - self$params$initial_year
               yearly_decrease <- (expected_return_on_investment_inflation_corrected - expected_conservative_return_on_investment_inflation_corrected) / years_until_retirement
@@ -201,20 +265,41 @@ GeneralCalculator <-
                 value <- previous_value - yearly_decrease
               }
 
-              self$results[self$results$Year == year, "expected_yearly_return_on_passive_investment_inflation_corrected"] <- self$round_to_2(value * 100)  # Convert to percentage
+              self$results[self$results$Year == year, "expected_yearly_return_on_passive_investment_inflation_corrected"] <- self$round_to_2(value * 100)
             },
 
+            # Calculates the total taxes on income for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the total taxes on income.
             calculate_total_taxes_on_income = function(year) {
               total_tax <- (self$params$income_tax / 100*(1+self$params$solidarity_surcharge_tax / 100+self$params$church_tax / 100))*100
               self$results[self$results$Year == year, "total_taxes_on_income"] <- self$round_to_2(total_tax)
             },
 
+            # Calculates the capital gains tax rate for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the capital gains tax rate.
             calculate_capital_gains_tax_rate = function(year) {
               total_tax <- (self$params$capital_gains_tax_rate / 100*(1+self$params$solidarity_surcharge_tax / 100+self$params$church_tax / 100))*100
 
               self$results[self$results$Year == year, "capital_gains_tax_rate"] <- self$round_to_2(total_tax)
             },
 
+            # Calculates the passive investment return from the previous year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the passive investment return from the previous year.
             calculate_passive_investment_return_from_previous_year = function(year) {
               if (year == self$params$initial_year) {
                 if (self$params$savings > self$params$savings_emergency_reserve) {
@@ -234,32 +319,38 @@ GeneralCalculator <-
               self$results[self$results$Year == year, "passive_investment_return_from_previous_year"] <- self$round_to_2(return_value)
             },
 
+            # Calculates the Vorabpauschale for passive investments.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the Vorabpauschale.
             calculate_passive_investment_vorabpauschale = function(year) {
-              # Get the tax-free allowance
               tax_free_allowance <- switch(self$params$tax_free_allowance_type,
                                            "single" = 1000,
                                            "married" = 2000,
-                                           1000) # Default to single
-
+                                           1000)
 
               if (year == self$params$initial_year) {
-                self$results[self$results$Year == year, "passive_investment_vorabpauschale"] <-
-                  self$round_to_2(tax_free_allowance)
-
+                self$results[self$results$Year == year, "passive_investment_vorabpauschale"] <- self$round_to_2(tax_free_allowance)
               } else {
                 previous_year <- year - 1
 
-                inflation_previous_year <-
-                  self$results[self$results$Year == previous_year, "inflation"]
+                inflation_previous_year <- self$results[self$results$Year == previous_year, "inflation"]
+                passive_investment_vorabpauschale_previous_year <- self$results[self$results$Year == previous_year, "passive_investment_vorabpauschale"]
 
-                passive_investment_vorabpauschale_previous_year <-
-                  self$results[self$results$Year == previous_year, "passive_investment_vorabpauschale"]
-
-                self$results[self$results$Year == year, "passive_investment_vorabpauschale"] <-
-                  self$round_to_2(passive_investment_vorabpauschale_previous_year * (1 + inflation_previous_year / 100))
+                self$results[self$results$Year == year, "passive_investment_vorabpauschale"] <- self$round_to_2(passive_investment_vorabpauschale_previous_year * (1 + inflation_previous_year / 100))
               }
             },
 
+            # Calculates the Vorabpauschale tax from the previous year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the Vorabpauschale tax from the previous year.
             calculate_passive_investment_vorabpauschale_tax_from_previous_year = function(year) {
               # Get the investment factor based on investment type
               # In a real scenario, we would need to track all investment types separately
@@ -306,12 +397,26 @@ GeneralCalculator <-
 
             },
 
+            # Calculates the growth rate of housing costs adjusted for inflation.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the inflation-corrected housing cost growth rate.
             calculate_housing_cost_growth_inflation_corrected = function(year) {
               inflation <- self$results[self$results$Year == year, "inflation"]
               value <- self$correct_by_inflation(self$params$fixed_housing_costs_change, inflation) * 100
               self$results[self$results$Year == year, "housing_cost_growth_inflation_corrected"] <- self$round_to_2(value)
             },
 
+            # Calculates the housing cost for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the calculated housing cost.
             calculate_housing_cost = function(year) {
               if (year == self$params$initial_year) {
                 value <- -self$params$fixed_housing_costs * 12
