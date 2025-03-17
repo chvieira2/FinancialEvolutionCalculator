@@ -1,5 +1,12 @@
 library(R6)
 
+source(file.path("R", "calculators", "BaseCalculator.R"))
+source(file.path("R", "calculators", "GeneralCalculator.R"))
+source(file.path("R", "calculators", "RentalCalculator.R"))
+source(file.path("R", "calculators", "PropertyCalculator.R"))
+source(file.path("R", "calculators", "FinancialBalanceCalculator.R"))
+source(file.path("R", "calculators", "PassiveInvestingCalculator.R"))
+
 DataProcessor <-
   R6Class("DataProcessor",
           inherit = BaseCalculator,
@@ -240,13 +247,6 @@ DataProcessor <-
 
 #### Test code ####
 if (sys.nframe() == 0) {
-
-  source(file.path("R", "calculators", "BaseCalculator.R"))
-  source(file.path("R", "calculators", "GeneralCalculator.R"))
-  source(file.path("R", "calculators", "RentalCalculator.R"))
-  source(file.path("R", "calculators", "PropertyCalculator.R"))
-  source(file.path("R", "calculators", "FinancialBalanceCalculator.R"))
-  source(file.path("R", "calculators", "PassiveInvestingCalculator.R"))
 
   cat("Running test code for DataProcessor class...\n")
   input_config = yaml::read_yaml(file.path("config", "templates", "mid_wage_family_housepoor.yaml"))

@@ -75,6 +75,7 @@ PassiveInvestingCalculator <- R6Class("PassiveInvestingCalculator",
     #'
     #' @param year Calculation year
     calculate_passive_investment_money_withdrawn_from_capital_gains = function(year) {
+
       previous_year <- year - 1
       previous_total_invested <- self$results[self$results$Year == previous_year, "passive_investment_total_invested"]
       previous_contributions_accumulated <- self$results[self$results$Year == previous_year, "passive_investment_contributions_accumulated"]
@@ -148,7 +149,6 @@ PassiveInvestingCalculator <- R6Class("PassiveInvestingCalculator",
         new_accumulated_tax <- previous_accumulated_tax - tax_on_capital_gains
         self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- self$round_to_2(new_accumulated_tax)
       }
-
       self$results[self$results$Year == year, "passive_investment_money_withdrawn_from_capital_gains"] <- self$round_to_2(money_taken_out)
     },
 
@@ -276,29 +276,30 @@ PassiveInvestingCalculator <- R6Class("PassiveInvestingCalculator",
   lock_objects = FALSE  # This allows dynamic addition of fields
 )
 
-library(testthat)
-
 #### Test code ####
 if (sys.nframe() == 0) {
   source(file.path("R", "calculators", "BaseCalculator.R"))
-  
+
+  library(testthat)
+
   # Arrange
   params <- list(initial_year = 2021, apply_vorabpauschale = TRUE, savings = 10000, savings_emergency_reserve = 2000)
-  results <- data.frame(Year = 2021:2022, savings_emergency_reserve = c(2000, 0), cash_flow = c(1000, -500), cash_flow_to_investment = c(500, 0), capital_gains_tax_rate = c(25, 25), passive_investment_return_from_previous_year = c(0, 100))
-  properties <- list(property1 = list(purchase_year = 2022))
-  
+  results <- data.frame(Year = 2021:2022, savings_emergency_reserve = c(2000, 0), cash_flow = c(1000, -500), cash_flow_to_investment = c(500, 0), capital_gains_tax_rate = c(25, 25), passive_investment_return_from_previous_year = c(0, 100), accumulated_vorabpauschale_tax = c(0,0))
+
+    properties <- list(property1 = list(purchase_year = 2022))
+
   calculator <- PassiveInvestingCalculator$new()
-  
+
   # Act
   results <- calculator$calculate_passive_investment(2021, params, results, properties)
   results <- calculator$calculate_passive_investment(2022, params, results, properties)
-  
+
   # Assert
   test_that("PassiveInvestingCalculator calculates correctly for initial year", {
     expect_equal(results[results$Year == 2021, "passive_investment_money_withdrawn_from_capital_gains"], 0)
     expect_equal(results[results$Year == 2021, "passive_investment_money_withdrawn_from_contributions"], 0)
   })
-  
+
   test_that("PassiveInvestingCalculator calculates correctly for subsequent year", {
     expect_true(results[results$Year == 2022, "passive_investment_money_withdrawn_from_capital_gains"] < 0)
     expect_true(results[results$Year == 2022, "passive_investment_money_withdrawn_from_contributions"] <= 0)

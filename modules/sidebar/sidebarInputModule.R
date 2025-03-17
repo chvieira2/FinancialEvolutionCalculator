@@ -144,18 +144,18 @@ sidebarInputModuleServer <- function(id) {
       tryCatch({
         template_config <- safelyLoadConfig(file.path("config", "templates", template_file))
 
-        if (!is.null(template_config$properties)) {
-          for (i in seq_along(template_config$properties)) {
-            if (is.null(template_config$properties[[i]]$id)) {
-              template_config$properties[[i]]$id <- uuid::UUIDgenerate()
-            }
-          }
-        }
-
         if (!is.null(template_config)) {
           validation_result <- validateConfig(template_config)
 
           if (validation_result$is_valid) {
+            # Clear existing properties and regenerate IDs for the new template
+            if (!is.null(template_config$properties)) {
+              for (i in seq_along(template_config$properties)) {
+                template_config$properties[[i]]$id <- uuid::UUIDgenerate()  # Generate new unique IDs
+              }
+            }
+
+            # Replace the entire configuration
             config(template_config)
 
             # Update UI inputs
