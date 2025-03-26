@@ -58,7 +58,7 @@ sidebarInputModuleUI <- function(id) {
               lapply(non_essential_inputs, createStaticInput, section = section)
             )
           )
-        }      )
+        })
     })
   }
 

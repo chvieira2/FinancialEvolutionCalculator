@@ -4,14 +4,14 @@ pacman::p_load(
   uuid, digest, shinyjs, shinyBS, DT, ggplot2
 )
 
-library(shiny)
-library(bslib)
-library(jsonlite)
-library(yaml)
-library(shinyBS)
-library(uuid)
-library(R6)
-library(data.table)
+require(shiny)
+require(bslib)
+require(jsonlite)
+require(yaml)
+require(shinyBS)
+require(uuid)
+require(R6)
+require(data.table)
 
 source(file.path("R", "DataProcessorClass.R"))
 source(file.path("R", "helper_functions.R"))
@@ -19,8 +19,7 @@ source(file.path("R", "constants.R"))
 source(file.path("R", "validations.R"))
 
 # Module sources
-source(file.path("modules", "plots", "plotYearlyAssetProgressionModule.R"))
-source(file.path("modules", "plots", "comparisonPlotsModule.R"))
+source(file.path("modules", "plots", "YearlyAssetProgressionModule.R"))
 source(file.path("modules", "sidebar", "sidebarInputModule.R"))
 source(file.path("modules", "sidebar", "propertyManagementModule.R"))
 source(file.path("modules", "plots", "financialMetricsModule.R"))
@@ -49,7 +48,7 @@ ui <- bslib::page_navbar(
       var mobile = window.matchMedia("(max-width: 768px)").matches;
       Shiny.setInputValue("is_mobile", mobile);
     });
-  '),
+    '),
 
     # Add meta tags
     tags$link(rel = "stylesheet",
@@ -61,7 +60,31 @@ ui <- bslib::page_navbar(
   ),
 
   nav_panel(
-    title = "Analysis",
+    title = "Home",
+    sidebarLayout(
+      sidebarPanel(
+        class = "sidebar-panel",
+        width = 3,
+        radioButtons(
+          inputId = "home_section",
+          label = "Learn More About This App:",
+          choices = c(
+            "Welcome" = "welcome",
+            "About the Calculator" = "about",
+            "Key Features" = "features"
+          ),
+          selected = "welcome"
+        )
+      ),
+      mainPanel(
+        width = 9,
+        uiOutput("home_content")
+      )
+    )
+  ),
+
+  nav_panel(
+    title = "Calculator",
     sidebarLayout(
       sidebarPanel(
         class = "sidebar-panel",
@@ -93,10 +116,8 @@ ui <- bslib::page_navbar(
             width = 6,
             div(
               style = "margin-top: 25px;",
-              downloadButton("download_calculations", "Save Financial Evolution",
-                             class = "btn-sm"),
-              actionButton("add_to_comparison", "Add to Comparison",
-                           class = "btn-sm")
+              downloadButton("download_calculations", "Save Financial Evolution calculations (.csv)",
+                             class = "btn-sm")
             )
           )
         ),
@@ -107,7 +128,7 @@ ui <- bslib::page_navbar(
             card(
               id = "asset_plot_card",
               card_header("Asset Evolution"),
-              plotYearlyAssetProgressionModuleUI("result_plot")
+              plotYearlyAssetProgressionModuleUI("YearlyAssetProgressionPlot")
             )
           ),
           column(
@@ -155,15 +176,39 @@ ui <- bslib::page_navbar(
       )
     )
   ),
-
-  # Remove the separate sensitivity analysis tab
-  nav_panel(
-    title = "Comparison",
-    comparisonPlotsModuleUI("comparison_plots")
+  tags$footer(
+    class = "footer",
+    style = "position: fixed; bottom: 0; width: 100%; background-color: #f8f9fa; padding: 10px; text-align: left;",
+    HTML(
+      'Developed by <a href="https://github.com/chvieira2" target="_blank">chvieira2</a>'
+    )
   )
 )
 
 server <- function(input, output, session) {
+
+  output$home_content <- renderUI({
+    switch(input$home_section,
+           "welcome" = div(
+             h3("Welcome to the Financial Evolution Calculator"),
+             p("This app helps you analyze your financial evolution over time."),
+             p("Select the tabs on top to try out the calculator."),
+             p("Read more about the calculator using the options on the left.")
+           ),
+           "about" = div(
+             h3("About the Calculator"),
+             p("This calculator is designed to help users project their financial evolution."),
+             p("It uses user-provided data to calculate key financial metrics."),
+             p("No financial data from users is saved.")
+           ),
+           "features" = div(
+             h3("Key Features"),
+             p("1. Projects financial evolution over a customizable time range."),
+             p("2. Provides detailed visualizations of income, expenses, and assets."),
+             p("3. Offers sensitivity analysis to explore different scenarios.")
+           )
+    )
+  })
 
   # Debuggin helper for mobile
   observe({
@@ -204,7 +249,7 @@ server <- function(input, output, session) {
 
   # Plot module
   observeEvent(input$is_mobile, {
-    plotYearlyAssetProgressionModuleServer("result_plot", processed_data, reactive_config, year_range)
+    plotYearlyAssetProgressionModuleServer("YearlyAssetProgressionPlot", processed_data, reactive_config, year_range)
     financialMetricsModuleServer("financial_metrics", processed_data, year_range)
     stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
     stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
@@ -225,16 +270,6 @@ server <- function(input, output, session) {
       write.csv(data, file, row.names = FALSE)
     }
   )
-
-  # Observer for add to comparison button (placeholder for now)
-  observeEvent(input$add_to_comparison, {
-    # This will be implemented later
-    showNotification("Add to comparison functionality will be implemented soon",
-                     type = "message")
-  })
-
-  # Call the comparison plots module
-  comparisonPlotsModule("comparison_plots", comparison_list)
 }
 
 shinyApp(ui, server)
