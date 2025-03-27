@@ -1,3 +1,20 @@
+/* ===== ShinyTree home page ===== */
+.shiny-tree {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.shiny-tree .jstree-anchor {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.shiny-tree .jstree-anchor:hover {
+  text-decoration: underline;
+}
+
+
+
 /* ===== Core Sidebar Styles ===== */
 .sidebar-title {
   font-size: 1rem;

@@ -6,6 +6,7 @@ pacman::p_load(
 
 require(shiny)
 require(bslib)
+require(shinyTree)
 require(jsonlite)
 require(yaml)
 require(shinyBS)
@@ -59,31 +60,30 @@ ui <- bslib::page_navbar(
     tags$script(src = "js/main.js")
   ),
 
-  nav_panel(
+  bslib::nav_panel(
     title = "Home",
     sidebarLayout(
       sidebarPanel(
-        class = "sidebar-panel",
+        class = "col-lg-12 col-md-4 col-sm-12",
         width = 3,
-        radioButtons(
-          inputId = "home_section",
-          label = "Learn More About This App:",
-          choices = c(
-            "Welcome" = "welcome",
-            "About the Calculator" = "about",
-            "Key Features" = "features"
-          ),
-          selected = "welcome"
+        shinyTree(
+          "home_toc",
+          checkbox = FALSE,
+          search = FALSE,
+          theme = "proton", # default, default-dark, or proton
+          themeIcons = FALSE,
+          multiple = FALSE
         )
       ),
       mainPanel(
+        class = "col-lg-0 col-md-8 col-sm-12",
         width = 9,
         uiOutput("home_content")
       )
     )
   ),
 
-  nav_panel(
+  bslib::nav_panel(
     title = "Calculator",
     sidebarLayout(
       sidebarPanel(
@@ -176,36 +176,114 @@ ui <- bslib::page_navbar(
       )
     )
   ),
-  tags$footer(
+  footer = tags$footer(
     class = "footer",
-    style = "position: fixed; bottom: 0; width: 100%; background-color: #f8f9fa; padding: 10px; text-align: left;",
+    style = "position: fixed; bottom: 0; width: 100%; background-color: #f8f9fa; padding: 8px; text-align: left;",
     HTML(
-      'Developed by <a href="https://github.com/chvieira2" target="_blank">chvieira2</a>'
+      'Developed by chvieira2. Open source code available <a href="https://github.com/chvieira2/FinancialEvolutionCalculator" target="_blank">here</a>. No personal data is collected.'
     )
   )
 )
 
 server <- function(input, output, session) {
 
+  # Render the tree structure
+  output$home_toc <- shinyTree::renderTree({
+    list(
+      "Welcome" = structure(
+        list(
+          "Introduction" = structure("welcome_intro", stopened = TRUE),
+          "Guidelines" = structure("welcome_guidelines", stopened = TRUE)
+        ),
+        stopened = TRUE
+      ),
+      "About the Calculator" = structure(
+        list(
+          "Purpose" = structure("about_purpose", stopened = TRUE),
+          "Data Used" = structure("about_data", stopened = TRUE),
+          "Outcomes" = structure("about_outcomes", stopened = TRUE),
+          "Privacy" = structure("about_privacy", stopened = TRUE)
+        ),
+        stopened = TRUE
+      ),
+      "Key Features" = structure(
+        list(
+          "Financial Projections" = structure("features_projections", stopened = TRUE),
+          "Visualizations" = structure("features_visualizations", stopened = TRUE),
+          "Sensitivity Analysis" = structure("features_sensitivity", stopened = TRUE)
+        ),
+        stopened = TRUE
+      )
+    )
+  })
+
+  # Render the content based on the selected tree node
   output$home_content <- renderUI({
-    switch(input$home_section,
-           "welcome" = div(
+    selected <- unlist(shinyTree::get_selected(input$home_toc, format = "names"))
+
+    label_to_handle <- list(
+      "Welcome" = "welcome_intro",
+      "Introduction" = "welcome_intro",
+      "Guidelines" = "welcome_guidelines",
+      "About the Calculator" = "about_purpose",
+      "Purpose" = "about_purpose",
+      "Data Used" = "about_data",
+      "Outcomes" = "about_outcomes",
+      "Privacy" = "about_privacy",
+      "Key Features" = "features_projections",
+      "Financial Projections" = "features_projections",
+      "Visualizations" = "features_visualizations",
+      "Sensitivity Analysis" = "features_sensitivity"
+    )
+
+    # Default selection if nothing is selected
+    if (is.null(selected)) {
+      selected_handle <- "welcome_intro"
+    } else {
+      # Translate the selected label to the corresponding handle
+      selected_handle <- label_to_handle[[selected]]
+    }
+
+    switch(selected_handle,
+           "welcome_intro" = div(
              h3("Welcome to the Financial Evolution Calculator"),
              p("This app helps you analyze your financial evolution over time."),
              p("Select the tabs on top to try out the calculator."),
              p("Read more about the calculator using the options on the left.")
            ),
-           "about" = div(
-             h3("About the Calculator"),
-             p("This calculator is designed to help users project their financial evolution."),
-             p("It uses user-provided data to calculate key financial metrics."),
+           "welcome_guidelines" = div(
+             h3("Guidelines"),
+             p("1. Use the Calculator tab to input your data."),
+             p("2. Explore the visualizations to understand your financial evolution."),
+             p("3. Use the sensitivity analysis to test different scenarios.")
+           ),
+           "about_purpose" = div(
+             h3("Purpose of the Calculator"),
+             p("This calculator is designed to help users project their financial evolution.")
+           ),
+           "about_data" = div(
+             h3("Data Used"),
+             p("The calculator uses user-provided data such as income, expenses, and assets.")
+           ),
+           "about_outcomes" = div(
+             h3("Main Outcomes"),
+             p("The calculator provides key financial metrics and visualizations.")
+           ),
+           "about_privacy" = div(
+             h3("Privacy"),
              p("No financial data from users is saved.")
            ),
-           "features" = div(
-             h3("Key Features"),
-             p("1. Projects financial evolution over a customizable time range."),
-             p("2. Provides detailed visualizations of income, expenses, and assets."),
-             p("3. Offers sensitivity analysis to explore different scenarios.")
+           "features_projections" = div(
+             h3("Financial Projections"),
+             p("The calculator projects financial evolution over a customizable time range.")
+           ),
+           "features_visualizations" = div(
+             h3("Visualizations"),
+             p("Detailed visualizations of income, expenses, and assets are provided.")
+           ),
+           "features_sensitivity" = div(
+             h3("Sensitivity Analysis"),
+             p("Explore different scenarios using the sensitivity analysis feature.")
            )
     )
   })
