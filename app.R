@@ -1,13 +1,12 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(
   shiny, bslib, yaml, R6, data.table, purrr, glue,
-  uuid, digest, shinyjs, shinyBS, DT, ggplot2
+  uuid, digest, shinyjs, shinyBS, DT, ggplot2, shinyTree
 )
 
 require(shiny)
 require(bslib)
 require(shinyTree)
-require(jsonlite)
 require(yaml)
 require(shinyBS)
 require(uuid)
