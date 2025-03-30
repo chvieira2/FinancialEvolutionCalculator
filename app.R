@@ -19,6 +19,7 @@ source(file.path("R", "constants.R"))
 source(file.path("R", "validations.R"))
 
 # Module sources
+source(file.path("modules", "homeNavigationModule.R"))
 source(file.path("modules", "plots", "YearlyAssetProgressionModule.R"))
 source(file.path("modules", "sidebar", "sidebarInputModule.R"))
 source(file.path("modules", "sidebar", "propertyManagementModule.R"))
@@ -33,21 +34,22 @@ ui <- bslib::page_navbar(
     version = 5,
     bootswatch = "default"
   ),
+  selected = "Home",  # Set the default active tab
 
   header = tags$head(
-    # Add shinyjs initialization
+    # Shinyjs initialization
     shinyjs::useShinyjs(),
 
-    # Add script to detect mobile devices
+    # Script to detect mobile devices
     tags$script('
-    $(document).on("shiny:connected", function() {
-      var mobile = window.matchMedia("(max-width: 768px)").matches;
-      Shiny.setInputValue("is_mobile", mobile);
-    });
-    $(window).resize(function() {
-      var mobile = window.matchMedia("(max-width: 768px)").matches;
-      Shiny.setInputValue("is_mobile", mobile);
-    });
+      $(document).on("shiny:connected", function() {
+        var mobile = window.matchMedia("(max-width: 768px)").matches;
+        Shiny.setInputValue("is_mobile", mobile);
+      });
+      $(window).resize(function() {
+        var mobile = window.matchMedia("(max-width: 768px)").matches;
+        Shiny.setInputValue("is_mobile", mobile);
+      });
     '),
 
     # Add meta tags
@@ -61,25 +63,7 @@ ui <- bslib::page_navbar(
 
   bslib::nav_panel(
     title = "Home",
-    sidebarLayout(
-      sidebarPanel(
-        class = "col-lg-12 col-md-4 col-sm-12",
-        width = 3,
-        shinyTree(
-          "home_toc",
-          checkbox = FALSE,
-          search = FALSE,
-          theme = "proton", # default, default-dark, or proton
-          themeIcons = FALSE,
-          multiple = FALSE
-        )
-      ),
-      mainPanel(
-        class = "col-lg-0 col-md-8 col-sm-12",
-        width = 9,
-        uiOutput("home_content")
-      )
-    )
+    homeNavigationModuleUI("home_navigation")
   ),
 
   bslib::nav_panel(
@@ -179,113 +163,34 @@ ui <- bslib::page_navbar(
     class = "footer",
     style = "position: fixed; bottom: 0; width: 100%; background-color: #f8f9fa; padding: 8px; text-align: left;",
     HTML(
-      'Developed by chvieira2. Open source code available <a href="https://github.com/chvieira2/FinancialEvolutionCalculator" target="_blank">here</a>. No personal data is collected.'
+      'Developed by chvieira2. Open source code available <a href="https://github.com/chvieira2/FinancialEvolutionCalculator" target="_blank">here</a>. Feel free to open an issue, or contact me.'
     )
   )
 )
 
 server <- function(input, output, session) {
+  # Reactive value to track the active tab
+  active_tab <- reactiveVal("Home")  # Default tab is "Home"
 
-  # Render the tree structure
-  output$home_toc <- shinyTree::renderTree({
-    list(
-      "Welcome" = structure(
-        list(
-          "Introduction" = structure("welcome_intro", stopened = TRUE),
-          "Guidelines" = structure("welcome_guidelines", stopened = TRUE)
-        ),
-        stopened = TRUE
-      ),
-      "About the Calculator" = structure(
-        list(
-          "Purpose" = structure("about_purpose", stopened = TRUE),
-          "Data Used" = structure("about_data", stopened = TRUE),
-          "Outcomes" = structure("about_outcomes", stopened = TRUE),
-          "Privacy" = structure("about_privacy", stopened = TRUE)
-        ),
-        stopened = TRUE
-      ),
-      "Key Features" = structure(
-        list(
-          "Financial Projections" = structure("features_projections", stopened = TRUE),
-          "Visualizations" = structure("features_visualizations", stopened = TRUE),
-          "Sensitivity Analysis" = structure("features_sensitivity", stopened = TRUE)
-        ),
-        stopened = TRUE
-      )
-    )
+  # Observe tab changes
+  observe({
+    # Use JavaScript to detect tab changes and update the reactive value
+    shinyjs::runjs('
+      $("a[data-bs-toggle=\'tab\']").on("shown.bs.tab", function(e) {
+        var activeTab = $(e.target).text().trim();
+        Shiny.setInputValue("active_tab", activeTab, {priority: "event"});
+      });
+    ')
   })
 
-  # Render the content based on the selected tree node
-  output$home_content <- renderUI({
-    selected <- unlist(shinyTree::get_selected(input$home_toc, format = "names"))
-
-    label_to_handle <- list(
-      "Welcome" = "welcome_intro",
-      "Introduction" = "welcome_intro",
-      "Guidelines" = "welcome_guidelines",
-      "About the Calculator" = "about_purpose",
-      "Purpose" = "about_purpose",
-      "Data Used" = "about_data",
-      "Outcomes" = "about_outcomes",
-      "Privacy" = "about_privacy",
-      "Key Features" = "features_projections",
-      "Financial Projections" = "features_projections",
-      "Visualizations" = "features_visualizations",
-      "Sensitivity Analysis" = "features_sensitivity"
-    )
-
-    # Default selection if nothing is selected
-    if (is.null(selected)) {
-      selected_handle <- "welcome_intro"
-    } else {
-      # Translate the selected label to the corresponding handle
-      selected_handle <- label_to_handle[[selected]]
-    }
-
-    switch(selected_handle,
-           "welcome_intro" = div(
-             h3("Welcome to the Financial Evolution Calculator"),
-             p("This app helps you analyze your financial evolution over time."),
-             p("Select the tabs on top to try out the calculator."),
-             p("Read more about the calculator using the options on the left.")
-           ),
-           "welcome_guidelines" = div(
-             h3("Guidelines"),
-             p("1. Use the Calculator tab to input your data."),
-             p("2. Explore the visualizations to understand your financial evolution."),
-             p("3. Use the sensitivity analysis to test different scenarios.")
-           ),
-           "about_purpose" = div(
-             h3("Purpose of the Calculator"),
-             p("This calculator is designed to help users project their financial evolution.")
-           ),
-           "about_data" = div(
-             h3("Data Used"),
-             p("The calculator uses user-provided data such as income, expenses, and assets.")
-           ),
-           "about_outcomes" = div(
-             h3("Main Outcomes"),
-             p("The calculator provides key financial metrics and visualizations.")
-           ),
-           "about_privacy" = div(
-             h3("Privacy"),
-             p("No financial data from users is saved.")
-           ),
-           "features_projections" = div(
-             h3("Financial Projections"),
-             p("The calculator projects financial evolution over a customizable time range.")
-           ),
-           "features_visualizations" = div(
-             h3("Visualizations"),
-             p("Detailed visualizations of income, expenses, and assets are provided.")
-           ),
-           "features_sensitivity" = div(
-             h3("Sensitivity Analysis"),
-             p("Explore different scenarios using the sensitivity analysis feature.")
-           )
-    )
+  # Update the reactive value when the tab changes
+  observeEvent(input$active_tab, {
+    active_tab(input$active_tab)
+    print(paste("Active tab:", active_tab()))  # Debugging: Print the active tab
   })
+
+  # Call the Home Navigation Module
+  homeNavigationModuleServer("home_navigation")
 
   # Debuggin helper for mobile
   observe({
@@ -324,13 +229,22 @@ server <- function(input, output, session) {
   ignoreNULL = FALSE
   )
 
+
   # Plot module
-  observeEvent(input$is_mobile, {
-    plotYearlyAssetProgressionModuleServer("YearlyAssetProgressionPlot", processed_data, reactive_config, year_range)
-    financialMetricsModuleServer("financial_metrics", processed_data, year_range)
-    stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
-    stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
-    sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range, isolate(input$is_mobile))
+  # Observe the active tab and initialize the plots when the "Calculator" tab is selected
+  observeEvent(active_tab(), {
+    if (active_tab() == "Calculator") {
+      req(processed_data())
+      req(reactive_config())
+      req(year_range())
+      req(input$is_mobile)
+      # Trigger the plot modules
+      plotYearlyAssetProgressionModuleServer("YearlyAssetProgressionPlot", processed_data, reactive_config, year_range)
+      financialMetricsModuleServer("financial_metrics", processed_data, year_range)
+      stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
+      stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
+      sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range, isolate(input$is_mobile))
+    }
   })
 
 

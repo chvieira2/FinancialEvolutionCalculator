@@ -15,6 +15,7 @@ plotYearlyAssetProgressionModuleServer <- function(id, data, reactive_config, ye
   moduleServer(id, function(input, output, session) {
 
     filtered_data <- reactive({
+      browser()
       req(data(), year_range())
       data() %>%
         filter(Year >= year_range()[1] & Year <= year_range()[2])
