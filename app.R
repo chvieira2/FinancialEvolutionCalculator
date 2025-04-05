@@ -34,19 +34,14 @@ ui <- bslib::page_navbar(
     version = 5,
     bootswatch = "default"
   ),
-  selected = "Home",  # Set the default active tab
+  selected = "Home",
 
   header = tags$head(
-    # Shinyjs initialization
     shinyjs::useShinyjs(),
 
     # Script to detect mobile devices
     tags$script('
       $(document).on("shiny:connected", function() {
-        var mobile = window.matchMedia("(max-width: 768px)").matches;
-        Shiny.setInputValue("is_mobile", mobile);
-      });
-      $(window).resize(function() {
         var mobile = window.matchMedia("(max-width: 768px)").matches;
         Shiny.setInputValue("is_mobile", mobile);
       });
@@ -56,9 +51,9 @@ ui <- bslib::page_navbar(
     tags$link(rel = "stylesheet",
               href = "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"),
     tags$link(rel = "stylesheet", href = "css/styles.css"),
-    tags$script(src = "https://code.jquery.com/jquery-3.6.0.min.js"),
     tags$script(src = "https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"),
     tags$script(src = "js/main.js")
+
   ),
 
   bslib::nav_panel(
@@ -110,7 +105,7 @@ ui <- bslib::page_navbar(
             class = "col-lg-6",  # Half width on large screens
             card(
               id = "asset_plot_card",
-              card_header("Asset Evolution"),
+              card_header("Total Asset Evolution"),
               plotYearlyAssetProgressionModuleUI("YearlyAssetProgressionPlot")
             )
           ),
@@ -215,18 +210,18 @@ server <- function(input, output, session) {
   # Reactive expression for processed data
   processed_data <- eventReactive(
     c(reactive_config(), input$global_year_range), {
-    req(reactive_config(), year_range())
-    data_processor <- DataProcessor$new(
-      scenario_name = "example",
-      config = reactive_config(),
-      initial_year = min(year_range()),
-      final_year = max(year_range())
-    )
-    data_processor$calculate()
-    results <- data_processor$get_results()
-    return(results)
-  },
-  ignoreNULL = FALSE
+      req(reactive_config(), year_range())
+      data_processor <- DataProcessor$new(
+        scenario_name = "example",
+        config = reactive_config(),
+        initial_year = min(year_range()),
+        final_year = max(year_range())
+      )
+      data_processor$calculate()
+      results <- data_processor$get_results()
+      return(results)
+    },
+    ignoreNULL = FALSE
   )
 
 
@@ -237,7 +232,6 @@ server <- function(input, output, session) {
       req(processed_data())
       req(reactive_config())
       req(year_range())
-      req(input$is_mobile)
       # Trigger the plot modules
       plotYearlyAssetProgressionModuleServer("YearlyAssetProgressionPlot", processed_data, reactive_config, year_range)
       financialMetricsModuleServer("financial_metrics", processed_data, year_range)
