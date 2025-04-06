@@ -1,15 +1,19 @@
 # Add this to your constants.R file
 TEMPLATE_SCENARIOS <- list(
-  "Low-income family renting" = "low_wage_family.yaml",
-  "Mid-income family renting" = "mid_wage_family_rent.yaml",
-  "Mid-income family with home property" = "mid_wage_family_housepoor.yaml",
-  "Mid-income family with investment property" = "mid_wage_family_property_investment.yaml",
-  "High-income family renting" = "high_wage_family_rent.yaml",
-  "High-income family with home property" = "high_wage_family_home.yaml",
-  "High-income family with investment property" = "high_wage_family_property_investment.yaml"
+  "Low-income family renting" = "inputs_low_wage_family_rent.yaml",
+  "Low-income family with real estate as home" = "inputs_low_wage_family_homeowner.yaml",
+  "Low-income family with real estate as investment" = "inputs_low_wage_family_landlord.yaml",
+
+  "Mid-income family renting" = "inputs_mid_wage_family_rent.yaml",
+  "Mid-income family with real estate as home" = "inputs_mid_wage_family_homeowner.yaml",
+  "Mid-income family with real estate as investment" = "inputs_mid_wage_family_landlord.yaml",
+
+  "High-income family renting" = "inputs_high_wage_family_rent.yaml",
+  "High-income family with real estate as home" = "inputs_high_wage_family_homeowner.yaml",
+  "High-income family with real estate as investment" = "inputs_high_wage_family_landlord.yaml"
 )
 
-DEFAULT_TEMPLATE <- "Mid-income family with home property"
+DEFAULT_TEMPLATE <- "Mid-income family with real estate as home"
 
 
 ESSENTIAL_PARAMS <- list(

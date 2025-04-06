@@ -1,0 +1,519 @@
+general_life:
+  title: Financial Life
+  inputs:
+  - id: net_annual_income
+    type: numericInput
+    label: Net annual income (EUR/month)
+    value: 4500
+    description: Your monthly net income after income, solidarity, and church taxes
+      and payment of insurances, including health insurance, pension insurance, unemployment
+      insurance, and any other insurances discounted directly from salary.
+  - id: living_style_costs
+    type: numericInput
+    label: Living Standard costs (without housing costs) (EUR/month)
+    value: 2200
+    description: Your monthly living expenses excluding housing. This include all
+      other expenses, like holidays, clothes, dinning out, groceries, etc (NOT health
+      insurance).
+  - id: percent_income_investing
+    type: numericInput
+    label: Percent income dedicated to investing (%)
+    value: 0
+    description: Percentage of income dedicated to passive investing, e.g. in ETFs,
+      stocks, dividends, etc.
+  - id: savings
+    type: numericInput
+    label: Savings (EUR)
+    value: 0
+    description: Current savings amount.
+  - id: savings_emergency_reserve
+    type: numericInput
+    label: Emergency reserve (EUR)
+    value: 13500
+    description: Amount set aside for emergencies. This is an emergency fund with
+      extreme liquidity for immediate access in case of emergencies. A general recommendation
+      is to enough emergency funds to cover 3-6 months of living expenses.
+  - id: salaries_growth_start_career
+    type: numericInput
+    label: Salaries growth at start career (% per year)
+    value: 3
+    description: The average expected salary growth rate at the start of your career.
+      Salaries tend to grow faster at te beginning of the career. Also, different
+      career paths have largely different career growth.
+  - id: salaries_growth_end_career
+    type: numericInput
+    label: Salaries growth at end career (% per year)
+    value: 2
+    description: Expected salary growth rate at the end of your career.
+  - id: expected_year_retirement
+    type: numericInput
+    label: Expected year of retirement
+    value: 2065
+    description: The year you expect to retire.
+  - id: expected_salary_reduction_retirement
+    type: numericInput
+    label: Expected salary reduction upon retirement (%)
+    value: 50
+    description: Expected percentage reduction in salary upon retirement.
+family:
+  title: Family Size and Associated Costs
+  inputs:
+  - id: annual_cost_per_child_0_3
+    type: numericInput
+    label: Annual cost per child 0-3 years (EUR/child/year)
+    value: 3450
+    description: Annual cost for a child aged 0-3 years.
+  - id: annual_cost_per_child_4_10
+    type: numericInput
+    label: Annual cost per child 4-10 years (EUR/child/year)
+    value: 5000
+    description: Annual cost for a child aged 4-10 years.
+  - id: annual_cost_per_child_11_18
+    type: numericInput
+    label: Annual cost per child 11-18 years (EUR/child/year)
+    value: 6875
+    description: Annual cost for a child aged 11-18 years.
+  - id: annual_cost_per_child_19_25
+    type: numericInput
+    label: Annual cost per child 19-25 years (EUR/child/year)
+    value: 9000
+    description: Annual cost for a child aged 19-25 years.
+  - id: elterngeld
+    type: numericInput
+    label: Parental allowance (EUR/child/year)
+    value: 3060
+    description: Parental allowance per child (Elterngeld).
+  - id: living_costs_change_elternzeit
+    type: numericInput
+    label: Home costs reduction during parental leave (%)
+    value: 50
+    description: Percentage reduction in living costs during parental leave (Elternzeit).
+  - id: salary_reduction_elternzeit
+    type: numericInput
+    label: Salary reduction during parental leave (%)
+    value: 50
+    description: Percentage of salary reduction during parental leave (Elternzeit).
+  - id: year_first_child_is_born
+    type: numericInput
+    label: Year first child is born
+    value: 2025
+    description: Expected birth year of first child.
+  - id: year_second_child_is_born
+    type: numericInput
+    label: Year second child is born
+    value: 2027
+    description: Expected birth year of second child.
+  - id: number_extra_children
+    type: numericInput
+    label: Number of extra children
+    value: 0
+    description: Number of additional children.
+  - id: year_first_extra_child
+    type: numericInput
+    label: Year first extra child is born
+    value: 2100
+    description: Expected birth year of first additional child.
+  - id: extra_child_born_after
+    type: numericInput
+    label: Extra child born after X years of the second child
+    value: 2
+    description: Years between additional children.
+rental:
+  title: Rental Costs
+  inputs:
+  - id: rent_month
+    type: numericInput
+    label: Rent (EUR/month)
+    value: 1500
+    description: Monthly rent payment.
+  - id: rental_prices_growth
+    type: numericInput
+    label: Rental prices growth (% per year)
+    value: 3
+    description: Annual growth rate of rental prices. Usually follows the growth of
+      the property price.
+  - id: fixed_housing_costs
+    type: numericInput
+    label: Fixed housing costs (Nebenkosten) (EUR/month)
+    value: 220
+    description: Monthly fixed housing costs.
+  - id: fixed_housing_costs_change
+    type: numericInput
+    label: Fixed housing costs (Nebenkosten) change rate (% per year)
+    value: 2.5
+    description: Annual change rate of the fixed housing costs (Nebenkosten). Usually
+      follows the inflation.
+passive_investing:
+  title: Passive Investing
+  inputs:
+  - id: expected_return_on_investment
+    type: numericInput
+    label: Expected return on investment (% per year)
+    value: 10
+    description: Current expected annual return on investments. This refers to passive
+      investments, e.g. ETFs, stocks, dividends.
+  - id: expected_conservative_return_on_investment
+    type: numericInput
+    label: Expected return on investment by retirement age (% per year)
+    value: 6
+    description: Expected annual return on investments at age of retirement. It is
+      sometimes recommended to reduce risk over the years by shifting to a more conservative
+      investment approach, with reduced returns.
+  - id: apply_vorabpauschale
+    type: checkboxInput
+    label: Apply German advance lump-sum taxation? (Germany only)
+    value: yes
+    description: Apply the German-specific advanced taxation based on the Vorabpauschale
+      for accumulating funds. This tax is mandatory since 2018 in Germany. For more
+      information, please visit https://www.finanztip.de/indexfonds-etf/etf-steuern/vorabpauschale/
+  - id: base_interest_rate_vorabpauschale
+    type: numericInput
+    label: Base interest rate for Vorabpauschale (%)
+    value: 2.63
+    description: The base interest rate used for Vorabpauschale calculation (Basiszins).
+      Find the current value by the Federal Bank https://www.bundesbank.de/dynamic/action/de/statistiken/zeitreihen-datenbanken/zeitreihen-datenbank/723452/723452?tsId=BBSSY.D.REN.EUR.A615.000000WT1515.A&dateSelect=2024
+  - id: investment_type
+    type: selectInput
+    label: Type of passive investment
+    value: Equity Fund
+    choices:
+    - equity_fund: Equity Fund
+    - mixed_fund: Mixed Fund
+    - domestic_real_estate_fund: Domestic Real Estate Fund
+    - foreign_real_estate_fund: Foreign Real Estate Fund
+    description: Type of passive investment. Different types of funds are taxed differently.
+  - id: tax_free_allowance_type
+    type: selectInput
+    label: Vorabpauschale tax-free allowance type
+    value: Married Couple (2000€)
+    choices:
+    - single: Single Person (1000€)
+    - married: Married Couple (2000€)
+    description: Yearly tax-free allowance for advanced tax on accumulating investment.
+      For more information, please visit https://www.finanztip.de/indexfonds-etf/investmentsteuerreformgesetz/
+taxes_description:
+  title: Taxes and Inflation
+  inputs:
+  - id: inflation
+    type: numericInput
+    label: Inflation (% per year)
+    value: 2.5
+    description: Expected annual inflation rate.
+  - id: interest_rate_cash_flow_debt
+    type: numericInput
+    label: Interest rate on standing debt (% per year)
+    value: 12
+    description: 'Interest rate on any standing debt. When one goes into debt with
+      a crediting institution (e.g.: credit card debit), the creditor will charge
+      large interest rates.'
+  - id: income_tax
+    type: numericInput
+    label: Income tax (%)
+    value: 25
+    description: Tax rate on income
+  - id: solidarity_surcharge_tax
+    type: numericInput
+    label: Solidarity surcharge tax (%)
+    value: 5.5
+    description: Solidarity surcharge tax rate (Solidaritätszuschlag).
+  - id: church_tax
+    type: numericInput
+    label: Church tax (%)
+    value: 0
+    description: Church tax rate (Kirchensteuer).
+  - id: capital_gains_tax_rate
+    type: numericInput
+    label: Taxes on investment/capital gains (%)
+    value: 25
+    description: Tax rate on investment/capital gains (Spekulationssteuer).
+lump_sum:
+  title: Lump Sums
+  inputs:
+  - id: lump_sum_1
+    type: numericInput
+    label: Lump sum 1 (EUR)
+    value: 50000
+    description: First lump sum. This value refers to any major monetary gain or loss,
+      e.g. inheritance, medical bills, car purchase, etc.
+  - id: lump_sum_1_year
+    type: numericInput
+    label: Year receiving the first Lump Sum
+    value: 2045
+    description: Year of first lump sum.
+  - id: lump_sum_2
+    type: numericInput
+    label: Lump sum 2 (EUR)
+    value: -25000
+    description: Second lump sum. This value refers to any major monetary gain or
+      loss, e.g. inheritance, medical bills, car purchase, etc.
+  - id: lump_sum_2_year
+    type: numericInput
+    label: Year receiving the second Lump Sum
+    value: 2055
+    description: Year of second lump sum.
+property_tax:
+  title: Costs Associated with Purchasing Property
+  inputs:
+  - id: estate_agent_fees
+    type: numericInput
+    label: Estate agent fees (% purchase price)
+    value: 3.57
+    description: Estate agent fees as a percentage of property purchase price.
+  - id: notary_fees_purchase
+    type: numericInput
+    label: Notary fees (% purchase price)
+    value: 2
+    description: Notary fees as a percentage of the property purchase price
+  - id: purchase_tax
+    type: numericInput
+    label: Property purchase tax (% purchase price)
+    value: 6
+    description: Property purchase tax as a percentage of the property purchase price.
+  - id: real_estate_agent_fees_sale
+    type: numericInput
+    label: Real Estate Agent Fees (% of sale price)
+    value: 3.57
+    description: Typically range from 3% to 7% of the sale price.
+  - id: notary_fees_sale
+    type: numericInput
+    label: Notary Fees (% of sale price)
+    value: 1
+    description: Notary fees for the sale contract usually range from 1% to 1.5% of
+      the sale price.
+  - id: property_transfer_taxes_sale
+    type: numericInput
+    label: Property Transfer Taxes (% of sale price)
+    value: 6.5
+    description: Property Transfer Tax (Grunderwerbsteuer):This tax is generally around
+      6% to 7% of the sale price in Berlin.
+  - id: miscelanous_fees_costs_sale
+    type: numericInput
+    label: Miscellaneous Costs (% of sale price)
+    value: 0.1
+    description: Additional costs may include property valuation fees (if applicable),
+      marketing costs, and administrative expenses.
+properties:
+- name: property1
+  type: investment
+  inputs:
+  - id: value_growth
+    type: numericInput
+    label: Investment Property Year-on-Year value Growth (% per year)
+    value: 3
+    description: Annual growth rate of the investment property value
+  - id: value_today
+    type: numericInput
+    label: Property price today (EUR)
+    value: 250000
+    description: Current market value of the property.
+  - id: purchase_year
+    type: numericInput
+    label: Year property purchase
+    value: 2025
+    description: Year when the property will be purchased.
+  - id: sale_year
+    type: numericInput
+    label: Year property sold
+    value: 2100
+    description: Year when the property will be sold.
+  - id: initial_interest_rate
+    type: numericInput
+    label: Interest rate on mortgage (% per year)
+    value: 3.7
+    description: Interest rate for the mortgage
+  - id: principal_repayment_rate
+    type: numericInput
+    label: Principal repayment rate (% per year)
+    value: 2
+    description: Annual rate of mortgage principal repayment (Rückzahlungsrate)
+  - id: max_mortgage_amortization_rate
+    type: numericInput
+    label: Maximal mortgage principal amortization rate (% per year)
+    value: 0
+    description: Maximal annual rate of amortization allowed by your mortgage contract
+      for the principal. This is the maximum value (Percent of principal) your mortgage
+      contract with the bank will allow you to pay in extra installments every year
+      to speed-up the payment of your mortgage.
+  - id: loan_family_friends
+    type: numericInput
+    label: Loan from family/friends (EUR)
+    value: 25000
+    description: Amount borrowed from family or friends
+  - id: interest_rate_family_friends
+    type: numericInput
+    label: Interest rate on loan from family/friends (% per year)
+    value: 3.7
+    description: Interest rate for family/friends loan
+  - id: duration_payback_family_friends
+    type: numericInput
+    label: Duration payback family/friends loan (years)
+    value: 10
+    description: Duration to pay back family/friends loan
+  - id: cold_lease_today
+    type: numericInput
+    label: Cold lease today (EUR/month)
+    value: 750
+    description: Current monthly cold lease amount
+  - id: lease_rental_growth
+    type: numericInput
+    label: Lease rental prices growth (% per year)
+    value: 3
+    description: Annual growth rate of lease rental prices
+  - id: yearly_depreciation_rate
+    type: numericInput
+    label: Depreciation (AfA) (% per year)
+    value: 2
+    description: Annual depreciation rate of a property's price when purchased. Used
+      for taxes deduction calculation.
+  - id: vacancy_months
+    type: numericInput
+    label: Vacancy costs (number of vacant month per year)
+    value: 1
+    description: Number of months per year the property is expected to be vacant
+  - id: property_management_rate
+    type: numericInput
+    label: Property Management Fees (% of cold rent)
+    value: 7.5
+    description: Property management fees as a percentage of annual rent
+  - id: property_taxes_rate
+    type: numericInput
+    label: Property taxes rate (% property value per year)
+    value: 0.3
+    description: Annual property tax rate
+  - id: maintenance_cost_rate
+    type: numericInput
+    label: Maintenance cost rate (% property value per year)
+    value: 1
+    description: Annual maintenance cost as a percentage of property value
+  - id: hausgeld_fees_total
+    type: numericInput
+    label: Hausgeld (EUR/month)
+    value: 220
+    description: 'Monthly Hausgeld fees total. Sum of all other Hausgeld fees and
+      costs: Building maintenance, utilities, reserve fund contributions, property
+      management fees, building insurance, etc.'
+  - id: hausgeld_maintenance_costs
+    type: numericInput
+    label: Hausgeld - Building maintenance (EUR/month)
+    value: 55
+    description: Monthly Hausgeld building maintenance costs.
+  - id: hausgeld_utilities
+    type: numericInput
+    label: Hausgeld - Utilities (EUR/month)
+    value: 85
+    description: Monthly Hausgeld utilities costs.
+  - id: hausgeld_reserve_fund
+    type: numericInput
+    label: Hausgeld - Reserve fund contributions (EUR/month)
+    value: 25
+    description: Monthly Hausgeld reserve fund contributions.
+  - id: hausgeld_house_management_fee
+    type: numericInput
+    label: Hausgeld - Property management fee (EUR/month)
+    value: 25
+    description: Monthly Hausgeld property management fee.
+  - id: hausgeld_building_insurance
+    type: numericInput
+    label: Hausgeld - Building insurance (EUR/month)
+    value: 30
+    description: Monthly Hausgeld building insurance cost.
+  id: 0d8e0fc4-2620-438e-9034-88adbd1c5bfa
+- name: property2
+  type: home
+  inputs:
+  - id: value_growth
+    type: numericInput
+    label: Home Property Year-on-Year value Growth (% per year)
+    value: 3
+    description: Annual growth rate of the investment property value
+  - id: value_today
+    type: numericInput
+    label: Home property price today (EUR)
+    value: 650000
+    description: Current market value of the property
+  - id: purchase_year
+    type: numericInput
+    label: Year property purchase
+    value: 2065
+    description: Year when the property will be purchased
+  - id: sale_year
+    type: numericInput
+    label: Year property sold
+    value: 2100
+    description: Year when the property will be sold
+  - id: initial_interest_rate
+    type: numericInput
+    label: Interest rate on mortgage (% per year)
+    value: 3.7
+    description: Interest rate for the mortgage
+  - id: principal_repayment_rate
+    type: numericInput
+    label: Principal repayment rate (% per year)
+    value: 2
+    description: Annual rate of mortgage principal repayment (Rückzahlungsrate).
+  - id: max_mortgage_amortization_rate
+    type: numericInput
+    label: Maximal mortgage principal amortization rate (% per year)
+    value: 0
+    description: Maximal annual rate of amortization allowed by your mortgage contract
+      for the principal. This is the maximum value (Percent of principal) your mortgage
+      contract with the bank will allow you to pay in extra installments every year
+      to speed-up the payment of your mortgage.
+  - id: loan_family_friends
+    type: numericInput
+    label: Loan from family/friends (EUR)
+    value: 0
+    description: Amount borrowed from family or friends
+  - id: interest_rate_family_friends
+    type: numericInput
+    label: Interest rate on loan from family/friends (% per year)
+    value: 3.7
+    description: Interest rate for family/friends loan
+  - id: duration_payback_family_friends
+    type: numericInput
+    label: Duration payback family/friends loan (years)
+    value: 10
+    description: Duration to pay back family/friends loan
+  - id: property_taxes_rate
+    type: numericInput
+    label: Property taxes rate (% property value per year)
+    value: 0.3
+    description: Annual property tax rate
+  - id: maintenance_cost_rate
+    type: numericInput
+    label: Maintenance cost rate (% property value per year)
+    value: 1
+    description: Annual maintenance cost as a percentage of property value
+  - id: hausgeld_fees_total
+    type: numericInput
+    label: Hausgeld (EUR/month)
+    value: 330
+    description: 'Monthly Hausgeld fees total. Sum of all other Hausgeld fees and
+      costs: Building maintenance, utilities, reserve fund contributions, property
+      management fees, building insurance, etc.'
+  - id: hausgeld_maintenance_costs
+    type: numericInput
+    label: Hausgeld - Building maintenance (EUR/month)
+    value: 75
+    description: Monthly Hausgeld building maintenance costs.
+  - id: hausgeld_utilities
+    type: numericInput
+    label: Hausgeld - Utilities (EUR/month)
+    value: 125
+    description: Monthly Hausgeld utilities costs.
+  - id: hausgeld_reserve_fund
+    type: numericInput
+    label: Hausgeld - Reserve fund contributions (EUR/month)
+    value: 40
+    description: Monthly Hausgeld reserve fund contributions.
+  - id: hausgeld_house_management_fee
+    type: numericInput
+    label: Hausgeld - Property management fee (EUR/month)
+    value: 40
+    description: Monthly Hausgeld property management fee.
+  - id: hausgeld_building_insurance
+    type: numericInput
+    label: Hausgeld - Building insurance (EUR/month)
+    value: 50
+    description: Monthly Hausgeld building insurance cost.
+  id: 19596aaa-25f4-4177-884c-90a296d250dd
