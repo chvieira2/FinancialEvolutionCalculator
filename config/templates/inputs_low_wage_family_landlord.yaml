@@ -4,14 +4,14 @@ general_life:
   - id: net_annual_income
     type: numericInput
     label: Net annual income (EUR/month)
-    value: 4500
+    value: 2400
     description: Your monthly net income after income, solidarity, and church taxes
       and payment of insurances, including health insurance, pension insurance, unemployment
       insurance, and any other insurances discounted directly from salary.
   - id: living_style_costs
     type: numericInput
     label: Living Standard costs (without housing costs) (EUR/month)
-    value: 2200
+    value: 800
     description: Your monthly living expenses excluding housing. This include all
       other expenses, like holidays, clothes, dinning out, groceries, etc (NOT health
       insurance).
@@ -29,14 +29,14 @@ general_life:
   - id: savings_emergency_reserve
     type: numericInput
     label: Emergency reserve (EUR)
-    value: 13500
+    value: 6000
     description: Amount set aside for emergencies. This is an emergency fund with
       extreme liquidity for immediate access in case of emergencies. A general recommendation
       is to enough emergency funds to cover 3-6 months of living expenses.
   - id: salaries_growth_start_career
     type: numericInput
     label: Salaries growth at start career (% per year)
-    value: 3
+    value: 2.5
     description: The average expected salary growth rate at the start of your career.
       Salaries tend to grow faster at te beginning of the career. Also, different
       career paths have largely different career growth.
@@ -53,7 +53,7 @@ general_life:
   - id: expected_salary_reduction_retirement
     type: numericInput
     label: Expected salary reduction upon retirement (%)
-    value: 50
+    value: 30
     description: Expected percentage reduction in salary upon retirement.
 family:
   title: Family Size and Associated Costs
@@ -91,7 +91,7 @@ family:
   - id: salary_reduction_elternzeit
     type: numericInput
     label: Salary reduction during parental leave (%)
-    value: 50
+    value: 35
     description: Percentage of salary reduction during parental leave (Elternzeit).
   - id: year_first_child_is_born
     type: numericInput
@@ -124,7 +124,7 @@ rental:
   - id: rent_month
     type: numericInput
     label: Rent (EUR/month)
-    value: 1500
+    value: 1000
     description: Monthly rent payment.
   - id: rental_prices_growth
     type: numericInput
@@ -135,7 +135,7 @@ rental:
   - id: fixed_housing_costs
     type: numericInput
     label: Fixed housing costs (Nebenkosten) (EUR/month)
-    value: 220
+    value: 110
     description: Monthly fixed housing costs.
   - id: fixed_housing_costs_change
     type: numericInput
@@ -209,7 +209,7 @@ taxes_description:
   - id: income_tax
     type: numericInput
     label: Income tax (%)
-    value: 25
+    value: 14
     description: Tax rate on income
   - id: solidarity_surcharge_tax
     type: numericInput
@@ -249,7 +249,7 @@ lump_sum:
   - id: lump_sum_2_year
     type: numericInput
     label: Year receiving the second Lump Sum
-    value: 2055
+    value: 2050
     description: Year of second lump sum.
 property_tax:
   title: Costs Associated with Purchasing Property
@@ -304,7 +304,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Property price today (EUR)
-    value: 250000
+    value: 200000
     description: Current market value of the property.
   - id: purchase_year
     type: numericInput
@@ -337,7 +337,7 @@ properties:
   - id: loan_family_friends
     type: numericInput
     label: Loan from family/friends (EUR)
-    value: 25000
+    value: 20000
     description: Amount borrowed from family or friends
   - id: interest_rate_family_friends
     type: numericInput
@@ -352,7 +352,7 @@ properties:
   - id: cold_lease_today
     type: numericInput
     label: Cold lease today (EUR/month)
-    value: 750
+    value: 500
     description: Current monthly cold lease amount
   - id: lease_rental_growth
     type: numericInput
@@ -388,6 +388,105 @@ properties:
   - id: hausgeld_fees_total
     type: numericInput
     label: Hausgeld (EUR/month)
+    value: 105
+    description: 'Monthly Hausgeld fees total. Sum of all other Hausgeld fees and
+      costs: Building maintenance, utilities, reserve fund contributions, property
+      management fees, building insurance, etc.'
+  - id: hausgeld_maintenance_costs
+    type: numericInput
+    label: Hausgeld - Building maintenance (EUR/month)
+    value: 30
+    description: Monthly Hausgeld building maintenance costs.
+  - id: hausgeld_utilities
+    type: numericInput
+    label: Hausgeld - Utilities (EUR/month)
+    value: 50
+    description: Monthly Hausgeld utilities costs.
+  - id: hausgeld_reserve_fund
+    type: numericInput
+    label: Hausgeld - Reserve fund contributions (EUR/month)
+    value: 10
+    description: Monthly Hausgeld reserve fund contributions.
+  - id: hausgeld_house_management_fee
+    type: numericInput
+    label: Hausgeld - Property management fee (EUR/month)
+    value: 10
+    description: Monthly Hausgeld property management fee.
+  - id: hausgeld_building_insurance
+    type: numericInput
+    label: Hausgeld - Building insurance (EUR/month)
+    value: 15
+    description: Monthly Hausgeld building insurance cost.
+  id: 4086c793-1b8b-4611-85a2-27ae12f4acac
+- name: property2
+  type: home
+  inputs:
+  - id: value_growth
+    type: numericInput
+    label: Home Property Year-on-Year value Growth (% per year)
+    value: 3
+    description: Annual growth rate of the investment property value
+  - id: value_today
+    type: numericInput
+    label: Home property price today (EUR)
+    value: 200000
+    description: Current market value of the property
+  - id: purchase_year
+    type: numericInput
+    label: Year property purchase
+    value: 2065
+    description: Year when the property will be purchased
+  - id: sale_year
+    type: numericInput
+    label: Year property sold
+    value: 2100
+    description: Year when the property will be sold
+  - id: initial_interest_rate
+    type: numericInput
+    label: Interest rate on mortgage (% per year)
+    value: 3.7
+    description: Interest rate for the mortgage
+  - id: principal_repayment_rate
+    type: numericInput
+    label: Principal repayment rate (% per year)
+    value: 2
+    description: Annual rate of mortgage principal repayment (Rückzahlungsrate).
+  - id: max_mortgage_amortization_rate
+    type: numericInput
+    label: Maximal mortgage principal amortization rate (% per year)
+    value: 0
+    description: Maximal annual rate of amortization allowed by your mortgage contract
+      for the principal. This is the maximum value (Percent of principal) your mortgage
+      contract with the bank will allow you to pay in extra installments every year
+      to speed-up the payment of your mortgage.
+  - id: loan_family_friends
+    type: numericInput
+    label: Loan from family/friends (EUR)
+    value: 0
+    description: Amount borrowed from family or friends
+  - id: interest_rate_family_friends
+    type: numericInput
+    label: Interest rate on loan from family/friends (% per year)
+    value: 3.7
+    description: Interest rate for family/friends loan
+  - id: duration_payback_family_friends
+    type: numericInput
+    label: Duration payback family/friends loan (years)
+    value: 10
+    description: Duration to pay back family/friends loan
+  - id: property_taxes_rate
+    type: numericInput
+    label: Property taxes rate (% property value per year)
+    value: 0.3
+    description: Annual property tax rate
+  - id: maintenance_cost_rate
+    type: numericInput
+    label: Maintenance cost rate (% property value per year)
+    value: 1
+    description: Annual maintenance cost as a percentage of property value
+  - id: hausgeld_fees_total
+    type: numericInput
+    label: Hausgeld (EUR/month)
     value: 220
     description: 'Monthly Hausgeld fees total. Sum of all other Hausgeld fees and
       costs: Building maintenance, utilities, reserve fund contributions, property
@@ -395,7 +494,7 @@ properties:
   - id: hausgeld_maintenance_costs
     type: numericInput
     label: Hausgeld - Building maintenance (EUR/month)
-    value: 55
+    value: 50
     description: Monthly Hausgeld building maintenance costs.
   - id: hausgeld_utilities
     type: numericInput
@@ -415,6 +514,6 @@ properties:
   - id: hausgeld_building_insurance
     type: numericInput
     label: Hausgeld - Building insurance (EUR/month)
-    value: 30
+    value: 35
     description: Monthly Hausgeld building insurance cost.
-  id: 3021c1c5-b6aa-4400-ba25-9fbccf392a25
+  id: b86c3fee-971b-4790-9ad4-644872f93fa4
