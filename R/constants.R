@@ -104,17 +104,3 @@ property_parameter_template <- list(
     type = "currency"
   )
 )
-
-
-# UI texts
-DISCLAIMER_FINANCIAL_ADVISE <- "The Financial Evolution Calculator is free of costs and we do not track your financial data. The tool was designed to help you gain insights into your personal finances. Please note that this tool does not provide financial advice, and we are not financial advisors. For professional guidance, consult a certified financial expert."
-
-
-DISCLAIMER_FINANCIAL_ADVISE_SCENARIOS <- "Before I go any further, I must again emphasize that we do not give financial advice. If you identify yourself with the characters described in this scenario, please remember that this numeric analysis does not take in consideration many other personal factors that may apply to your situation."
-
-
-SCENARIO_LIFESTYLE_DESCRIPTION <- "As a lifestyle, they want to focus on family, friends and hobbies. Financially, for them, that means minimizing risks by having stable jobs, an enduring living situation and a reliable reserve fund."
-
-SCENARIO_EXTRA_CASH_DESCRIPTION <- "Whenever possible, they’d like to donate some cash to causes they believe in and to make their communities more resilient, without threatening their financial stability."
-
-SCENARIO_LATE_LIFE_DESCRIPTION <- "Reducing working hours to spend more time with loved ones is one of their main priorities, once financial stability is achieved. Retiring as soon as possible is desirable while maintaining their lifestyle. They don’t aim at accumulating wealth as passing it on to their kids is secondary."

@@ -19,7 +19,7 @@ source(file.path("R", "constants.R"))
 source(file.path("R", "validations.R"))
 
 # Module sources
-source(file.path("modules", "homeNavigationModule.R"))
+source(file.path("modules", "homeNavtabModule.R"))
 source(file.path("modules", "plots", "YearlyAssetProgressionModule.R"))
 source(file.path("modules", "sidebar", "sidebarInputModule.R"))
 source(file.path("modules", "sidebar", "propertyManagementModule.R"))
