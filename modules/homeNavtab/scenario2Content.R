@@ -11,6 +11,38 @@ scenario2Content <- function() {
     )
   })
 
+  # Generate the figures for this scenario
+  for (scenario in c("rent", "homeowner", "landlord")) {
+    scenario_name <- paste0("mid_wage_family_", scenario)
+    config <- safelyLoadConfig(file.path("config", "templates",
+                                         paste0("inputs_", scenario_name, ".yaml")))
+    plot_data <- read.csv(file.path("article",
+                                    paste0("calculations_", scenario_name, ".csv")))
+
+    assign(paste0(scenario, "_AssetEvolution"),
+           renderUI(renderPlot(generateYearlyAssetProgressionPlot(
+             plot_data,
+             config
+           ))))
+    assign(paste0(scenario, "_FinMetrics"),
+           renderUI(renderPlot(generateFinancialMetricsPlot(
+             plot_data,
+             legend_bool = TRUE
+           ))))
+    assign(paste0(scenario, "_IncomeComp"),
+           renderUI(renderPlot(generateStackedAreaPlot(
+             plot_data = plot_data,
+             plot_type = "income",
+             legend_bool = TRUE
+           ))))
+    assign(paste0(scenario, "_ExpensesComp"),
+           renderUI(renderPlot(generateStackedAreaPlot(
+             plot_data = plot_data,
+             plot_type = "expenses",
+             legend_bool = TRUE
+           ))))
+  }
+
   div(
     h2("Alex and Max, the home-poor lifestyle"),
     p(em("Alex and Max are a 30-years old middle-income family in Berlin, Germany. They likely work on technical jobs, services or other functions requiring some level of higher education. Their salaries are directly linked to their performance.")),
@@ -44,6 +76,7 @@ scenario2Content <- function() {
 
 
     h3("Total Asset Evolution"),
+    homeowner_AssetEvolution,
     p(em("Figure 1 - Scenario 2, Alex and Max. Total asset value evolution.")),
     p("As Alex and Max just bought a home with a loan from the bank, their total asset value is negative but grows over the years (Figure 1). It takes 10 years for their total asset value to reach zero."),
     p("By the time major lump sums are expected to arrive (positive and negative), they will have accumulated enough asset value that these will not have a significant impact on their overall financial evolution."),
@@ -54,6 +87,7 @@ scenario2Content <- function() {
 
 
     h3("Financial Metrics"),
+    homeowner_FinMetrics,
     p(em("Figure 2 - Scenario 2, Alex and Max. Evolution of main financial metrics.")),
     p("Alex and Max’s main financial metrics are marked by the purchase of their home property early in their lives."),
     p("In the following decades (2025-2052), they balance total expenses and income well, having no extra savings to invest passively and rely on their emergency reserve whenever necessary to cover expenses (Figure 2)."),
@@ -66,7 +100,9 @@ scenario2Content <- function() {
 
 
     h3("Income and Expenses Components"),
-    p(em("Figure 3 - Scenario 2, Alex and Max. Detailed view of the financial components of income and expenses.")),
+    p(strong("A")), homeowner_IncomeComp,
+    p(strong("B")), homeowner_ExpensesComp,
+    p(em("Figure 3 - Scenario 2, Alex and Max. Detailed view of the financial components of income (A) and expenses (B).")),
     p("Decomposition of Alex and Max’s income and expenses help paint a better picture of their financial evolution. Their living costs are constant throughout the years, except in the years after the kids are born, reflecting a sustained lifestyle (Figure 3A)."),
     p("In the first three decades of their lives, kids represent a significant but not large expense, while mortgage – composed of principal and interest payments – is very significant and represents around 50% of their total expenses."),
     p("Upon paying off the property around 2053, expenses drop significantly and most of their money is spend on themselves and on maintaining their home."),
@@ -105,6 +141,9 @@ scenario2Content <- function() {
     hr(),
 
     h4("Aligning Financial Goals and Decisions"),
+    p(strong("A")), rent_AssetEvolution,
+    p(strong("B")), rent_FinMetrics,
+    p(strong("C")),
     p(em("Figure 5 - Scenario 2, Alex and Max. Scenario re-simulation without homeownership. Total asset value evolution (A), evolution of main financial metrics (B), and sensitivity analysis on total asset value of single parameter perturbations (C).")),
     p("What could they have done differently to better align their financial goals and decisions? The Financial Evolution Calculator can be used to test multiple scenarios. For example, we can re-simulate Alex and Max’s scenario where instead of purchasing their home they keep on renting it (Figure 5)."),
     p("In this second scenario, Alex and Max would build less than half of the total asset value as before (300.000€ vs 800.000€, at retirement age) (Figure 5A). However, this amount would be enough to sustain their lifestyle during retirement, indicating a stable and safe later life (Figure 5B). Therefore, in their case, living as a renter is also an option for a safe retirement."),
@@ -117,7 +156,11 @@ scenario2Content <- function() {
     p("Also, few people have the discipline to not use the invested money, relying on a private pension scheme to safeguard their money from themselves spending it too early, which takes away from the flexibility of having such money accumulated."),
     hr(),
 
+
     h4("Going Beyond Initial Goals"),
+    p(strong("A")), landlord_AssetEvolution,
+    p(strong("B")), landlord_FinMetrics,
+    p(strong("C")),
     p(em("Figure 6 - Scenario 2, Alex and Max. Scenario simulation leasing the property purchased in 2025. Total asset value evolution (A), evolution of main financial metrics without Total Investment value (B), and sensitivity analysis on total asset value of single parameter perturbations (C).")),
     p("In “Buy-vs-Rent” discussions, rarely people consider a third alternative: to keep on renting their home but still purchase a property and renting it out to someone else! There seems to be a general misconception that becoming a landlord is something only rich people do. There is no reason for that, and everyone could benefit from this type of active investment in real estate."),
     p("Let’s re-simulate a third scenario for Alex and Max. As before, they bought the same property (250.000€) in the periphery of Berlin. Instead of moving in, they stayed in their rental apartment (1500€/month) closer to the city centre. Their property is then leased to someone else at 750€/month rental price, following the same rental contract they have on their own rent (3% increase per year)."),

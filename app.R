@@ -19,13 +19,13 @@ source(file.path("R", "constants.R"))
 source(file.path("R", "validations.R"))
 
 # Module sources
-source(file.path("modules", "homeNavtabModule.R"))
-source(file.path("modules", "plots", "YearlyAssetProgressionModule.R"))
-source(file.path("modules", "sidebar", "sidebarInputModule.R"))
-source(file.path("modules", "sidebar", "propertyManagementModule.R"))
+source(file.path("modules", "homeNavtab", "homeNavtabModule.R"))
+source(file.path("modules", "calculatorNavTab", "sidebarInputModule.R"))
+source(file.path("modules", "calculatorNavTab", "propertyManagementModule.R"))
+source(file.path("modules", "plots", "AssetEvolutionModule.R"))
 source(file.path("modules", "plots", "financialMetricsModule.R"))
 source(file.path("modules", "plots", "stackedAreaPlotModule.R"))
-source(file.path("modules", "sensitivityAnalysisModule.R"))
+source(file.path("modules", "plots", "sensitivityAnalysisModule.R"))
 
 ui <- bslib::page_navbar(
   title = "Financial Evolution Calculator",

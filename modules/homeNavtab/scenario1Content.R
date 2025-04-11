@@ -11,6 +11,39 @@ scenario1Content <- function() {
     )
   })
 
+  # Generate the figures for this scenario
+  for (scenario in c("rent",
+                     "rent_higher_salary", "rent_lower_rent", "rent_higher_salary_lower_rent",
+                     "homeowner", "landlord")) {
+    scenario_name <- paste0("low_wage_family_", scenario)
+    config <- safelyLoadConfig(file.path("config", "templates",
+                                         paste0("inputs_", scenario_name, ".yaml")))
+    plot_data <- read.csv(file.path("article",
+                                    paste0("calculations_", scenario_name, ".csv")))
+
+    assign(paste0(scenario, "_AssetEvolution"),
+           renderUI(renderPlot(generateYearlyAssetProgressionPlot(
+             plot_data,
+             config
+             ))))
+    assign(paste0(scenario, "_FinMetrics"),
+           renderUI(renderPlot(generateFinancialMetricsPlot(
+             plot_data,
+             legend_bool = TRUE
+             ))))
+    assign(paste0(scenario, "_IncomeComp"),
+           renderUI(renderPlot(generateStackedAreaPlot(
+             plot_data = plot_data,
+             plot_type = "income",
+             legend_bool = TRUE
+           ))))
+    assign(paste0(scenario, "_ExpensesComp"),
+           renderUI(renderPlot(generateStackedAreaPlot(
+             plot_data = plot_data,
+             plot_type = "expenses",
+             legend_bool = TRUE
+           ))))
+  }
 
   div(
     h2("Gene and Jean, the poverty trap"),
@@ -45,6 +78,7 @@ scenario1Content <- function() {
 
 
     h3("Total Asset Evolution"),
+    rent_AssetEvolution,
     p(em("Figure 1 - Scenario 1, Gene and Jean. Total asset value evolution.")),
     p("Gene and Jean’s total asset value expands slowly (Figure 1), with periods of stagnation and been strongly affected by major lump sums (positive and negative). Their finances only really take off later in life, assuming they manage to maintain this level of living costs, indicating costs with kids are a significant burden."),
     p("Upon retirement at age of 70 (2065), their total asset curve stagnates, indicating that they’d be living stable financial lives so long as they keep the same lifestyle and living costs."),
@@ -54,6 +88,7 @@ scenario1Content <- function() {
 
 
     h3("Financial Metrics"),
+    rent_FinMetrics,
     p(em("Figure 2 - Scenario 1, Gene and Jean. Evolution of main financial metrics.")),
     p("Gene and Jean’s main financial metrics reflect their slowly evolving financial situation with a life of cutting costs and saving wherever possible (Figure 2)."),
     p("In the first decade (2025-2037), while the kids are small, they balance total expenses and income allowing for the accumulation of passive investments."),
@@ -65,7 +100,9 @@ scenario1Content <- function() {
 
 
     h3("Income and Expenses Components"),
-    p(em("Figure 3 - Scenario 1, Gene and Jean. Detailed view of the financial components of income and expenses.")),
+    p(strong("A")), rent_IncomeComp,
+    p(strong("B")), rent_ExpensesComp,
+    p(em("Figure 3 - Scenario 1, Gene and Jean. Detailed view of the financial components of income (A) and expenses (B).")),
     p("Decomposition of Gene and Jean’s income and expenses help paint a better picture of their financial evolution. Their living costs are constant throughout the years after inflation correction, except in the years after the kids are born, reflecting a sustained lifestyle (Figure 3A)."),
     p("Rent is by far their largest expenditure, representing between 50-70% of all expenses and relatively increasing over the years. Kids also represent a significant expense throughout almost the first 3 decades."),
     p("Salary is their main source of income and investing has very little impact on their income. Capital gains from their passive investments become relatively more significant for income upon retirement with the reduction of their salaries (Figure 3B)."),
@@ -96,6 +133,9 @@ scenario1Content <- function() {
     hr(),
 
     h4("Aligning Financial Goals and Decisions"),
+    p(strong("A")), rent_higher_salary_AssetEvolution,
+    p(strong("B")), rent_lower_rent_AssetEvolution,
+    p(strong("C")), rent_higher_salary_lower_rent_AssetEvolution,
     p(em("Figure 5 - Scenario 1, Gene and Jean. Total asset value evolution in simulations of scenarios with single parameter variations. A) Salary increased from 2400€ to 2500€. B) Rent reduced from 1000€ to 950€. C) Salary increased and rent reduced.")),
     p("What could they have done differently to better align their financial goals and decisions? The Financial Evolution Calculator can be used to test multiple scenarios. For example, we can re-simulate Gene and Jean’s scenario to identify critical factors for improving their financial situation (Figure 5)."),
     p("For example, increasing their current salaries by 50€ each would strongly impact their financial evolution (Figure 5A). Not surprisingly, people in similar situations to Gene and Jean often work extra hours. Although impactful, this approach might not be a sustainable solution. Focusing on improving skills set and fighting for better salaries could higher impact long-term."),
@@ -103,6 +143,9 @@ scenario1Content <- function() {
     hr(),
 
     h4("Going Beyond Initial Goals"),
+    p(strong("A")), landlord_AssetEvolution,
+    p(strong("B")), landlord_FinMetrics,
+    p(strong("C")),
     p(em("Figure 6 - Scenario 1, Gene and Jean. Scenario simulation leasing the property purchased in 2025. Total asset value evolution (A), evolution of main financial metrics (B), and sensitivity analysis on total asset value of single parameter perturbations (C).")),
     p("These two factors together point to a possible but difficult financial improvement for Gene and Jean: increasing their salaries and saving on rent should be their priorities. It also highlights how people in the lowest income range are vulnerable in society."),
     p("However, there is another alternative to consider. There seems to be a general misconception that becoming a landlord is something only rich people do. Although more difficult to obtain a bank loan when one’s salaries are low, with help of family and friends it can be possible, and the benefits are immense."),

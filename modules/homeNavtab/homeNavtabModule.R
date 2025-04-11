@@ -1,9 +1,9 @@
-source("modules/homeNavtabContent/welcomePageContent.R")
-source("modules/homeNavtabContent/parametersPageContent.R")
-source("modules/homeNavtabContent/scenario1Content.R")
-source("modules/homeNavtabContent/scenario2Content.R")
-source("modules/homeNavtabContent/scenario3Content.R")
-source("modules/homeNavtabContent/aboutPageContent.R")
+source("modules/homeNavtab/welcomePageContent.R")
+source("modules/homeNavtab/parametersPageContent.R")
+source("modules/homeNavtab/scenario1Content.R")
+source("modules/homeNavtab/scenario2Content.R")
+source("modules/homeNavtab/scenario3Content.R")
+source("modules/homeNavtab/aboutPageContent.R")
 NAVTAB_CONTENT <- safelyLoadConfig("config/homeNavtabContent.yaml")
 
 

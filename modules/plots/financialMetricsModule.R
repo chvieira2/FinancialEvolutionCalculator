@@ -1,8 +1,6 @@
-library(shiny)
-library(ggplot2)
 library(dplyr)
 library(tidyr)
-
+library(ggplot2)
 
 financialMetricsModuleUI <- function(id) {
   ns <- NS(id)
@@ -77,74 +75,109 @@ financialMetricsModuleServer <- function(id, data, year_range) {
     filtered_data <- reactive({
       req(data(), year_range())
       data() %>%
-        mutate(
-          passive_investment_money_needed =
-            passive_investment_money_withdrawn_from_capital_gains +
-            passive_investment_money_withdrawn_from_contributions
-        ) %>%
         filter(Year >= year_range()[1] & Year <= year_range()[2])
     })
 
     output$metrics_plot <- renderPlot({
       req(selected_metrics(), filtered_data())
-
-      # Get the data ready
-      plot_data <- filtered_data()
-      selected_ids <- selected_metrics()
-
-      # Get the corresponding labels for the selected metrics
-      selected_labels <- sapply(FINANCIAL_METRIC_DEFINITIONS[sapply(FINANCIAL_METRIC_DEFINITIONS, function(x) x$id %in% selected_ids)],
-                                `[[`, "label")
-
-      # Create long format data
-      plot_data_long <- plot_data %>%
-        select(Year, all_of(selected_ids)) %>%
-        pivot_longer(
-          cols = -Year,
-          names_to = "Metric",
-          values_to = "Value"
-        )
-
-      # Create a named vector for the label mapping
-      label_mapping <- setNames(selected_labels, selected_ids)
-
-      # Add labels to the data
-      plot_data_long$MetricLabel <- factor(
-        label_mapping[plot_data_long$Metric],
-        levels = selected_labels
-      )
-
-      # Create the plot
-      ggplot(plot_data_long, aes(x = Year, y = Value/1000, color = MetricLabel, group = MetricLabel)) +
-        geom_line(linewidth = 1) +
-        geom_point() +
-        theme_minimal() +
-        labs(title = "Finances evolution, inflation-corrected (thousands, €)",
-             subtitle = "Summary of key financial metrics over the years",
-             x = NULL,
-             y = NULL) +
-        scale_color_manual(values = FINANCIAL_METRIC_COLORS[selected_labels]) +
-        scale_x_continuous(breaks = seq(min(plot_data$Year),
-                                        max(plot_data$Year),
-                                        by = if(max(plot_data$Year) - min(plot_data$Year) <= 15) 1
-                                        else if(max(plot_data$Year) - min(plot_data$Year) <= 25) 2
-                                        else 4)) +
-        scale_y_continuous(
-          labels = scales::label_number(
-            big.mark = ",",
-            accuracy = 1,
-            scale = 1,
-            suffix = ""
-          )
-        ) +
-        theme(
-          legend.position = "none",
-          strip.text = element_text(size = 14, face = "bold"),
-          plot.subtitle = element_text(size = 12, color = "gray40"),
-          plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
-          axis.text.x = element_text(angle = 90, hjust = 1),
-          axis.text = element_text(size = 9)
-        )
+      generateFinancialMetricsPlot(filtered_data(), selected_metrics())
     })
   })
+}
+
+generateFinancialMetricsPlot <- function(plot_data, selected_ids = NULL, legend_bool = FALSE) {
+  # Get default metrics to display
+  if (is.null(selected_ids)) selected_ids <- sapply(FINANCIAL_METRIC_DEFINITIONS, `[[`, "id")
+
+  plot_data <- plot_data %>%
+    mutate(
+      passive_investment_money_needed =
+        passive_investment_money_withdrawn_from_capital_gains +
+        passive_investment_money_withdrawn_from_contributions
+    )
+
+  # Get the corresponding labels for the selected metrics
+  selected_labels <- sapply(FINANCIAL_METRIC_DEFINITIONS[sapply(FINANCIAL_METRIC_DEFINITIONS, function(x) x$id %in% selected_ids)],
+                            `[[`, "label")
+
+  # Create long format data
+
+  plot_data_long <- plot_data %>%
+    select(Year, all_of(selected_ids)) %>%
+    tidyr::pivot_longer(
+      cols = -Year,
+      names_to = "Metric",
+      values_to = "Value"
+    )
+
+  # Create a named vector for the label mapping
+  label_mapping <- setNames(selected_labels, selected_ids)
+
+  # Add labels to the data
+  plot_data_long$MetricLabel <- factor(
+    label_mapping[plot_data_long$Metric],
+    levels = selected_labels
+  )
+
+  # Create the plot
+  ggplot(plot_data_long, aes(x = Year, y = Value/1000, color = MetricLabel, group = MetricLabel)) +
+    geom_line(linewidth = 1) +
+    geom_point() +
+    theme_minimal() +
+    labs(title = "Finances evolution, inflation-corrected (thousands, €)",
+         subtitle = "Summary of key financial metrics over the years",
+         x = NULL,
+         y = NULL) +
+    scale_color_manual(values = FINANCIAL_METRIC_COLORS[selected_labels]) +
+    scale_x_continuous(breaks = seq(min(plot_data$Year),
+                                    max(plot_data$Year),
+                                    by = if(max(plot_data$Year) - min(plot_data$Year) <= 15) 1
+                                    else if(max(plot_data$Year) - min(plot_data$Year) <= 25) 2
+                                    else 4)) +
+    scale_y_continuous(
+      labels = scales::label_number(
+        big.mark = ",",
+        accuracy = 1,
+        scale = 1,
+        suffix = ""
+      )
+    ) +
+    theme(
+      legend.position = if (legend_bool) "bottom" else "none",
+      strip.text = element_text(size = 14, face = "bold"),
+      plot.subtitle = element_text(size = 12, color = "gray40"),
+      plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
+      axis.text.x = element_text(angle = 90, hjust = 1),
+      axis.text = element_text(size = 9)
+    )
+}
+
+
+
+if (sys.nframe() == 0) {
+  source(file.path("R", "helper_functions.R"))
+  source(file.path("R", "constants.R"))
+
+  for (scenario in TEMPLATE_SCENARIOS) {
+    scenario <- sub(".yaml*$", "", scenario)
+    scenario <- sub("inputs_", "", scenario)
+
+    # Define test parameters
+    config <- safelyLoadConfig(file.path("config", "templates",
+                                         paste0("inputs_", scenario, ".yaml")))
+    plot_data <- read.csv(file.path("article",
+                                    paste0("calculations_", scenario, ".csv")))
+    output_path <- file.path("article",
+                             paste0("FinMetrics_", scenario,".tif"))
+
+
+    # Generate the plot
+    message("Generating test plot...")
+    test_plot <- generateFinancialMetricsPlot(plot_data, default_metrics)
+
+    # Save the plot
+    ggsave(output_path, plot = test_plot, width = 10, height = 6, dpi = 300)
+    message(paste("Plot saved to", output_path))
+
+  }
 }

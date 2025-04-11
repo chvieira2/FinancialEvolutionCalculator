@@ -394,7 +394,7 @@ if (sys.nframe() == 0) {
     plot_data <- read.csv(file.path("article",
                                     paste0("calculations_", scenario, ".csv")))
     output_path <- file.path("article",
-                             paste0("Fig1_", scenario,".tif"))
+                             paste0("AssetEvolution_", scenario,".tif"))
 
     # Generate the plot
     message("Generating test plot...")
