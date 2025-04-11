@@ -3,34 +3,14 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 
-# Define fixed colors for metrics
-METRIC_COLORS <- c(
-  "Total Expenses" = "#E63946",       # Bright red - represents outflow/costs
-  "Total Income" = "#2A9D8F",         # Teal green - represents inflow/earnings
-  "Cash Flow" = "#5E60CE",            # Vibrant purple - represents net financial movement
-  "Emergency Reserve" = "#F4A261",    # Orange amber - represents safety/caution
-  "Investment Withdrawals" = "#8338EC", # Deep purple - represents drawing from investments
-  "Total Invested" = "#FFD700"        # Bright gold - represents wealth/investment
-)
-
-# Define fixed order and labels for metrics
-METRIC_DEFINITIONS <- list(
-  list(id = "total_expenses", label = "Total Expenses"),
-  list(id = "total_income", label = "Total Income"),
-  list(id = "cash_flow", label = "Cash Flow"),
-  list(id = "savings_emergency_reserve", label = "Emergency Reserve"),
-  list(id = "passive_investment_money_needed", label = "Investment Withdrawals"),
-  list(id = "passive_investment_total_invested", label = "Total Invested")
-)
-
 
 financialMetricsModuleUI <- function(id) {
   ns <- NS(id)
 
   # Create mapping between display names and column names
   metric_mapping <- setNames(
-    sapply(METRIC_DEFINITIONS, `[[`, "id"),
-    sapply(METRIC_DEFINITIONS, `[[`, "label")
+    sapply(FINANCIAL_METRIC_DEFINITIONS, `[[`, "id"),
+    sapply(FINANCIAL_METRIC_DEFINITIONS, `[[`, "label")
   )
 
   tagList(
@@ -49,9 +29,9 @@ financialMetricsModuleUI <- function(id) {
                    style = "font-size: 12px; font-weight: bold; margin-bottom: 0px;"),
         div(
           style = "margin-top: 0px;",
-          lapply(names(METRIC_COLORS), function(metric_label) {
+          lapply(names(FINANCIAL_METRIC_COLORS), function(metric_label) {
             metric_id <- metric_mapping[metric_label]
-            metric_color <- METRIC_COLORS[[metric_label]]
+            metric_color <- FINANCIAL_METRIC_COLORS[[metric_label]]
 
             span(
               class = "checkbox-inline",
@@ -83,7 +63,7 @@ financialMetricsModuleServer <- function(id, data, year_range) {
     # Reactive expression for selected metrics
     selected_metrics <- reactive({
       # Get all possible metrics
-      metrics <- sapply(METRIC_DEFINITIONS, `[[`, "id")
+      metrics <- sapply(FINANCIAL_METRIC_DEFINITIONS, `[[`, "id")
 
       # Check which ones are selected
       selected <- sapply(metrics, function(metric_id) {
@@ -113,7 +93,7 @@ financialMetricsModuleServer <- function(id, data, year_range) {
       selected_ids <- selected_metrics()
 
       # Get the corresponding labels for the selected metrics
-      selected_labels <- sapply(METRIC_DEFINITIONS[sapply(METRIC_DEFINITIONS, function(x) x$id %in% selected_ids)],
+      selected_labels <- sapply(FINANCIAL_METRIC_DEFINITIONS[sapply(FINANCIAL_METRIC_DEFINITIONS, function(x) x$id %in% selected_ids)],
                                 `[[`, "label")
 
       # Create long format data
@@ -143,7 +123,7 @@ financialMetricsModuleServer <- function(id, data, year_range) {
              subtitle = "Summary of key financial metrics over the years",
              x = NULL,
              y = NULL) +
-        scale_color_manual(values = METRIC_COLORS[selected_labels]) +
+        scale_color_manual(values = FINANCIAL_METRIC_COLORS[selected_labels]) +
         scale_x_continuous(breaks = seq(min(plot_data$Year),
                                         max(plot_data$Year),
                                         by = if(max(plot_data$Year) - min(plot_data$Year) <= 15) 1

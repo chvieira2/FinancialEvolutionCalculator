@@ -104,3 +104,27 @@ property_parameter_template <- list(
     type = "currency"
   )
 )
+
+
+
+
+
+# Define fixed colors for metrics
+FINANCIAL_METRIC_COLORS <- c(
+  "Total Expenses" = "#E63946",       # Bright red - represents outflow/costs
+  "Total Income" = "#2A9D8F",         # Teal green - represents inflow/earnings
+  "Cash Flow" = "#5E60CE",            # Vibrant purple - represents net financial movement
+  "Emergency Reserve" = "#F4A261",    # Orange amber - represents safety/caution
+  "Investment Withdrawals" = "#8338EC", # Deep purple - represents drawing from investments
+  "Total Invested" = "#FFD700"        # Bright gold - represents wealth/investment
+)
+
+# Define fixed order and labels for metrics
+FINANCIAL_METRIC_DEFINITIONS <- list(
+  list(id = "total_expenses", label = "Total Expenses"),
+  list(id = "total_income", label = "Total Income"),
+  list(id = "cash_flow", label = "Cash Flow"),
+  list(id = "savings_emergency_reserve", label = "Emergency Reserve"),
+  list(id = "passive_investment_money_needed", label = "Investment Withdrawals"),
+  list(id = "passive_investment_total_invested", label = "Total Invested")
+)
