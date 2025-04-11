@@ -5,7 +5,7 @@ properties:
       - id: "value_growth"
         type: "numericInput"
         label: "Home Property Year-on-Year value Growth (% per year)"
-        value: 5.00
+        value: 3.00
         description: "Annual growth rate of the investment property value"
       - id: "value_today"
         type: "numericInput"
@@ -15,12 +15,12 @@ properties:
       - id: "purchase_year"
         type: "numericInput"
         label: "Year property purchase"
-        value: 2030
+        value: 2025
         description: "Year when the property will be purchased"
       - id: "sale_year"
         type: "numericInput"
         label: "Year property sold"
-        value: 2045
+        value: 2100
         description: "Year when the property will be sold"
       - id: "initial_interest_rate"
         type: "numericInput"
@@ -35,7 +35,7 @@ properties:
       - id: "max_mortgage_amortization_rate"
         type: "numericInput"
         label: "Maximal mortgage principal amortization rate (% per year)"
-        value: 5.00
+        value: 0
         description: "Maximal annual rate of amortization allowed by your mortgage contract for the principal. This is the maximum value (Percent of principal) your mortgage contract with the bank will allow you to pay in extra installments every year to speed-up the payment of your mortgage."
 
       - id: "loan_family_friends"
@@ -101,22 +101,22 @@ properties:
       - id: "value_growth"
         type: "numericInput"
         label: "Investment Property Year-on-Year value Growth (% per year)"
-        value: 5.00
+        value: 3.00
         description: "Annual growth rate of the investment property value"
       - id: "value_today"
         type: "numericInput"
         label: "Property price today (EUR)"
-        value: 415000
+        value: 300000
         description: "Current market value of the property."
       - id: "purchase_year"
         type: "numericInput"
         label: "Year property purchase"
-        value: 2055
+        value: 2025
         description: "Year when the property will be purchased."
       - id: "sale_year"
         type: "numericInput"
         label: "Year property sold"
-        value: 2060
+        value: 2100
         description: "Year when the property will be sold."
       - id: "initial_interest_rate"
         type: "numericInput"
@@ -131,13 +131,13 @@ properties:
       - id: "max_mortgage_amortization_rate"
         type: "numericInput"
         label: "Maximal mortgage principal amortization rate (% per year)"
-        value: 5.00
+        value: 0
         description: "Maximal annual rate of amortization allowed by your mortgage contract for the principal. This is the maximum value (Percent of principal) your mortgage contract with the bank will allow you to pay in extra installments every year to speed-up the payment of your mortgage."
 
       - id: "loan_family_friends"
         type: "numericInput"
         label: "Loan from family/friends (EUR)"
-        value: 0
+        value: 30000
         description: "Amount borrowed from family or friends"
       - id: "interest_rate_family_friends"
         type: "numericInput"
@@ -154,12 +154,12 @@ properties:
       - id: "cold_lease_today"
         type: "numericInput"
         label: "Cold lease today (EUR/month)"
-        value: 1155
+        value: 750
         description: "Current monthly cold lease amount"
       - id: "lease_rental_growth"
         type: "numericInput"
         label: "Lease rental prices growth (% per year)"
-        value: 5.00
+        value: 3.00
         description: "Annual growth rate of lease rental prices"
       - id: "yearly_depreciation_rate"
         type: "numericInput"
@@ -189,30 +189,30 @@ properties:
       - id: "hausgeld_fees_total"
         type: "numericInput"
         label: "Hausgeld (EUR/month)"
-        value: 330
+        value: 220
         description: "Monthly Hausgeld fees total. Sum of all other Hausgeld fees and costs: Building maintenance, utilities, reserve fund contributions, property management fees, building insurance, etc."
       - id: "hausgeld_maintenance_costs"
         type: "numericInput"
         label: "Hausgeld - Building maintenance (EUR/month)"
-        value: 75
+        value: 50
         description: "Monthly Hausgeld building maintenance costs."
       - id: "hausgeld_utilities"
         type: "numericInput"
         label: "Hausgeld - Utilities (EUR/month)"
-        value: 125
+        value: 90
         description: "Monthly Hausgeld utilities costs."
       - id: "hausgeld_reserve_fund"
         type: "numericInput"
         label: "Hausgeld - Reserve fund contributions (EUR/month)"
-        value: 40
+        value: 25
         description: "Monthly Hausgeld reserve fund contributions."
       - id: "hausgeld_house_management_fee"
         type: "numericInput"
         label: "Hausgeld - Property management fee (EUR/month)"
-        value: 40
+        value: 25
         description: "Monthly Hausgeld property management fee."
       - id: "hausgeld_building_insurance"
         type: "numericInput"
         label: "Hausgeld - Building insurance (EUR/month)"
-        value: 50
+        value: 30
         description: "Monthly Hausgeld building insurance cost."
