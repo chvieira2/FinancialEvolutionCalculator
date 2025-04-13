@@ -1,5 +1,6 @@
-welcomePageContent <- function() {
+welcomePageContent <- function(is_mobile) {
   div(
+    style = if (is_mobile) "padding-left: 15px; padding-right: 15px; padding-bottom: 50px;" else "",
     h2("Welcome to the Financial Evolution Calculator!"),
     p(em(NAVTAB_CONTENT$DISCLAIMERS$NOT_FINANCIAL_ADVISE)),
 

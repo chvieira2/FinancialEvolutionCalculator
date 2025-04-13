@@ -115,40 +115,7 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
       # Get properties from config
       properties <- reactive_config()$properties
 
-      if (!is.null(properties)) {
-        # For each property, add its parameters
-        property_params_list <- lapply(properties, function(property) {
-          # Select which parameters to include based on property type
-          parameter_templates <- if(property$type == "investment") {
-            property_parameter_template  # Include all parameters for investment properties
-          } else {
-            property_parameter_template[!names(property_parameter_template) %in% c("cold_lease_today")]  # Exclude investment parameters for home properties
-          }
-
-          # Create parameter list
-          params <- lapply(parameter_templates, function(template) {
-            list(
-              id = sprintf("properties.%s.%s",
-                           property$name,
-                           template$id_suffix),
-              name = sprintf("%s (%s - %s)",
-                             template$name_suffix,
-                             property$name,
-                             property$type),
-              color = template$color,
-              type = template$type,
-              property_type = property$type  # Store property type for faceting
-            )
-          })
-
-          params
-        })
-
-        # Flatten the property parameters list
-        property_params(unlist(property_params_list, recursive = FALSE))
-      } else {
-        property_params(NULL)
-      }
+      property_params(extract_property_parameters(properties))
     })
 
     # Render property parameters checkboxes
@@ -332,19 +299,10 @@ sensitivityAnalysisModuleServer <- function(id, reactive_config, processed_data,
     plot_heights <- reactive({
       req(selected_parameters_snapshot())
 
-      n_params <- length(selected_parameters_snapshot())
-
-      # Calculate base height per parameter
-      base_height_per_param <- if(is_mobile) 400 else 300
-
-      # Calculate total height based on number of parameters and columns
-      n_cols <- if(is_mobile) 1 else 3
-      n_rows <- ceiling(n_params / n_cols)
-
-      # Minimum height of 400px, then add height for each row
-      sensitivity_height <- max(400, n_rows * base_height_per_param)
-
-      sensitivity_height
+      calculate_plot_heights(
+        selected_params = selected_parameters_snapshot(),
+        is_mobile = is_mobile
+        )
     })
 
     # Render sensitivity plot container
@@ -396,12 +354,12 @@ generateSensitivityPlot <- function(analysis_results, selected_parameters, year_
   y_range <- diff(y_limits)
 
   # Calculate text spacing
-  text_height <- y_range * 0.1  # Height of each text entry
+  text_height <- y_range * 0.125  # Height of each text entry
 
   # Calculate fixed y positions for all texts
-  max_y <- y_limits[2] + y_range * 0.15  # Position for parameter headers
+  max_y <- y_limits[2] + y_range * 0.125  # Position for parameter headers
   text_positions <- seq(
-    from = max_y - text_height,  # Start just below header
+    from = max_y,  # Start just below header
     by = -text_height,           # Stack downwards
     length.out = steps           # One position per variation
   )
@@ -494,10 +452,10 @@ generateSensitivityPlot <- function(analysis_results, selected_parameters, year_
     coord_cartesian(ylim = y_limits_adjusted, xlim = year_range) +
     scale_x_continuous(limits = c(initial_year, NA)) +
     labs(
-      title = "Single Parameter Impact Range on Asset Value Evolution",
+      title = "Single Parameter Impact on Total Asset Value Evolution",
       subtitle = "All values are inflation-adjusted to today's euros",
       x = NULL,
-      y = "Total Assets (thousands, €)",
+      y = "Total Assets Value (thousands, €)",
       color = "Parameter\nVariation (% or years)"
     ) +
     theme_minimal(base_size = if(is_mobile) 14 else 16) +
@@ -509,7 +467,57 @@ generateSensitivityPlot <- function(analysis_results, selected_parameters, year_
     )
 }
 
+extract_property_parameters <- function(properties) {
+  if (is.null(properties) || length(properties) == 0) {
+    return(NULL)
+  }
 
+  # For each property, add its parameters
+  property_params_list <- lapply(properties, function(property) {
+    # Select which parameters to include based on property type
+    parameter_templates <- if(property$type == "investment") {
+      property_parameter_template  # Include all parameters for investment properties
+    } else {
+      property_parameter_template[!names(property_parameter_template) %in% c("cold_lease_today")]  # Exclude investment parameters for home properties
+    }
+
+    # Create parameter list
+    params <- lapply(parameter_templates, function(template) {
+      list(
+        id = sprintf("properties.%s.%s",
+                     property$name,
+                     template$id_suffix),
+        name = sprintf("%s (%s - %s)",
+                       template$name_suffix,
+                       property$name,
+                       property$type),
+        color = template$color,
+        type = template$type,
+        property_type = property$type  # Store property type for faceting
+      )
+    })
+
+    params
+  })
+
+  # Flatten the property parameters list
+  unlist(property_params_list, recursive = FALSE)
+}
+
+calculate_plot_heights <- function(selected_params, is_mobile, base_height = 350) {
+  n_params <- length(selected_params)
+
+  # Calculate base height per parameter
+  base_height_per_param <- if(is_mobile) base_height else round(base_height*0.67)
+
+  # Calculate total height based on number of parameters and columns
+  n_cols <- if(is_mobile) 1 else 3
+  n_rows <- ceiling(n_params / n_cols)
+
+  # Minimum height of 350px, then add height for each row
+  height <- max(base_height, n_rows * base_height_per_param)
+  return(height)
+}
 
 if (sys.nframe() == 0) {
   source(file.path("R", "helper_functions.R"))
@@ -521,9 +529,7 @@ if (sys.nframe() == 0) {
   steps <- 9
   variation_range <- c(-20, 20)
 
-  for (scenario in TEMPLATE_SCENARIOS[1:2]) {
-    ## TODO
-    ## Add here code to check if Data processing calculations file has already been generated and load it
+  for (scenario in TEMPLATE_SCENARIOS) {
     scenario <- sub(".yaml*$", "", scenario)
     scenario <- sub("inputs_", "", scenario)
 
@@ -531,65 +537,97 @@ if (sys.nframe() == 0) {
     config <- safelyLoadConfig(file.path("config", "templates",
                                          paste0("inputs_", scenario, ".yaml")))
 
-    # Initialize results list
-    all_parameter_results <- list()
 
-    # Run analysis for test parameters
-    for (param in BASE_PARAMETERS) {
-      # Get base value
-      base_value <- get_parameter_value(config, param$id)
+    sens_results_path <- file.path("article", paste0("SensitivityResults_", scenario, ".RData"))
+    if (file.exists(sens_results_path)) {
+      message(paste("Loading", sens_results_path))
+      load(sens_results_path)
+    } else {
+      message(paste("Creating", sens_results_path))
 
-      # Create sequence of values based on parameter type
-      variation_seq <- seq(
-        base_value * (1 + variation_range[1]/100),
-        base_value * (1 + variation_range[2]/100),
-        length.out = steps
-      )
-
-      param_results <- list()
-
-      for (j in seq_along(variation_seq)) {
-        param_value <- variation_seq[j]
-        modified_config <- modify_config(config, param$id, param_value)
-
-        data_processor <- DataProcessor$new(
-          scenario_name = sprintf("%s_%s", param$name, round(param_value, 2)),
-          config = modified_config,
-          initial_year = min(year_range),
-          final_year = max(year_range)
-        )
-
-        data_processor$calculate()
-        results <- data_processor$get_results()
-
-        # Calculate variation percentage
-        variation_pct <- (param_value/base_value - 1) * 100
-
-        results$param_value <- param_value
-        results$param_variation <- variation_pct
-        results$parameter <- param$name
-        results$parameter_color <- param$color
-        results$param_type <- param$type
-
-        param_results[[j]] <- results
+      # Get property parameters and combine with base parameters
+      all_params <- if (length(config$properties) > 0) {
+        c(BASE_PARAMETERS, extract_property_parameters(config$properties[1]))
+      } else {
+        BASE_PARAMETERS
       }
 
-      all_parameter_results[[param$name]] <- do.call(rbind, param_results)
+      # Initialize results list
+      all_parameter_results <- list()
+
+      # Run analysis for test parameters
+      for (param in all_params) {
+        # Get base value
+        base_value <- get_parameter_value(config, param$id)
+
+        # Create sequence of values based on parameter type
+        if (param$type == "year") {
+          # For year parameters, use integer sequence
+          steps_year <- max(3, steps)
+          variation_seq <- seq(base_value - steps_year, base_value + steps_year, by = 2)
+          while (min(variation_seq) < min(year_range)) {
+            variation_seq <- variation_seq + 1
+          }
+        } else {
+          # For other parameters, use percentage variation
+          variation_seq <- seq(
+            base_value * (1 + variation_range[1]/100),
+            base_value * (1 + variation_range[2]/100),
+            length.out = steps
+          )
+        }
+
+        param_results <- list()
+
+        for (j in seq_along(variation_seq)) {
+          param_value <- variation_seq[j]
+          modified_config <- modify_config(config, param$id, param_value)
+
+          data_processor <- DataProcessor$new(
+            scenario_name = sprintf("%s_%s", param$name, round(param_value, 2)),
+            config = modified_config,
+            initial_year = min(year_range),
+            final_year = max(year_range)
+          )
+
+          data_processor$calculate()
+          results <- data_processor$get_results()
+
+          # Calculate variation percentage
+          variation_pct <- (param_value/base_value - 1) * 100
+
+          results$param_value <- param_value
+          results$param_variation <- variation_pct
+          results$parameter <- param$name
+          results$parameter_color <- param$color
+          results$param_type <- param$type
+
+          param_results[[j]] <- results
+        }
+
+        all_parameter_results[[param$name]] <- do.call(rbind, param_results)
+      }
+
+      # Combine all results
+      final_results <- do.call(rbind, all_parameter_results)
+
+      final_results <- list(
+        calculations = final_results,
+        year_range = year_range,
+        steps = steps,
+        variation_range = variation_range,
+        selected_parameters = all_params)
+
+      save(final_results, file = sens_results_path)
     }
-
-    # Combine all results
-    final_results <- do.call(rbind, all_parameter_results)
-
-    ## TODO
-    ## Add here code to save Data processing calculations file
 
     # Generate and save the plot
     sensitivity_plot <- generateSensitivityPlot(
-      analysis_results = final_results,
-      selected_parameters = BASE_PARAMETERS,
-      year_range = year_range,
+      analysis_results = final_results$calculations,
+      selected_parameters = final_results$selected_parameters,
+      year_range = final_results$year_range,
       is_mobile = FALSE,
-      steps = steps
+      steps = final_results$steps
     )
 
     # Save the plot

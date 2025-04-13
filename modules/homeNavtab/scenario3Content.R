@@ -1,4 +1,4 @@
-scenario3Content <- function() {
+scenario3Content <- function(is_mobile) {
 
   main_scenario <- safelyLoadConfig(file.path("config", "templates", "inputs_high_wage_family_homeowner.yaml"))
 
@@ -11,9 +11,59 @@ scenario3Content <- function() {
     )
   })
 
+  for (scenario in c("rent", "homeowner", "landlord")) {
+    scenario_name <- paste0("high_wage_family_", scenario)
+    config <- safelyLoadConfig(file.path("config", "templates",
+                                         paste0("inputs_", scenario_name, ".yaml")))
+    plot_data <- read.csv(file.path("article",
+                                    paste0("calculations_", scenario_name, ".csv")))
+
+    assign(paste0(scenario, "_AssetEvolution"),
+           generateYearlyAssetProgressionPlot(
+             plot_data,
+             config
+           ))
+    assign(paste0(scenario, "_FinMetrics"),
+           generateFinancialMetricsPlot(
+             plot_data,
+             legend_bool = TRUE
+           ))
+    assign(paste0(scenario, "_IncomeComp"),
+           generateStackedAreaPlot(
+             plot_data = plot_data,
+             plot_type = "income",
+             legend_bool = TRUE
+           ))
+    assign(paste0(scenario, "_ExpensesComp"),
+           generateStackedAreaPlot(
+             plot_data = plot_data,
+             plot_type = "expenses",
+             legend_bool = TRUE
+           ))
+
+    if (scenario %in% c("rent", "homeowner", "landlord" )) {
+      load(file.path("article", paste0("SensitivityResults_", scenario_name, ".RData")))
+      assign(paste0(scenario, "_SensitivityAnalysis_height"),
+             calculate_plot_heights(final_results$selected_parameters,
+                                    is_mobile)
+      )
+      assign(paste0(scenario, "_SensitivityAnalysis"),
+             generateSensitivityPlot(
+               analysis_results = final_results$calculations,
+               selected_parameters = final_results$selected_parameters,
+               year_range = final_results$year_range,
+               is_mobile = FALSE,
+               steps = final_results$steps
+             ))
+    }
+  }
+
+
 
   div(
-    h2("Jack and Beck, wearing golden cuffs"),
+    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "",
+
+    h2("Jack and Beck, early retirement"),
     p(em("Jack and Beck are a 30-years old high-income family in Germany. They likely work on knowledge jobs requiring high level of education. Their salaries depend mostly on their education rather than their performance. Their income is among the highest of all Germany, but they are still part of the working class meaning they do not live off inherited assets. Their salaries allow them to save and buy a property in Berlin not far from the city centre.")),
 
     h3("Financial Goals"),
@@ -45,40 +95,46 @@ scenario3Content <- function() {
 
 
     h3("Total Asset Evolution"),
-    p(em("Figure 1 - Scenario 3, Jack and Beck. Total asset value evolution.")),
     p("As Jack and Beck just bought a home with a loan from the bank, their total asset value is negative but grows over the years (Figure 1). It takes 9 years for their total asset value to reach zero."),
     p("By the time major lump sums are expected to arrive (positive and negative), they will have accumulated enough asset value that these will not have a significant impact on their overall financial evolution."),
     p("Upon retirement at age of 63 (2058), their accumulated asset value decreases slightly, indicating that they’d be living stable financial lives without capacity to increase their expenses even further."),
     p("They hold until advanced age a significant total asset value that could be passed on to their kids as generational wealth."),
+    renderUI(renderPlot(homeowner_AssetEvolution)),
+    p(em("Figure 1 - Scenario 3, Jack and Beck. Total asset value evolution.")),
     hr(),
 
 
 
     h3("Financial Metrics"),
-    p(em("Figure 2 - Scenario 3, Jack and Beck. Evolution of main financial metrics.")),
     p("Jack and Beck’s main financial metrics are marked by the purchase of their home property early in their lives."),
     p("In the following five years (2025-2030), they balance total expenses and income well, having no extra savings to invest passively and relying on their emergency reserve whenever necessary to cover expenses (Figure 2)."),
     p("In the following years, their income surpasses expenses, and the positive cash flow is used to start build savings. The inheritance from their parents in 2045, although not significantly impacting the total value asset, adds to their savings."),
     p("Their financial metrics evolution takes off when they finally pay-off their home (2053). The positive cash flow resulting from vanishing mortgage expenses boosts the pace in which they’ve been accumulating savings."),
     p("The pace with which they build savings changes upon retirement, when the drop in their salaries brings their cash flow to negative. This cash flow gap is however small and is easily offset by their passive investments."),
     p("They live a comfortable lifestyle throughout retirement, with a significant amount of money invested (>200.000€) and a property to live in."),
+    renderUI(renderPlot(homeowner_FinMetrics)),
+    p(em("Figure 2 - Scenario 3, Jack and Beck. Evolution of main financial metrics.")),
     hr(),
 
 
 
     h3("Income and Expenses Components"),
-    p(em("Figure 3 - Scenario 3, Jack and Beck. Detailed view of the financial components of income and expenses.")),
+    p(strong("A")), renderUI(renderPlot(homeowner_ExpensesComp)),
+    p(strong("B")), renderUI(renderPlot(homeowner_IncomeComp)),
+    p(em("Figure 3 - Scenario 3, Jack and Beck. Detailed view of the financial components in their expenses (A) and income (B).")),
     p("Decomposition of Jack and Beck’s income and expenses help paint a better picture of their financial evolution. Their living costs are constant throughout the years, except when the kids are born, reflecting a sustained life quality (Figure 3A)."),
     p("In the first three decades of their lives, expenses with kids are small relative to their own lifestyle expenses, while mortgage – composed of principal and interest payments – is significant and represents around 50% of their total expenses."),
     p("Upon paying off the property around 2053, expenses drop significantly and most of their money is spend on themselves while a small fraction covers home maintenance."),
     p("Salary is their main source of income throughout their lives (Figure 3B). However, the money accumulated in the years after they’ve paid off their property and before retirement leads to significant returns during retirement."),
     p("After retirement, capital gains represent around 20% of their total income and is essential to offset the lost in salary that leads to decreasing savings."),
+    p(strong("A")), renderUI(renderPlot(homeowner_ExpensesComp)),
+    p(strong("B")), renderUI(renderPlot(homeowner_IncomeComp)),
+    p(em("Figure 3 - Scenario 3, Jack and Beck. Detailed view of the financial components in their expenses (A) and income (B).")),
     hr(),
 
 
 
     h3("Sensitivity Analysis"),
-    p(em("Figure 4 - Scenario 3, Jack and Beck. Sensitivity analysis on total asset value of single parameter perturbations.")),
     p("A fundamental aspect of having a stable financial life is financial robustness. That is, the ability to resist to unforeseen life changes. The simulated scenario assumes that everything goes according to the plan, without deviations."),
     p("Sensitivity analysis identifies factors to which Jack and Beck’s finances are most sensitive by iteratively repeating the simulation upon slightly varying a single parameters per iteration (Figure 4)."),
     p("Within the range tested (+- 20%), individual changes to some parameters do not significantly impact the couple’s financial evolution. That’s the case for the return on investments as they only invest passively later in life, or the rate of rent prices growth as they don’t pay rent."),
@@ -87,6 +143,8 @@ scenario3Content <- function() {
     p("For example, if this family spends 210€ more than the expected 4200€/month – a 5% variation to their monthly living costs – they will have accumulated 400.000€ less in total asset value by retirement age – a whopping 40% variation to their total asset value."),
     p("Spending any more than this could lead to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt, exponentially increasing. Therefore, tightly controlling their living costs is not of great importance for Jack and Beck, as they have a large safety margin and could easily reduce their living costs if needed."),
     p("To avoid debt collapse, similar analysis of other exponential parameters leads to the conclusion that Jack and Beck’s must also keep working hard to achieve the minimum required salary growth (above 3.6%/year), must negotiate well the price of their home (bellow 525.000€) and must negotiate a good interest rate on their bank loan (bellow 4.4%). Failing to achieve these hallmarks puts them at risk of debt collapse, assuming all other parameters remain the same."),
+    renderUI(renderPlot(homeowner_SensitivityAnalysis, height = homeowner_SensitivityAnalysis_height)),
+    p(em("Figure 4 - Scenario 3, Jack and Beck. Sensitivity analysis on total asset value of single parameter perturbations.")),
     hr(),
 
 
@@ -104,25 +162,31 @@ scenario3Content <- function() {
     hr(),
 
     h4("Aligning Financial Goals and Decisions"),
-    p(em("Figure 5 - Scenario 3, Jack and Beck. Scenario simulation after delaying purchasing the home property to 2065. Total asset value evolution (A) and sensitivity analysis in simulations of scenarios with single parameter variations (B).")),
     p("What could they have done differently to better align their financial goals and decisions? The Financial Evolution Calculator can be used to test multiple scenarios. For example, we can re-simulate Jack and Beck’s scenario but instead of purchasing their home they kept on renting it (Figure 5)."),
     p("In this second scenario, Jack and Beck would build a similar total asset value as before (800.000€, at retirement age) while retiring at age 60 (Figure 5A). The amount saved would be enough to sustain their lifestyle during retirement, indicating a stable and safe later life (Figure 5B). Therefore, in their case, living as a renter is also an option for a safe retirement, while allowing even earlier retirement."),
     p("Their assets would also be easily accessible in investment accounts, instead of buried in their property value. This form of asset is liquid and effectively works as an emergency fund for larger financial crisis, like extended sickness or loss of job. As a renter, they’d have throughout their lives a monetary safety net."),
     p("In addition, if upon retirement they’d still would like to own their home, they could use their savings at retirement age to purchase the same property as in the homeowner scenario, without a bank loan and still having funds to sustain their lifestyle. That is the case, even after considering the real estate market growth, inflation and taxes they’d need to pay on capital gains."),
     p("Given their personal goals, it would have been better for Jack and Beck to not become homeowners and continue renting their home. As renters, their financial evolution would still be sensitive to living costs and the rate their salaries grow but without risk of debt collapse (Figure 5C)."),
     p("Finally, it might also be important to consider that few people have the discipline to not use the invested money, relying on a private pension scheme to safeguard their money from themselves spending it too early."),
+    p(strong("A")), renderUI(renderPlot(rent_AssetEvolution)),
+    p(strong("B")), renderUI(renderPlot(rent_FinMetrics)),
+    p(strong("C")), renderUI(renderPlot(rent_SensitivityAnalysis, height = rent_SensitivityAnalysis_height)),
+    p(em("Figure 5 - Scenario 3, Jack and Beck. Scenario simulation after delaying purchasing the home property to 2065. Total asset value evolution (A) and sensitivity analysis in simulations of scenarios with single parameter variations (B).")),
     hr(),
 
+
     h4("Going Beyond Initial Goals"),
-    p(em("Figure 6 - Scenario 3, Jack and Beck. Scenario simulation subleasing the property they bought in 2025 and purchasing their home property in 2065. Total asset value evolution (A) and sensitivity analysis in simulations with single parameter variations (B).")),
-    p("In “Buy-vs-Rent” discussions, rarely people consider a third alternative: to keep on renting their home but still purchase a property and renting it out to someone else!"),
-    p("Let’s re-simulate a third scenario for Jack and Beck. As before, they bought the same property (500.000€) in Berlin. Instead of moving in, they stayed in their rental apartment (2000€/month). Their property is then leased to someone else at 1000€/month rental price, following the same rental contract they have on their own rent (3% increase per year)."),
-    p("The Financial Evolution Calculator considers all taxes they’d need to pay, risk of not having a tenant, tax deductible costs, mortgage for the investment property, property depreciation, management fees and maintenance costs."),
-    p("Their total accumulated asset value at retirement age as landlords would be similar as before (800.000€, at retirement age) while retiring at age 47 (Figure 6A). The amount saved would be enough to sustain their lifestyle during retirement, indicating a stable and safe later life (Figure 6B)."),
+    p("In “Buy-vs-Rent” discussions, often people don't consider the third option: becoming landlords.There seems to be a general misconception that becoming landlords is something only rich people can do. Although more difficult to obtain a bank loan when one’s salaries are low, with help of family and friends it could be possible. But is it a good idea for this couple?"),
+    p("Let’s re-simulate a third scenario for Jack and Beck. As before, they bought the same property (500.000€) in Berlin. Instead of moving in, they stayed in their rental apartment (2000€/month). Their property is then leased to someone else for 1000€/month, following the same rental contract they have on their own rent (3% increase per year)."),
+    p("The Financial Evolution Calculator considers all taxes they’d need to pay, risk of not having a tenant, tax deductible costs, mortgage for the investment property, property depreciation, management fees and maintenance costs. All these factors considered, their accumulated asset value at retirement age as landlords would be similar as before - 800.000€ as landlords and 800.000€ as homeowners. However, they'd retire at age 47 as landlord instead of 58 as homeowners (Figure 6A). The amount saved would also be enough to sustain their lifestyle during retirement, indicating a stable and safe later life (Figure 6B)."),
     p("With the extra income source, they could pursue their secondary financial goals, like donating to causes, and passing on generational wealth."),
-    p("Interestingly, they would have saved enough money by retirement age to buy the same property as in the homeowner scenario. That is, without a bank loan, without selling their leased property, and still having savings in their bank account after the purchase to sustain their lifestyle in retirement!"),
+    p("Alternatively, they could have saved enough money by retirement age to buy the same property as in the homeowner scenario. That is, without a bank loan, without selling their leased property, and still having savings in their bank account after the purchase to sustain their lifestyle in retirement!"),
+    p(strong("A")), renderUI(renderPlot(landlord_AssetEvolution)),
+    p(strong("B")), renderUI(renderPlot(landlord_FinMetrics)),
+    p(strong("C")), renderUI(renderPlot(landlord_SensitivityAnalysis, height = landlord_SensitivityAnalysis_height)),
+    p(em("Figure 6 - Scenario 3, Jack and Beck. Scenario simulation subleasing the property they bought in 2025 and purchasing their home property in 2065. Total asset value evolution (A) and sensitivity analysis in simulations with single parameter variations (B).")),
     p("How is this possible? It might come as a surprise, but it’s really just numbers. By becoming landlords, Jack and Beck pay their own rent (2000€/month) and house expenses (330€/year) plus the bank loan (2750€/month). House expenses for the investment property are paid by the tenant."),
-    p("Altogether, their housing expenses in the first years are barely covered by the leftover salary after discounting living costs plus the lease income (7400 – 4200 + 1200 = 4400€/month). Income tax deductions from expenses with the investment property (1000€/month) help significantly."),
+    p("Altogether, their housing expenses (2000 + 330 + 2750 = 5080€/month) in the first years are barely covered by the leftover salary after discounting living costs plus the lease income (7400 – 4200 + 1200 = 4400€/month). Income tax deductions from expenses with the investment property (1000€/month) help significantly."),
     p("The secret is time. While their incomes and expenses increase every year, the mortgage is fixed at least until refinancing 5-20 years later. Every year their cashflow becomes more positive and, while all their available cash is re-directed to pay the flat in the first years, it slowly builds savings."),
     p("From the investment perspective, Jack and Beck diversified their assets over the years, increasing financial robustness. For example, their own rent will increase every year but, so long as their leased property increases rent at a similar rate, they are immune to real estate market changes (Figure 6C)."),
     p("Also, their income does not depend only on their salaries anymore, as they receive lease. Been less dependent on salary means that they could work less and try less hard for promotions."),

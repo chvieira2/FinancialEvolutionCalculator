@@ -185,7 +185,8 @@ server <- function(input, output, session) {
   })
 
   # Call the Home Navigation Module
-  homeNavigationModuleServer("home_navigation")
+  homeNavigationModuleServer("home_navigation",
+                             if (is.null(isolate(input$is_mobile))) FALSE else isolate(input$is_mobile))
 
   # Debuggin helper for mobile
   observe({
@@ -232,12 +233,14 @@ server <- function(input, output, session) {
       req(processed_data())
       req(reactive_config())
       req(year_range())
+      is_mobile <- isolate(input$is_mobile)
+      if (is.null(is_mobile)) is_mobile <- FALSE
       # Trigger the plot modules
       plotYearlyAssetProgressionModuleServer("YearlyAssetProgressionPlot", processed_data, reactive_config, year_range)
       financialMetricsModuleServer("financial_metrics", processed_data, year_range)
       stackedAreaPlotModuleServer("expense_components", processed_data, year_range, plot_type = "expenses")
       stackedAreaPlotModuleServer("income_components", processed_data, year_range, plot_type = "income")
-      sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range, isolate(input$is_mobile))
+      sensitivityAnalysisModuleServer("sensitivity_analysis", reactive_config, processed_data, year_range, is_mobile)
     }
   })
 

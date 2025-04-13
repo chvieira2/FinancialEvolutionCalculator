@@ -30,7 +30,7 @@ homeNavigationModuleUI <- function(id) {
   )
 }
 
-homeNavigationModuleServer <- function(id) {
+homeNavigationModuleServer <- function(id, is_mobile) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -41,7 +41,7 @@ homeNavigationModuleServer <- function(id) {
         "Calculator Parameters" = structure("parameters_page", stopened = TRUE),
         "Scenario 1: the poverty trap" = structure("scenario_1", stopened = TRUE),
         "Scenario 2: home-poor lifestyle" = structure("scenario_2", stopened = TRUE),
-        "Scenario 3: wearing golden cuffs" = structure("scenario_3", stopened = TRUE),
+        "Scenario 3: early retirement" = structure("scenario_3", stopened = TRUE),
         "About" = structure("about_page", stopened = TRUE)
       )
     })
@@ -55,19 +55,18 @@ homeNavigationModuleServer <- function(id) {
         "Calculator Parameters" = "parameters_page",
         "Scenario 1: the poverty trap" = "scenario_1",
         "Scenario 2: home-poor lifestyle" = "scenario_2",
-        "Scenario 3: wearing golden cuffs" = "scenario_3",
+        "Scenario 3: early retirement" = "scenario_3",
         "About" = "about_page"
       )
 
       selected_handle <- if (is.null(selected)) "welcome_page" else label_to_handle[[selected]]
-
       switch(selected_handle,
-             "welcome_page" = welcomePageContent(),
-             "parameters_page" = parametersPageContent(),
-             "scenario_1" = scenario1Content(),
-             "scenario_2" = scenario2Content(),
-             "scenario_3" = scenario3Content(),
-             "about_page" = aboutPageContent()
+             "welcome_page" = welcomePageContent(is_mobile),
+             "parameters_page" = parametersPageContent(is_mobile),
+             "scenario_1" = scenario1Content(is_mobile),
+             "scenario_2" = scenario2Content(is_mobile),
+             "scenario_3" = scenario3Content(is_mobile),
+             "about_page" = aboutPageContent(is_mobile)
       )
 
     })
