@@ -24,7 +24,7 @@ general_life:
   - id: savings
     type: numericInput
     label: Savings (EUR)
-    value: 0
+    value: 5000
     description: Current savings amount.
   - id: savings_emergency_reserve
     type: numericInput
@@ -86,12 +86,12 @@ family:
   - id: living_costs_change_elternzeit
     type: numericInput
     label: Home costs reduction during parental leave (%)
-    value: 50
+    value: 25
     description: Percentage reduction in living costs during parental leave (Elternzeit).
   - id: salary_reduction_elternzeit
     type: numericInput
     label: Salary reduction during parental leave (%)
-    value: 35
+    value: 25
     description: Percentage of salary reduction during parental leave (Elternzeit).
   - id: year_first_child_is_born
     type: numericInput
@@ -391,4 +391,4 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 15
     description: Monthly Hausgeld building insurance cost.
-  id: a159be66-4949-42cf-84ca-9d0f120e996f
+  id: 93ff23de-2028-4957-8b9b-c038bbc9f8c6

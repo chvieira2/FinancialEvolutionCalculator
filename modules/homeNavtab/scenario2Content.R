@@ -56,14 +56,20 @@ scenario2Content <- function(is_mobile) {
                is_mobile = FALSE,
                steps = final_results$steps
              ))
+
+      assign(paste0(scenario, "_table_for_vis"),
+             format_financial_table(
+                 table_for_vis(plot_data))
+             )
     }
   }
 
+
   div(
-    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "",
+    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "padding-left: 15px",
 
     h2("Alex and Max, the home-poor lifestyle"),
-    p(em("Alex and Max are a 30-years old middle-income family in Berlin, Germany. They likely work on technical jobs, services or other functions requiring some level of higher education. Their salaries are directly linked to their performance.")),
+    p(em("Alex and Max are a 30-years old middle-income family in Berlin, Germany. They work on technical jobs, services or other functions requiring some level of higher education. Their salaries are directly linked to their performance.")),
 
     h3("Financial Goals"),
     tags$ul(
@@ -140,7 +146,8 @@ scenario2Content <- function(is_mobile) {
     p("Spending any more than this could lead to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt, exponentially increasing. Therefore, controlling their living costs is important for Alex and Max, as they have a tight safety margin."),
     p("To avoid debt collapse, similar analysis of other exponential parameters leads to the conclusion that Alex and Max’s must also keep working hard to achieve the minimum required salary growth (above 2.6%/year), must negotiate well the price of their home (bellow 262.500€), and must also negotiate a good interest rate on their bank loan (bellow 4.1%). Failing to achieve these hallmarks puts them at risk of debt collapse, assuming all other parameters remain the same."),
     p("Unfortunately, this exponential pattern is only observed in the negative direction. Changes to parameters in the direction that would increase their total asset value only brings an equivalent, proportional increase in total asset value."),
-    renderUI(renderPlot(homeowner_SensitivityAnalysis, height = homeowner_SensitivityAnalysis_height)),
+    renderUI(renderPlot(homeowner_SensitivityAnalysis,
+                        height = homeowner_SensitivityAnalysis_height)),
     p(em("Figure 4 - Scenario 2, Alex and Max. Sensitivity analysis on total asset value of single parameter perturbations.")),
     hr(),
 
@@ -171,7 +178,8 @@ scenario2Content <- function(is_mobile) {
     p("Also, few people have the discipline to not use the invested money, relying on a private pension scheme to safeguard their money from themselves spending it too early, which takes away from the flexibility of having such money accumulated."),
     p(strong("A")), renderUI(renderPlot(rent_AssetEvolution)),
     p(strong("B")), renderUI(renderPlot(rent_FinMetrics)),
-    p(strong("C")), renderUI(renderPlot(rent_SensitivityAnalysis, height = rent_SensitivityAnalysis_height)),
+    p(strong("C")), renderUI(renderPlot(rent_SensitivityAnalysis,
+                                        height = rent_SensitivityAnalysis_height)),
     p(em("Figure 5 - Scenario 2, Alex and Max. Scenario re-simulation without homeownership. Total asset value evolution (A), evolution of main financial metrics (B), and sensitivity analysis on total asset value of single parameter perturbations (C).")),
     hr(),
 
@@ -184,15 +192,28 @@ scenario2Content <- function(is_mobile) {
     p("Alternatively, they could have saved enough money by retirement age to buy a bigger home – evaluated at 650.000€ in today’s price. That is, without a bank loan, without selling their leased property, and still having savings in their bank account after the purchase to sustain their lifestyle in retirement!"),
     p(strong("A")), renderUI(renderPlot(landlord_AssetEvolution)),
     p(strong("B")), renderUI(renderPlot(landlord_FinMetrics)),
-    p(strong("C")), renderUI(renderPlot(landlord_SensitivityAnalysis, height = landlord_SensitivityAnalysis_height)),
+    p(strong("C")), renderUI(renderPlot(landlord_SensitivityAnalysis,
+                                        height = landlord_SensitivityAnalysis_height)),
     p(em("Figure 6 - Scenario 2, Alex and Max. Scenario simulation leasing the property purchased in 2025. Total asset value evolution (A), evolution of main financial metrics without Total Investment value (B), and sensitivity analysis on total asset value of single parameter perturbations (C).")),
+
+    h4("Detailed Comparison"),
+    p(strong("Table 1A - Initial years living as homeowner")),
+    div(style = "width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 1.5rem; font-size: 12px;",
+        renderDT({homeowner_table_for_vis})
+    ),
+    br(),
+    p(strong("Table 1B - Initial years living as landlord")),
+    div(style = "width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 1.5rem; font-size: 12px;",
+        renderDT({landlord_table_for_vis})
+    ),
+    br(),
     p("How is this possible? It might come as a surprise, but it’s really just numbers. By becoming landlords, Alex and Max pay their own rent (1500€/month) and house expenses (220€/year) plus the bank loan (1500€/month). House expenses for the investment property are paid by the tenant."),
     p("Altogether, their housing expenses (1500 + 220 + 1500 = 3220€/month) in the first years are barely covered by the leftover salary after discounting living costs plus the lease income (4500 – 2200 + 750 = 3050€/month). Income tax deductions from expenses with the investment property (250€/month) help significantly."),
     p("The secret is time. While their incomes and expenses increase every year, the mortgage is fixed at least until refinancing 5-20 years later (Figure 6B). Every year their cashflow becomes more positive and, while all their available cash is re-directed to pay the flat in the first years, it slowly builds savings."),
     p("From the investment perspective, Alex and Max diversified their assets over the years, increasing financial robustness. For example, their own rent will increase every year but, so long as their leased property increases rent at a similar rate, they are immune to real estate market changes (Figure 6C)."),
     p("Also, their income does not depend only on their salaries anymore, as they receive lease. Been less dependent on salary means that they could work less and try less hard for promotions."),
     p("The downside of becoming a landlord is, of course, the increased complexity. They’d need to deal with tenants or property management agencies, repair and management companies and more taxes. This extra headache holds back people from pursuing such investments, even when the numbers clearly point to this alternative as a valid solution for the Buy-vs-Rent dilemma."),
-    hr(),
-    hr(),
+    br(),
+    br(),
   )
 }

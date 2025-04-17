@@ -86,12 +86,12 @@ family:
   - id: living_costs_change_elternzeit
     type: numericInput
     label: Home costs reduction during parental leave (%)
-    value: 50
+    value: 25
     description: Percentage reduction in living costs during parental leave (Elternzeit).
   - id: salary_reduction_elternzeit
     type: numericInput
     label: Salary reduction during parental leave (%)
-    value: 50
+    value: 25
     description: Percentage of salary reduction during parental leave (Elternzeit).
   - id: year_first_child_is_born
     type: numericInput
@@ -294,7 +294,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
-  id: 97e0c843-33dd-482a-8e9b-871dbb44bf96
+  id: a256937c-9821-4790-9dac-e2b2ba2ac904
   type: home
   inputs:
   - id: value_growth
@@ -305,7 +305,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 500000
+    value: 550000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput

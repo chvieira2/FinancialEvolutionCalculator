@@ -248,16 +248,43 @@ DataProcessor <-
 #### Test code ####
 if (sys.nframe() == 0) {
 
+  if (TRUE) {
+    source(file.path("R", "constants.R"))
+    for (scenario in c(TEMPLATE_SCENARIOS,
+                       "inputs_low_wage_family_rent_higher_salary.yaml",
+                       "inputs_low_wage_family_rent_lower_rent.yaml")) {
+      scenario <- sub(".yaml*$", "", scenario)
+      scenario <- sub("inputs_", "", scenario)
+
+      cat("Saving template scenarios calculations for", scenario,"\n")
+
+      # Define test parameters
+      config <- safelyLoadConfig(file.path("config", "templates",
+                                           paste0("inputs_", scenario, ".yaml")))
+      output_path <- file.path("article",
+                               paste0("calculations_", scenario, ".csv"))
+
+
+      processor <- DataProcessor$new(config = config, scenario_name = scenario)
+
+      processor$calculate()
+
+      results <- processor$get_results()
+
+      # Save the results to a CSV file
+      write.csv(results, output_path, row.names = FALSE)
+    }
+  }
+
   cat("Running test code for DataProcessor class...\n")
-  input_config = yaml::read_yaml(file.path("config", "templates", "mid_wage_family_housepoor.yaml"))
-  # input_config$passive_investing$inputs[[3]]$value <- FALSE
+  input_config = safelyLoadConfig(file.path("config", "templates", "inputs_high_wage_family_landlord.yaml"))
 
   processor <- DataProcessor$new(config = input_config, scenario_name = "example")
 
   processor$calculate()
 
   results <- processor$get_results()
-  print(head(results,20))
+  # print(head(results,20))
 
   cat("Test code completed.\n")
 

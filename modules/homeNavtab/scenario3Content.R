@@ -55,16 +55,20 @@ scenario3Content <- function(is_mobile) {
                is_mobile = FALSE,
                steps = final_results$steps
              ))
+
+      assign(paste0(scenario, "_table_for_vis"),
+             format_financial_table(
+                 table_for_vis(plot_data))
+             )
     }
   }
 
 
-
   div(
-    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "",
+    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "padding-left: 15px",
 
     h2("Jack and Beck, early retirement"),
-    p(em("Jack and Beck are a 30-years old high-income family in Germany. They likely work on knowledge jobs requiring high level of education. Their salaries depend mostly on their education rather than their performance. Their income is among the highest of all Germany, but they are still part of the working class meaning they do not live off inherited assets. Their salaries allow them to save and buy a property in Berlin not far from the city centre.")),
+    p(em("Jack and Beck are a 30-years old high-income family in Germany. They work on knowledge jobs requiring high level of education. Their salaries depend mostly on their education rather than their performance. Their income is among the highest of all Germany, but they are still part of the working class meaning they do not live off inherited assets. Their salaries allow them to save and buy a property in Berlin not far from the city centre.")),
 
     h3("Financial Goals"),
     tags$ul(
@@ -185,13 +189,27 @@ scenario3Content <- function(is_mobile) {
     p(strong("B")), renderUI(renderPlot(landlord_FinMetrics)),
     p(strong("C")), renderUI(renderPlot(landlord_SensitivityAnalysis, height = landlord_SensitivityAnalysis_height)),
     p(em("Figure 6 - Scenario 3, Jack and Beck. Scenario simulation subleasing the property they bought in 2025 and purchasing their home property in 2065. Total asset value evolution (A) and sensitivity analysis in simulations with single parameter variations (B).")),
+
+    h4("Detailed Comparison"),
+    p(strong("Table 1A - Initial years living as homeowner")),
+    div(style = "width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 1.5rem; font-size: 12px;",
+        renderDT({
+          homeowner_table_for_vis})
+    ),
+    br(),
+    p(strong("Table 1B - Initial years living as landlord")),
+    div(style = "width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 1.5rem; font-size: 12px;",
+        renderDT({
+          landlord_table_for_vis})
+    ),
+    br(),
     p("How is this possible? It might come as a surprise, but it’s really just numbers. By becoming landlords, Jack and Beck pay their own rent (2000€/month) and house expenses (330€/year) plus the bank loan (2750€/month). House expenses for the investment property are paid by the tenant."),
     p("Altogether, their housing expenses (2000 + 330 + 2750 = 5080€/month) in the first years are barely covered by the leftover salary after discounting living costs plus the lease income (7400 – 4200 + 1200 = 4400€/month). Income tax deductions from expenses with the investment property (1000€/month) help significantly."),
     p("The secret is time. While their incomes and expenses increase every year, the mortgage is fixed at least until refinancing 5-20 years later. Every year their cashflow becomes more positive and, while all their available cash is re-directed to pay the flat in the first years, it slowly builds savings."),
     p("From the investment perspective, Jack and Beck diversified their assets over the years, increasing financial robustness. For example, their own rent will increase every year but, so long as their leased property increases rent at a similar rate, they are immune to real estate market changes (Figure 6C)."),
     p("Also, their income does not depend only on their salaries anymore, as they receive lease. Been less dependent on salary means that they could work less and try less hard for promotions."),
     p("The downside of becoming a landlord is, of course, the increased complexity. They’d need to deal with tenants or property management agencies, repair and management companies and more taxes. This extra headache holds back people from pursuing such investments, even when the numbers clearly point to this alternative as a valid solution for the Buy-vs-Rent dilemma."),
-    hr(),
-    hr(),
+    br(),
+    br(),
   )
 }

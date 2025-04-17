@@ -1,3 +1,6 @@
+library(DT)
+library(formattable)
+
 source("modules/homeNavtab/welcomePageContent.R")
 source("modules/homeNavtab/parametersPageContent.R")
 source("modules/homeNavtab/scenario1Content.R")
@@ -71,4 +74,184 @@ homeNavigationModuleServer <- function(id, is_mobile) {
 
     })
   })
+}
+
+
+
+# Functions for scenarios content creation
+create_if_missing <- function(df, cols) {
+  for(col in setdiff(cols, names(df))) {
+    df[[col]] <- 0
+  }
+  df
+}
+
+table_for_vis <- function(calculations_df) {
+  table_columns_selection <- c(
+    "Year",
+
+    "salary",
+    "property1_warm_lease_income",
+    "property1_income_taxes_adjustment",
+    "passive_investment_return_from_previous_year",
+
+    "living_costs",
+    "vorabpauschale_tax_from_previous_year",
+
+    "rental_cost", "rental_housing_cost",
+    "property1_mortgage_payment", "property1_loan_family_friends_payment",
+    "property1_property_taxes", "property1_maintenance_cost",
+    "property1_hausgeld_fees_total",
+    "property1_property_management_fee", "property1_vacancy_months_cost"
+  )
+
+  calculations_df[1:10,] %>%
+    create_if_missing(table_columns_selection) %>%
+    select(all_of(table_columns_selection)) %>%
+    rename("Salary" = salary,
+           "Rent from Tenants" = property1_warm_lease_income,
+           "Tax Deductions" = property1_income_taxes_adjustment,
+           "Living Costs" = living_costs
+    ) %>%
+    mutate(
+      "Passive Investments Return" = rowSums(across(c(
+        "passive_investment_return_from_previous_year",
+        "vorabpauschale_tax_from_previous_year"
+      ))),
+      "Income Total" = rowSums(across(c(
+        "Salary",
+        "Rent from Tenants",
+        "Tax Deductions",
+        "Passive Investments Return"
+      ))),
+      "Own Rent" = rowSums(across(c(
+        rental_cost,
+        rental_housing_cost
+      ))),
+      "Mortgage" = rowSums(across(c(
+        property1_mortgage_payment,
+        property1_loan_family_friends_payment
+      ))),
+      "Property Costs" = rowSums(across(c(
+        property1_property_taxes,
+        property1_maintenance_cost,
+        property1_hausgeld_fees_total,
+        property1_property_management_fee,
+        property1_vacancy_months_cost
+      ))),
+      "Expenses Total" = rowSums(across(c(
+        "Living Costs",
+        "Own Rent",
+        "Mortgage",
+        "Property Costs"
+      ))),
+      "Total Saved" = rowSums(across(c(
+        "Income Total",
+        "Expenses Total"
+      )))
+    ) %>%
+    select(c(
+      "Year",
+      "Salary", "Rent from Tenants", "Tax Deductions",
+      "Passive Investments Return", "Income Total",
+      "Living Costs",
+      "Own Rent", "Mortgage", "Property Costs", "Expenses Total",
+      "Total Saved"
+    ))
+}
+
+format_financial_table <- function(table_data) {
+  # Define colors for different column types
+  colors <- list(
+    year = "#808080",           # Grey for Year
+    income = "#d4edda",         # Light green for income items
+    income_total = "#28a745",   # Darker green for income total
+    expense = "#f8d7da",        # Light red for expense items
+    expense_total = "#dc3545",  # Darker red for expense total
+    total_saved = "#ffc107"     # Gold/yellow for total saved
+  )
+
+  # Set up column definitions with width control
+  col_defs <- list(
+    list(className = 'dt-right', targets = 0:ncol(table_data)-1)
+  )
+
+  # Add width specifications for specific columns if they exist
+  if("Income Total" %in% colnames(table_data)) {
+    col_defs <- c(col_defs, list(
+      list(width = "60px", targets = which(colnames(table_data) == "Income Total") - 1)
+    ))
+  }
+
+  if("Expenses Total" %in% colnames(table_data)) {
+    col_defs <- c(col_defs, list(
+      list(width = "60px", targets = which(colnames(table_data) == "Expenses Total") - 1)
+    ))
+  }
+
+  if("Own Rent" %in% colnames(table_data)) {
+    col_defs <- c(col_defs, list(
+      list(width = "60px", targets = which(colnames(table_data) == "Own Rent") - 1)
+    ))
+  }
+
+  if("Living Costs" %in% colnames(table_data)) {
+    col_defs <- c(col_defs, list(
+      list(width = "60px", targets = which(colnames(table_data) == "Living Costs") - 1)
+    ))
+  }
+
+  # Format the table with DT
+  datatable(
+    table_data,
+    options = list(
+      pageLength = 10,
+      dom = 't',
+      ordering = FALSE,
+      scrollX = FALSE,  # Prevent horizontal scrolling
+      autoWidth = FALSE, # Disable auto-width calculation
+      columnDefs = col_defs
+    ),
+    width = "100%",
+    rownames = FALSE
+  ) %>%
+    formatStyle(
+      "Year",
+      backgroundColor = colors$year,
+      fontWeight = "bold"
+    ) %>%
+    formatStyle(
+      c("Salary", "Rent from Tenants", "Tax Deductions", "Passive Investments Return"),
+      backgroundColor = colors$income,
+      color = "black"
+    ) %>%
+    formatStyle(
+      "Income Total",
+      backgroundColor = colors$income_total,
+      color = "white",
+      fontWeight = "bold"
+    ) %>%
+    formatStyle(
+      c("Living Costs", "Own Rent", "Mortgage", "Property Costs"),
+      backgroundColor = colors$expense,
+      color = "black"
+    ) %>%
+    formatStyle(
+      "Expenses Total",
+      backgroundColor = colors$expense_total,
+      color = "white",
+      fontWeight = "bold"
+    ) %>%
+    formatStyle(
+      "Total Saved",
+      backgroundColor = colors$total_saved,
+      fontWeight = "bold"
+    ) %>%
+    formatCurrency(
+      columns = c(2:ncol(table_data)),  # Format all except Year as currency
+      currency = "€",
+      interval = 3,
+      mark = ",",
+      digits = 0
+    )
 }

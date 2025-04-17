@@ -263,7 +263,7 @@ R6Class("PropertyCalculator",
     #' @param year The year for which the calculation is being made.
     calculate_property_available_for_down_payment = function(year) {
       if (year == self$params$initial_year) {
-        available_funds <- self$params$savings - self$params$savings_emergency_reserve + self$property_params$loan_family_friends
+        available_funds <- self$params$savings + self$property_params$loan_family_friends
       } else {
         previous_year <- year - 1
         # Fund from selling property that year

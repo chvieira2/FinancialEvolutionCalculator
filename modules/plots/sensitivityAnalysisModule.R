@@ -520,6 +520,7 @@ calculate_plot_heights <- function(selected_params, is_mobile, base_height = 350
 }
 
 if (sys.nframe() == 0) {
+  RECALCULATE_SENSITIVITY <- TRUE
   source(file.path("R", "helper_functions.R"))
   source(file.path("R", "constants.R"))
   source(file.path("R", "DataProcessorClass.R"))
@@ -539,7 +540,7 @@ if (sys.nframe() == 0) {
 
 
     sens_results_path <- file.path("article", paste0("SensitivityResults_", scenario, ".RData"))
-    if (file.exists(sens_results_path)) {
+    if (file.exists(sens_results_path) & !RECALCULATE_SENSITIVITY) {
       message(paste("Loading", sens_results_path))
       load(sens_results_path)
     } else {

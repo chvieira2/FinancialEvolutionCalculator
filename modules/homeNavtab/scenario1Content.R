@@ -1,5 +1,7 @@
 scenario1Content <- function(is_mobile) {
 
+  couple_name <- "Gene and Jean"
+
   main_scenario <- safelyLoadConfig(file.path("config", "templates", "inputs_low_wage_family_rent.yaml"))
 
   # Dynamically create variables from the inputs
@@ -60,82 +62,18 @@ scenario1Content <- function(is_mobile) {
                is_mobile = is_mobile,
                steps = final_results$steps
              ))
+
+      assign(paste0(scenario, "_table_for_vis"),
+             format_financial_table(
+               table_for_vis(plot_data)))
     }
   }
-  browser()
-  table_columns_selection <- c(
-    "Year",
-
-    "salary",
-    "property1_cold_rent_from_lease",
-    "property1_income_taxes_adjustment",
-
-    "living_costs",
-
-    "rental_cost", "rental_housing_cost",
-    "property1_mortgage_payment", "property1_loan_family_friends_payment",
-    "property1_property_taxes", "property1_maintenance_cost",
-    "property1_property_management_fee", "property1_vacancy_months_cost"
-  )
-
-  create_if_missing <- function(df, cols) {
-    for(col in setdiff(cols, names(df))) {
-      df[[col]] <- 0
-    }
-    df
-  }
-
-  temp <- calculations_low_wage_family_landlord[1:10,] %>%
-    create_if_missing(table_columns_selection) %>%
-    select(all_of(table_columns_selection)) %>%
-    rename("Salary" = salary,
-           "Rent from Tenants" = property1_cold_rent_from_lease,
-           "Income Tax Deductions" = property1_income_taxes_adjustment,
-           "Living Costs" = living_costs
-    ) %>%
-    mutate(
-      "Income Total" = rowSums(across(c(
-        "Salary",
-        "Rent from Tenants",
-        "Income Tax Deductions"
-      ))),
-      "Own Rent" = rowSums(across(c(
-        rental_cost,
-        rental_housing_cost
-      ))),
-      "Mortgage" = rowSums(across(c(
-        property1_mortgage_payment,
-        property1_loan_family_friends_payment
-      ))),
-      "Property Costs" = rowSums(across(c(
-        property1_property_taxes,
-        property1_maintenance_cost,
-        property1_property_management_fee,
-        property1_vacancy_months_cost
-      ))),
-      "Expenses Total" = rowSums(across(c(
-        "Living Costs",
-        "Own Rent",
-        "Mortgage",
-        "Property Costs"
-      ))),
-      "Total Saved" = rowSums(across(c(
-        "Income Total",
-        "Expenses Total"
-      )))
-    ) %>%
-    select(c(
-      "Year",
-      "Salary", "Rent from Tenants", "Income Tax Deductions", "Income Total",
-      "Living Costs", "Own Rent", "Mortgage", "Property Costs", "Expenses Total",
-      "Total Saved"
-    ))
 
   div(
-    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "",
+    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "padding-left: 15px",
 
-    h2("Gene and Jean, the poverty trap"),
-    p(em("Gene and Jean are a 30-years old poor family in Germany. Hard-working class, working jobs with low education requirements, forced to live away from city centres due to high living costs and the housing market.")),
+    h2(paste0(couple_name, ", the poverty trap")),
+    p(em(paste0(couple_name, " are a 30-years old poor family in Germany. Hard-working class, working jobs with low education requirements, forced to live away from city centres due to high living costs and the housing market."))),
 
     h3("Financial Goals"),
     tags$ul(
@@ -166,90 +104,105 @@ scenario1Content <- function(is_mobile) {
 
 
     h3("Total Asset Evolution"),
-    p("Gene and Jean’s total asset value grows slowly (Figure 1), with periods of stagnation and been strongly affected by major lump sums (positive and negative). Their finances only really take off later in life, assuming they manage to tightly control living costs throughout their lives."),
-    p("Upon retirement at age of 70 (2065), their total asset value stagnates, indicating that they’d be living stable financial lives so long as they keep the same lifestyle and living costs."),
-    p("They hold until advanced age assets that could be passed on to their kids as generational wealth."),
+    p(paste0(couple_name, "’s total asset value remains mostly stable over their life time (Figure 1), with periods of growth, stagnation or even deline.")),
+    p("Their situation is strongly affected by major lump sums (positive and negative) and shows strong improvement in the final years of their careers, assuming they manage to tightly control living costs throughout their lives."),
+    p(paste0("Upon retirement at age of ", as.character(as.numeric(expected_year_retirement) - 2025 + 30), " in ", expected_year_retirement, ", their total asset value rapdly declines indicating that they’d be living a similar lifestyle and living costs but with the risk of not been able to sustain themselves at late life.")),
+    p("They hold at advanced age no assets that could be passed on to their kids as generational wealth."),
     renderUI(renderPlot(rent_AssetEvolution)),
-    p(em("Figure 1 - Scenario 1, Gene and Jean. Total asset value evolution.")),
+    p(em(paste0("Figure 1 - Scenario 1, ", couple_name, ". Total asset value evolution."))),
     hr(),
 
 
 
     h3("Financial Metrics"),
-    p("Gene and Jean’s main financial metrics reflect their slowly evolving financial situation with a lifestyle of cutting costs and saving wherever possible (Figure 2)."),
-    p("In the first decade (2025-2037), while the kids are small, they balance total expenses and income allowing for the accumulation of passive investments."),
-    p("Over the following two decades (2038-2052), costs with kids are a significant burden and they struggle maintaining cash flow, withdrawing from their savings to pay-off debts. The impact of punctual lump sums to their financial situation is significant, leading to large, punctual variations to their savings."),
-    p("In the following decade (2053-2064), when the costs with kids decreases, they return to a period of positive cash flow and saving."),
-    p("Finally, from retirement on (2065-2080), their cash flow is again slightly negative due to the reduced income. Still, they live a stable lifestyle by offsetting the cash flow gap with returns on passive investment and withdrawing when necessary."),
+    p(paste0(couple_name, "’s main financial metrics reflect their stagnated financial situation with a lifestyle of cutting costs and saving wherever possible (Figure 2).")),
+    p("A key observation is that their expenses (red line) slowly build up in the first 3 decades, while their income (green line) remains almost constant. This leads to a gradial switch in cash flow (blue line) balance."),
+    p("In the first decade (2025-2035), positive cash flow drives accumulation of savings that are passively invested (Yellow line). However, over the following two decades (2036-2052), they must withdraw from their emergency reserve (orange line) and investments (purple line) to pay-off debts due to the negative cash flow."),
+    p(paste0("The impact of punctual lump sums (", lump_sum_1, "€ in ", lump_sum_1_year, " and ", lump_sum_2, "€ in ", lump_sum_2_year, ") is significant, driving large changes.")),
+    p("In the following decade (2053-2065), they return to a period of positive cash flow and saving."),
+    p(paste0("Finally, from retirement on (", expected_year_retirement, "-2080), their cash flow is again negative and is offset by withdrawing from invested savings.")),
     renderUI(renderPlot(rent_FinMetrics)),
-    p(em("Figure 2 - Scenario 1, Gene and Jean. Evolution of main financial metrics.")),
+    p(em(paste0("Figure 2 - Scenario 1, ", couple_name, ". Evolution of main financial metrics."))),
     hr(),
 
 
 
     h3("Income and Expenses Components"),
-    p("Decomposition of Gene and Jean’s income and expenses paints a granular picture of their financial evolution."),
+    p(paste0("Decomposition of ", couple_name, "’s income and expenses paints a granular picture of their financial evolution.")),
     p("Living costs are constant throughout the years, except in the years when the kids are born, reflecting a sustained lifestyle (Figure 3A)."),
-    p("Rent is by far their largest expenditure, representing between 50-70% of all expenses and relatively increasing over the years. Kids also represent a significant expense in the first 3 decades."),
-    p("Salary is their main source of income and returns on their invested savings has a minor contribution to income. However, capital gains become relatively more significant upon retirement and the reduction of their salaries (Figure 3B)."),
+    p("Rent is by far their largest expenditure, representing between 60-70% of all expenses and slowly increasing over the years. Costs with family represent a significant expense during the first 3 decades and the fast increase leads to the switch in the cash flow balance observed above."),
+    p("Salary is their main source of income throughout their lives as returns on passively invested savings is small and they have no other source of income (Figure 3B)."),
     p(strong("A")), renderUI(renderPlot(rent_ExpensesComp)),
     p(strong("B")), renderUI(renderPlot(rent_IncomeComp)),
-    p(em("Figure 3 - Scenario 1, Gene and Jean. Detailed view of the financial components in their expenses (A) and income (B).")),
+    p(em(paste0("Figure 3 - Scenario 1, ", couple_name, ". Detailed view of the financial components in their expenses (A) and income (B)."))),
     hr(),
 
 
 
     h3("Sensitivity Analysis"),
-    p("A fundamental aspect of having a stable financial life is financial robustness. That is, the ability to resist to unforeseen life changes. The scenario simulated above assumes that everything goes according to the plan, without deviations."),
-    p("Sensitivity analysis identifies factors to which Gene and Jean’s finances are most sensitive by iteratively repeating the simulation upon slightly varying single parameters per iteration. This analysis shows that changing key parameters by a 20% margin has significant impacts on the couple’s financial evolution."),
-    p("For example, if this family spends 40€ more than the expected 800€/month (5% variation to their monthly living costs) while keeping all other parameters the same, they will have accumulated zero total asset value by retirement age and are not able to sustain their lifestyle (Figure 4, top left plot). Spending any more than this could lead to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt, exponentially increasing itself. Therefore, tightly controlling their living costs is of great importance for Gene and Jean, as they have a tiny safety margin."),
-    p("To avoid debt collapse, similar analysis on their salary increase over time leads to the conclusion that Gene and Jean’s must also keep working hard to achieve the minimum required salary growth (above 2.5%). Similarly, they must also negotiate well their rental price increase rate keeping bellow 3%, if possible. Failing to achieve these hallmarks puts them at risk of debt collapse."),
+    p("The scenario simulated above assumes that everything goes according to a plan. However, a fundamental aspect of having a stable financial life is robustness. That is, the ability to resist to unforeseen life changes."),
+    p(paste0("Sensitivity analysis identifies factors to which finances are most sensitive by iteratively repeating the simulation while slightly varying a single parameters per iteration. This analysis shows that changing key parameters by up to 20% margin has significant impacts on the couple’s financial evolution.")),
+    p(paste0("For example, if this family spends 40€ more than the expected ", living_style_costs, "€/month (5% variation to their monthly living costs) while keeping all other parameters the same, they will have accumulated zero total asset value by retirement age and are not able to sustain their lifestyle (Figure 4, top left plot). Spending any more than this could lead to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt, exponentially increasing itself. Therefore, tightly controlling their living costs is of great importance for ", couple_name, ", as they have a tiny safety margin.")),
+    p(paste0("To avoid debt collapse, similar analysis on their salary increase over time leads to the conclusion that ", couple_name, "’s must also keep working hard to achieve the minimum required salary growth (above 2.5%). Similarly, they must also negotiate well their rental price increase rate keeping bellow 3%, if possible. Failing to achieve these hallmarks puts them at risk of debt collapse.")),
     p("Although with less extreme consequences, choosing good investments for their money also impacts their financial life, specially upon retirement."),
     renderUI(renderPlot(rent_SensitivityAnalysis, height = rent_SensitivityAnalysis_height)),
-    p(em("Figure 4 - Scenario 1, Gene and Jean. Sensitivity analysis on total asset value of single parameter perturbations.")),
+    p(em(paste0("Figure 4 - Scenario 1, ", couple_name, ". Sensitivity analysis on total asset value of single parameter perturbations."))),
     hr(),
 
 
 
-    h3("How can Gene and Jean improve their financial situation?"),
+    h3(paste0("How can ", couple_name, " improve their financial situation?")),
     p(NAVTAB_CONTENT$DISCLAIMERS$NOT_FINANCIAL_ADVISE_SCENARIOS),
 
     h4("Guided by Financial Goals"),
-    p("To improve the financial situation of Gene and Jean we must keep in mind their goals: to have a stable financial life, to enhance their live quality by increasing expenses and to retire at later age while maintaining their lifestyle focused on family, friends and hobbies."),
-    p("Gene and Jean’s financial reality has overarching impacts over their life quality. Given the current market prices in Berlin, the property they rent for a family with 2 kids (1000€/month + 120€/month extra costs) is likely distant from their workplaces, family and friends. They also live in constant financial stress as they have a real risk of debt collapse."),
+    p(paste0("To improve the financial situation of ", couple_name, " we must keep in mind their goals: to have a stable financial life, to enhance their live quality by increasing expenses and to retire at later age while maintaining their lifestyle focused on family, friends and hobbies.")),
+    p(paste0(couple_name,"’s financial reality has overarching impacts over their life quality. Given the current market prices in Berlin, the property they rent for a family with 2 kids (1000€/month + 120€/month extra costs) is likely distant from their workplaces, family and friends. They also live in constant financial stress as they have a real risk of debt collapse.")),
     p("They already save every penny, so there is not much room for reducing their expenses further without impacting their health, which would lead to reduced income over time."),
     p("Rental increases by landlords due to real estate market development or gentrification leads to major financial stress, possibly forcing them to look for a cheaper alternative. Here, living in government-backed housing projects could be a good alternative to the private housing market."),
     p("Also, living far from city centres makes it difficult to get better education and opportunities to improve their salaries. The many hours commuting may also negatively affect their wellbeing and consequently their performance at work."),
     hr(),
 
     h4("Aligning Financial Goals and Decisions"),
-    p("What could they have done differently to better align their financial goals and decisions? The Financial Evolution Calculator can be used to test multiple scenarios. For example, we can re-simulate Gene and Jean’s scenario to identify critical factors for improving their financial situation (Figure 5)."),
-    p("For example, increasing their current salaries by 50€ each would strongly impact their financial evolution (Figure 5A). Not surprisingly, people in similar situations to Gene and Jean often work extra hours. Although impactful, this approach might not be a sustainable solution. Focusing on improving skills set and fighting for better salaries could have higher impact long-term."),
+    p(paste0("What could they have done differently to better align their financial goals and decisions? The Financial Evolution Calculator can be used to test multiple scenarios. For example, we can re-simulate ", couple_name, "’s scenario to identify critical factors for improving their financial situation (Figure 5).")),
+    p(paste0("For example, increasing their current salaries by 50€ each would strongly impact their financial evolution (Figure 5A). Not surprisingly, people in similar situations to ", couple_name, " often work extra hours. Although impactful, this approach might not be a sustainable solution. Focusing on improving skills set and fighting for better salaries could have higher impact long-term.")),
     p("Similarly, reducing their current rent by 50€ would also improve their situation significantly (Figure 5B). Not surprisingly, people in this situation tend to move away from city centres into peripheries."),
     p(strong("A")), renderUI(renderPlot(rent_higher_salary_AssetEvolution)),
     p(strong("B")), renderUI(renderPlot(rent_lower_rent_AssetEvolution)),
-    p(em("Figure 5 - Scenario 1, Gene and Jean. Total asset value evolution in simulations of scenarios with single parameter variations. A) Salary increased from 2400€ to 2500€. B) Rent reduced from 1000€ to 950€. C) Salary increased and rent reduced.")),
+    p(em(paste0("Figure 5 - Scenario 1, ", couple_name, ". Total asset value evolution in simulations of scenarios with single parameter variations. A) Salary increased from 2400€ to 2500€. B) Rent reduced from 1000€ to 950€. C) Salary increased and rent reduced."))),
     hr(),
 
     h4("Going Beyond Initial Goals"),
-    p("This analysis points to a possible but difficult financial improvement for Gene and Jean by increasing salaries and reducing rent. This highlights how people in the lowest income range are vulnerable in society, at ther mercy of the employees and the real estate market."),
+    p(paste0("This analysis points to a possible but difficult financial improvement for ", couple_name, " by increasing salaries and reducing rent. This highlights how people in the lowest income range are vulnerable in society, at ther mercy of the employees and the real estate market.")),
     p("However, there is another alternative to consider: becoming landlords. There seems to be a general misconception that becoming landlords is something only rich people can do. Although more difficult to obtain a bank loan when one’s salaries are low, with help of family and friends it could be possible. But is it a good idea for this couple?"),
-    p("Let’s re-simulate a second scenario for Gene and Jean. Instead of trying to save and invest passively, they invest actively in real estate by purchasing a property (200.000€) with help of family and friends. Also, instead of moving in, they stay in their rental apartment (1000€/month). Their property is then leased to someone else for 500€/month, following the same rental contract they have on their own rent (3% increase per year)."),
+    p(paste0("Let’s re-simulate a second scenario for ", couple_name, ". Instead of trying to save and invest passively, they invest actively in real estate by purchasing a property (200.000€) with help of family and friends. Also, instead of moving in, they stay in their rental apartment (1000€/month). Their property is then leased to someone else for 500€/month, following the same rental contract they have on their own rent (3% increase per year).")),
     p("The Financial Evolution Calculator considers all taxes they’d need to pay, risk of not having a tenant, tax deductible costs, mortgage for the investment property, property depreciation, management fees and maintenance costs. All these factors considered, their accumulated asset value at retirement age as landlords would be seven-fold higher - 550.000€ as landlords and 80.000€ when only renting their home (Figure 6A). They would not experience debt (Figure 6B) and would be financially resilient due to increased savings (Figure 6C)."),
     p("With the extra income source, they could boost their living costs to enhance life quality and even pursue their secondary financial goals, like donating to causes, working less and passing on generational wealth."),
     p("Alternatively, they could have saved enough money by retirement age to purchase a second property – evaluated at 200.000€ in today’s price. That is, without a bank loan, without selling their leased property, and still having savings in their bank account after the purchase to sustain their lifestyle in retirement!"),
     p(strong("A")), renderUI(renderPlot(landlord_AssetEvolution)),
     p(strong("B")), renderUI(renderPlot(landlord_FinMetrics)),
     p(strong("C")), renderUI(renderPlot(landlord_SensitivityAnalysis, height = landlord_SensitivityAnalysis_height)),
-    p(em("Figure 6 - Scenario 1, Gene and Jean. Scenario simulation leasing the property purchased in 2025. Total asset value evolution (A), evolution of main financial metrics (B), and sensitivity analysis on total asset value of single parameter perturbations (C).")),
-    p("How is this possible? It might come as a surprise, but it’s really just numbers. By becoming landlords, Gene and Jean pay their own rent (1000€/month) and house expenses (110€/year) plus the bank loan (1000€/month) and loan from friends and family (200€/month). House expenses for the investment property are paid by the tenant."),
+    p(em(paste0("Figure 6 - Scenario 1, ", couple_name, ". Scenario simulation leasing the property purchased in 2025. Total asset value evolution (A), evolution of main financial metrics (B), and sensitivity analysis on total asset value of single parameter perturbations (C)."))),
+
+    h4("Detailed Comparison"),
+    p(strong("Table 1A - Initial years living as renters")),
+    div(style = "width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 1.5rem; font-size: 12px;",
+        renderDT({
+          rent_table_for_vis})
+    ),
+    br(),
+    p(strong("Table 1B - Initial years living as landlord")),
+    div(style = "width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 1.5rem; font-size: 12px;",
+        renderDT({
+          landlord_table_for_vis})
+    ),
+    br(),
+    p("How is this possible? It might come as a surprise, but it’s really just numbers. By becoming landlords, they pay their own rent (1000€/month) and house expenses (110€/year) plus the bank loan (1000€/month) and loan from friends and family (200€/month). House expenses for the investment property are paid by the tenant."),
     p("Altogether, their housing expenses (1000 + 110 + 1000 + 200= 2310€/month) in the first years are barely covered by the leftover salary after discounting living costs plus the lease income (2400 – 800 + 500 = 2100€/month). Income tax deductions from expenses with the investment property (100€/month) help significantly."),
-    ## TODO create table showing their progression in initial decade. Point is to show how the cash flow increases faster with leasing
     p("The secret is time. While their incomes and expenses increase every year, the mortgage is fixed at least until refinancing 5-20 years later (Figure 6B). Every year their cashflow becomes more positive and, while all their available cash is re-directed to pay the flat in the first years, it slowly builds savings."),
-    p("From the investment perspective, Gene and Jean diversified their assets over the years, increasing financial robustness. For example, their own rent will increase every year but, so long as their leased property increases rent at a similar rate, they are immune to real estate market changes (Figure 6C)."),
+    p("From the investment perspective, they diversified their assets over the years, increasing financial robustness. For example, their own rent will increase every year but, so long as their leased property increases rent at a similar rate, they are immune to real estate market changes (Figure 6C)."),
     p("Also, their income does not depend only on their salaries anymore, as they receive lease. Been less dependent on salary means that they could work less and try less hard for promotions. Although, they still live a restricted life saving every penny and higher salaries could still help."),
     p("The downside of becoming a landlord is, of course, the increased complexity. They’d need to deal with tenants or property management agencies, repair and management companies and more taxes. This extra headache holds back people from pursuing such investments, even when the numbers clearly point to this alternative as a valid solution."),
-    hr(),
-    hr(),
+    br(),
+    br(),
   )
 }

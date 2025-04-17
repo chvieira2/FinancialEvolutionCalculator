@@ -24,7 +24,7 @@ general_life:
   - id: savings
     type: numericInput
     label: Savings (EUR)
-    value: 0
+    value: 50000
     description: Current savings amount.
   - id: savings_emergency_reserve
     type: numericInput
@@ -48,7 +48,7 @@ general_life:
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2055
+    value: 2052
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
@@ -86,12 +86,12 @@ family:
   - id: living_costs_change_elternzeit
     type: numericInput
     label: Home costs reduction during parental leave (%)
-    value: 50
+    value: 25
     description: Percentage reduction in living costs during parental leave (Elternzeit).
   - id: salary_reduction_elternzeit
     type: numericInput
     label: Salary reduction during parental leave (%)
-    value: 50
+    value: 25
     description: Percentage of salary reduction during parental leave (Elternzeit).
   - id: year_first_child_is_born
     type: numericInput
@@ -294,7 +294,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
-  id: c15b89bf-c75f-420a-958b-3ff6e84cec70
+  id: dab70d7e-cb55-429a-bcb4-cf33ac9f7957
   type: home
   inputs:
   - id: value_growth
@@ -305,12 +305,12 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 500000
+    value: 550000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
     label: Year property purchase
-    value: 2055
+    value: 2052
     description: Year when the property will be purchased
   - id: sale_year
     type: numericInput
