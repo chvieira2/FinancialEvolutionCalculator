@@ -48,7 +48,7 @@ general_life:
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2065
+    value: 2061
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
@@ -185,7 +185,7 @@ passive_investing:
   - id: tax_free_allowance_type
     type: selectInput
     label: Vorabpauschale tax-free allowance type
-    value: Married Couple (2000€)
+    value: Single Person (1000€)
     choices:
     - single: Single Person (1000€)
     - married: Married Couple (2000€)
@@ -294,7 +294,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
-  id: ad28a823-c51e-4a0a-8d0c-c19b813523f3
+  id: c4e77162-2412-4a61-9e08-7cdb7a1f71f6
   type: home
   inputs:
   - id: value_growth
@@ -305,12 +305,12 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 300000
+    value: 175000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
     label: Year property purchase
-    value: 2065
+    value: 2061
     description: Year when the property will be purchased
   - id: sale_year
     type: numericInput

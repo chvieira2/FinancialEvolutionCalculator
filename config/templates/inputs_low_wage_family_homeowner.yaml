@@ -11,7 +11,7 @@ general_life:
   - id: living_style_costs
     type: numericInput
     label: Living Standard costs (without housing costs) (EUR/month)
-    value: 800
+    value: 825
     description: Your monthly living expenses excluding housing. This include all
       other expenses, like holidays, clothes, dinning out, groceries, etc (NOT health
       insurance).
@@ -48,7 +48,7 @@ general_life:
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2065
+    value: 2053
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
@@ -304,7 +304,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 175000
+    value: 170000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
@@ -337,7 +337,7 @@ properties:
   - id: loan_family_friends
     type: numericInput
     label: Loan from family/friends (EUR)
-    value: 17500
+    value: 12500
     description: Amount borrowed from family or friends
   - id: interest_rate_family_friends
     type: numericInput
@@ -391,4 +391,4 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 15
     description: Monthly Hausgeld building insurance cost.
-  id: 93ff23de-2028-4957-8b9b-c038bbc9f8c6
+  id: 37b6a276-b0f8-4adb-8da2-6906afb5b4e1

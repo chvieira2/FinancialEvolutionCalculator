@@ -182,13 +182,13 @@ DataProcessor <-
               # Get all property-related columns for this year
               property_data <- self$results[self$results$Year == year, ]
 
-              # Calculate mortgage costs (principal + interest for all properties)
+              # Calculate principal share for mortgage and family/friends
               self$results[self$results$Year == year, "properties_principal_share"] <-
                 sum(property_data[, grep("principal_share$",
                                          names(property_data))],
                     na.rm = TRUE)
 
-              # Calculate family/friends loan costs
+              # Calculate interest share for mortgage and family/friends
               self$results[self$results$Year == year, "properties_interest_share"] <-
                 sum(property_data[, grep("interest_share$",
                                          names(property_data))],
@@ -250,7 +250,8 @@ if (sys.nframe() == 0) {
 
   if (TRUE) {
     source(file.path("R", "constants.R"))
-    for (scenario in c(TEMPLATE_SCENARIOS,
+    for (scenario in c("inputs_high_wage_family_landlord.yaml",
+                       TEMPLATE_SCENARIOS,
                        "inputs_low_wage_family_rent_higher_salary.yaml",
                        "inputs_low_wage_family_rent_lower_rent.yaml")) {
       scenario <- sub(".yaml*$", "", scenario)

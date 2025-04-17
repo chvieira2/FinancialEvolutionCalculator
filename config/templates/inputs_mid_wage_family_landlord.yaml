@@ -304,7 +304,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Property price today (EUR)
-    value: 300000
+    value: 100000
     description: Current market value of the property.
   - id: purchase_year
     type: numericInput
@@ -337,7 +337,7 @@ properties:
   - id: loan_family_friends
     type: numericInput
     label: Loan from family/friends (EUR)
-    value: 10000
+    value: 0
     description: Amount borrowed from family or friends
   - id: interest_rate_family_friends
     type: numericInput
@@ -352,7 +352,7 @@ properties:
   - id: cold_lease_today
     type: numericInput
     label: Cold lease today (EUR/month)
-    value: 750
+    value: 400
     description: Current monthly cold lease amount
   - id: lease_rental_growth
     type: numericInput
@@ -417,7 +417,7 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 30
     description: Monthly Hausgeld building insurance cost.
-  id: 48b3ae42-aaa1-429b-a1de-8bd7af5f0cb1
+  id: 957a9d14-1fad-4d72-b098-0094e91ce29f
 - name: property2
   type: home
   inputs:
@@ -429,7 +429,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 650000
+    value: 170000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
@@ -516,4 +516,4 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 50
     description: Monthly Hausgeld building insurance cost.
-  id: ac8acfea-c537-40c2-a4ce-d6b59314a03a
+  id: 4b7f7e51-24ea-4ddc-a884-98cc4be2530f

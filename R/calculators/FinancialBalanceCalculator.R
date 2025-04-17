@@ -1,6 +1,6 @@
 library(R6)
 
-FinancialBalanceCalculator <- 
+FinancialBalanceCalculator <-
 R6Class("FinancialBalanceCalculator",
   inherit = BaseCalculator,
   public = list(
@@ -57,14 +57,15 @@ R6Class("FinancialBalanceCalculator",
     #'
     #' @param year Calculation year
     calculate_total_income = function(year) {
-      salary <- self$results[self$results$Year == year, "net_annual_salary"]
-      returns <- self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
-      lump_sums <- self$results[self$results$Year == year, "lump_sums"]
-      rental_income <- sum(self$results[self$results$Year == year, grep("warm_lease_income$", names(self$results), value = TRUE)], na.rm = TRUE)
-      deductions <- sum(self$results[self$results$Year == year, grep("income_taxes_adjustment$", names(self$results), value = TRUE)], na.rm = TRUE)
+      income_columns <- c(
+        "net_annual_salary",
+        "passive_investment_return_from_previous_year",
+        "lump_sums",
+        "properties_warm_lease_income",
+        "properties_income_taxes_adjustment"
+      )
 
-      income <- salary + lump_sums + rental_income + deductions + returns
-      self$results[self$results$Year == year, "total_income"] <- self$round_to_2(income)
+      self$results[self$results$Year == year, "total_income"] <- rowSums(self$results[self$results$Year == year, income_columns], na.rm = TRUE)
     },
 
     #' Calculate Cash Flow
@@ -83,6 +84,7 @@ R6Class("FinancialBalanceCalculator",
       }
 
       cash_flow <- self$results[self$results$Year == year, "total_income"] + self$results[self$results$Year == year, "total_expenses"] + sale_funds
+      # Remove passive returns because they are not treated the same as income, as they are automatically re-invested
       cash_flow <- cash_flow - self$results[self$results$Year == year, "passive_investment_return_from_previous_year"]
 
       self$results[self$results$Year == year, "cash_flow"] <- self$round_to_2(cash_flow)

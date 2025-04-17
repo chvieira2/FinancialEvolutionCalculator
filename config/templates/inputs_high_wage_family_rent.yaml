@@ -294,7 +294,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
-  id: dab70d7e-cb55-429a-bcb4-cf33ac9f7957
+  id: b47c5373-c5ac-4ca8-a7d8-147d99c89538
   type: home
   inputs:
   - id: value_growth
@@ -305,7 +305,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 550000
+    value: 500000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
@@ -358,7 +358,7 @@ properties:
   - id: maintenance_cost_rate
     type: numericInput
     label: Maintenance cost rate (% property value per year)
-    value: 0.5
+    value: 1
     description: Annual maintenance cost as a percentage of property value
   - id: hausgeld_fees_total
     type: numericInput

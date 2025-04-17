@@ -48,7 +48,7 @@ general_life:
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2041
+    value: 2057
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
@@ -304,7 +304,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Property price today (EUR)
-    value: 550000
+    value: 250000
     description: Current market value of the property.
   - id: purchase_year
     type: numericInput
@@ -352,7 +352,7 @@ properties:
   - id: cold_lease_today
     type: numericInput
     label: Cold lease today (EUR/month)
-    value: 1200
+    value: 750
     description: Current monthly cold lease amount
   - id: lease_rental_growth
     type: numericInput
@@ -417,9 +417,9 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 50
     description: Monthly Hausgeld building insurance cost.
-  id: d5eafee0-8126-49bb-8337-8a04920feb3b
+  id: c9f6640b-996b-4271-b6e0-156cf948260f
 - name: property2
-  id: 7844a2dc-7a5a-4011-aabd-485c7f30510b
+  id: f20d87e3-e0c3-4076-81a3-57f1378eae64
   type: home
   inputs:
   - id: value_growth
@@ -430,12 +430,12 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 550000
+    value: 500000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
     label: Year property purchase
-    value: 2041
+    value: 2057
     description: Year when the property will be purchased
   - id: sale_year
     type: numericInput

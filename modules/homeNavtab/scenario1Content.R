@@ -13,6 +13,15 @@ scenario1Content <- function(is_mobile) {
     )
   })
 
+  landlord_scenario <- safelyLoadConfig(file.path("config", "templates", "inputs_low_wage_family_landlord.yaml"))
+  lapply(landlord_scenario, function(section) {
+    if (is.null(section$inputs) && length(section) > 0) section <- section[[1]] # For properties
+    lapply(section$inputs, function(input) {
+      assign(paste0("landlord_", input$id), input$value, envir = .GlobalEnv)
+    }
+    )
+  })
+
   # Generate the figures for this scenario
   for (scenario in c("rent",
                      "rent_higher_salary", "rent_lower_rent",
@@ -142,9 +151,11 @@ scenario1Content <- function(is_mobile) {
     h3("Sensitivity Analysis"),
     p("The scenario simulated above assumes that everything goes according to a plan. However, a fundamental aspect of having a stable financial life is robustness. That is, the ability to resist to unforeseen life changes."),
     p(paste0("Sensitivity analysis identifies factors to which finances are most sensitive by iteratively repeating the simulation while slightly varying a single parameters per iteration. This analysis shows that changing key parameters by up to 20% margin has significant impacts on the couple’s financial evolution.")),
-    p(paste0("For example, if this family spends 40€ more than the expected ", living_style_costs, "€/month (5% variation to their monthly living costs) while keeping all other parameters the same, they will have accumulated zero total asset value by retirement age and are not able to sustain their lifestyle (Figure 4, top left plot). Spending any more than this could lead to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt, exponentially increasing itself. Therefore, tightly controlling their living costs is of great importance for ", couple_name, ", as they have a tiny safety margin.")),
-    p(paste0("To avoid debt collapse, similar analysis on their salary increase over time leads to the conclusion that ", couple_name, "’s must also keep working hard to achieve the minimum required salary growth (above 2.5%). Similarly, they must also negotiate well their rental price increase rate keeping bellow 3%, if possible. Failing to achieve these hallmarks puts them at risk of debt collapse.")),
-    p("Although with less extreme consequences, choosing good investments for their money also impacts their financial life, specially upon retirement."),
+    p(paste0("For example, if this family spends 41€ more than the expected ", living_style_costs, "€/month (5% variation to their monthly living costs) while keeping all other parameters the same, they will have accumulated zero total asset value by retirement age and are not able to sustain their lifestyle (Figure 4, top left plot).")),
+    p(paste0("Spending any more than this could lead to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt, exponentially increasing itself. Therefore, tightly controlling their living costs is of great importance, as they have a tiny safety margin.")),
+    p(paste0("To avoid debt collapse, similar analysis on their salary increase rate shows that they must also keep working hard to achieve the minimum required salary growth (above ", salaries_growth_start_career, "%).")),
+    p(paste0("Similarly, they must also negotiate well their rental price increase rate keeping it bellow ", rental_prices_growth, "% per year, if possible. Failing to achieve these hallmarks puts them at risk of debt collapse.")),
+    p("Their financial situation is so tight that even the return over passive investments - a minor contributor to their income - is a limiting factor, specially upon retirement."),
     renderUI(renderPlot(rent_SensitivityAnalysis, height = rent_SensitivityAnalysis_height)),
     p(em(paste0("Figure 4 - Scenario 1, ", couple_name, ". Sensitivity analysis on total asset value of single parameter perturbations."))),
     hr(),
@@ -156,33 +167,43 @@ scenario1Content <- function(is_mobile) {
 
     h4("Guided by Financial Goals"),
     p(paste0("To improve the financial situation of ", couple_name, " we must keep in mind their goals: to have a stable financial life, to enhance their live quality by increasing expenses and to retire at later age while maintaining their lifestyle focused on family, friends and hobbies.")),
-    p(paste0(couple_name,"’s financial reality has overarching impacts over their life quality. Given the current market prices in Berlin, the property they rent for a family with 2 kids (1000€/month + 120€/month extra costs) is likely distant from their workplaces, family and friends. They also live in constant financial stress as they have a real risk of debt collapse.")),
-    p("They already save every penny, so there is not much room for reducing their expenses further without impacting their health, which would lead to reduced income over time."),
-    p("Rental increases by landlords due to real estate market development or gentrification leads to major financial stress, possibly forcing them to look for a cheaper alternative. Here, living in government-backed housing projects could be a good alternative to the private housing market."),
-    p("Also, living far from city centres makes it difficult to get better education and opportunities to improve their salaries. The many hours commuting may also negatively affect their wellbeing and consequently their performance at work."),
+    p(paste0(couple_name,"’s financial reality has overarching impacts over their life quality. Given the current market prices in Berlin, the property they rent for a family with 2 kids (", rent_month, "€/month + ", fixed_housing_costs, "€/month extra costs) is likely distant from their workplaces, family and friends. They also live in constant financial stress as they have a real risk of debt collapse.")),
+    p("They already save every penny, so there is not much room for reducing expenses without impacting their health, which would lead likely to reduced income over time."),
+    p("Increases to their rent due to real estate market development or gentrification are major financial stressors, possibly forcing them to look for a cheaper alternative. Living in government-backed housing projects could be a good alternative to the private housing market, although with limited availability."),
+    p("Also, living far from city centres makes it difficult for them to get better education and opportunities to improve their salaries. The many hours commuting may also negatively affect their wellbeing and consequently their performance at work."),
     hr(),
 
     h4("Aligning Financial Goals and Decisions"),
-    p(paste0("What could they have done differently to better align their financial goals and decisions? The Financial Evolution Calculator can be used to test multiple scenarios. For example, we can re-simulate ", couple_name, "’s scenario to identify critical factors for improving their financial situation (Figure 5).")),
-    p(paste0("For example, increasing their current salaries by 50€ each would strongly impact their financial evolution (Figure 5A). Not surprisingly, people in similar situations to ", couple_name, " often work extra hours. Although impactful, this approach might not be a sustainable solution. Focusing on improving skills set and fighting for better salaries could have higher impact long-term.")),
-    p("Similarly, reducing their current rent by 50€ would also improve their situation significantly (Figure 5B). Not surprisingly, people in this situation tend to move away from city centres into peripheries."),
+    p(paste0("What could they do differently to better align financial goals and decisions? The Financial Evolution Calculator can be used to test multiple scenarios. For example, we can re-simulate ", couple_name, "’s scenario modifying critical factors to improve their financial situation (Figure 5).")),
+    p(paste0("For example, increasing their current salaries by 50€ each would strongly impact their financial evolution (Figure 5A). Not surprisingly, people in similar situations to ", couple_name, " often work extra hours. This approach might not be sustainable and focusing on improving skills set or even fighting for better salaries could have higher impact long-term.")),
+    p("Similarly, reducing their current rent by 50€ would also improve their situation significantly (Figure 5B). Not surprisingly, people in this situation tend to move away from city centres into peripheries where housing tends to be cheaper."),
     p(strong("A")), renderUI(renderPlot(rent_higher_salary_AssetEvolution)),
     p(strong("B")), renderUI(renderPlot(rent_lower_rent_AssetEvolution)),
-    p(em(paste0("Figure 5 - Scenario 1, ", couple_name, ". Total asset value evolution in simulations of scenarios with single parameter variations. A) Salary increased from 2400€ to 2500€. B) Rent reduced from 1000€ to 950€. C) Salary increased and rent reduced."))),
+    p(em(paste0("Figure 5 - Scenario 1, ", couple_name, ". Total asset value evolution in simulations of scenarios with single parameter variations. A) Salary increased from ", net_annual_income, "€ to 2500€. B) Rent reduced from ", rent_month, "€ to 950€. C) Salary increased and rent reduced."))),
     hr(),
 
     h4("Going Beyond Initial Goals"),
-    p(paste0("This analysis points to a possible but difficult financial improvement for ", couple_name, " by increasing salaries and reducing rent. This highlights how people in the lowest income range are vulnerable in society, at ther mercy of the employees and the real estate market.")),
-    p("However, there is another alternative to consider: becoming landlords. There seems to be a general misconception that becoming landlords is something only rich people can do. Although more difficult to obtain a bank loan when one’s salaries are low, with help of family and friends it could be possible. But is it a good idea for this couple?"),
-    p(paste0("Let’s re-simulate a second scenario for ", couple_name, ". Instead of trying to save and invest passively, they invest actively in real estate by purchasing a property (200.000€) with help of family and friends. Also, instead of moving in, they stay in their rental apartment (1000€/month). Their property is then leased to someone else for 500€/month, following the same rental contract they have on their own rent (3% increase per year).")),
-    p("The Financial Evolution Calculator considers all taxes they’d need to pay, risk of not having a tenant, tax deductible costs, mortgage for the investment property, property depreciation, management fees and maintenance costs. All these factors considered, their accumulated asset value at retirement age as landlords would be seven-fold higher - 550.000€ as landlords and 80.000€ when only renting their home (Figure 6A). They would not experience debt (Figure 6B) and would be financially resilient due to increased savings (Figure 6C)."),
-    p("With the extra income source, they could boost their living costs to enhance life quality and even pursue their secondary financial goals, like donating to causes, working less and passing on generational wealth."),
-    p("Alternatively, they could have saved enough money by retirement age to purchase a second property – evaluated at 200.000€ in today’s price. That is, without a bank loan, without selling their leased property, and still having savings in their bank account after the purchase to sustain their lifestyle in retirement!"),
+    p(paste0("This analysis points to a possible but difficult financial improvement for ", couple_name, " by increasing salaries and reducing rent. This highlights how people in the lowest income range are vulnerable in society, at the mercy of their employees and the real estate market.")),
+    p("However, there is another alternative to consider: becoming landlords. There seems to be a general misconception that becoming landlords is something only rich people can do. Although more difficult to obtain a bank loan when one’s salaries are low, with help of family and friends it could be possible. But is it a good idea?"),
+    p(paste0("Let’s re-simulate a second scenario for ", couple_name, ". Instead of trying to save and invest passively, they invest actively in real estate by purchasing a property (", landlord_value_today, "€) with help of family and friends. Also, instead of moving in, they stay in their rental apartment (", rent_month, "€/month). Their property is then leased to someone else for ", landlord_cold_lease_today, "€/month, following the same rental contract they have on their own rent (", landlord_lease_rental_growth, "% increase per year).")),
+    p("The Financial Evolution Calculator considers all taxes they’d need to pay in such scenario, the income loss of not having a tenant temporarily, possible income tax deductibles, the mortgage payment and payments for the family/friends loan, property management fees and propertymaintenance costs."),
+    p("All these factors considered, their accumulated asset value at retirement age as landlords would be ten-fold higher - 550.000€ as landlords and 55.000€ when only renting their home (Figure 6A). They would not experience debt (Figure 6B) and would be financially resilient due to their large savings invested passively (Figure 6C)."),
+    p("With the extra income source from the leased property, they could boost their living costs and enhance life quality. They could even pursue secondary financial goals, like donating to causes, working less and passing on generational wealth."),
+    p(paste0("Alternatively, they could have saved enough money by retirement age to purchase a second property – evaluated at ", landlord_value_today, "€ in today’s price. That is, without a bank loan, without selling their leased property, and still having savings in their bank account after the purchase to sustain their lifestyle in retirement!")),
     p(strong("A")), renderUI(renderPlot(landlord_AssetEvolution)),
     p(strong("B")), renderUI(renderPlot(landlord_FinMetrics)),
     p(strong("C")), renderUI(renderPlot(landlord_SensitivityAnalysis, height = landlord_SensitivityAnalysis_height)),
     p(em(paste0("Figure 6 - Scenario 1, ", couple_name, ". Scenario simulation leasing the property purchased in 2025. Total asset value evolution (A), evolution of main financial metrics (B), and sensitivity analysis on total asset value of single parameter perturbations (C)."))),
 
+
+    p(paste0("But how is this possible? It might come as a surprise, but it’s really just numbers. By becoming landlords, they pay their own rent (", rent_month, "€/month) and house expenses (", fixed_housing_costs, "€/year) plus the bank loan (1000€/month) and loan from friends and family (200€/month). House expenses for the investment property are paid by the tenant.")),
+    p(paste0("Altogether, their housing expenses (", rent_month, " + ", fixed_housing_costs, " + 1000 + 200 = 2310€/month) in the first years are barely covered by the leftover salary after discounting living costs plus the lease income (", net_annual_income, " – ", living_style_costs, " + ", landlord_cold_lease_today, " = ", net_annual_income - living_style_costs + landlord_cold_lease_today, "€/month). Income tax deductions from expenses with the investment property (100€/month) help significantly.")),
+    p("The secret is time. While their incomes and expenses increase every year, the mortgage is fixed at least until refinancing 5-20 years later (Figure 6B). Every year their cashflow becomes more positive and, while all their available cash is re-directed to pay the flat in the first years, it slowly builds savings."),
+    p("From the investment perspective, they diversified their assets over the years, increasing financial robustness. For example, their own rent will increase every year but, so long as their leased property increases rent at a similar rate, they are immune to real estate market changes (Figure 6C)."),
+    p("Also, their income does not depend only on their salaries anymore, as they receive lease. Been less dependent on salary means that they could work less and try less hard for promotions. Although, they still live a restricted life saving every penny and higher salaries could still help."),
+    p("The downside of becoming a landlord is, of course, the increased complexity. They’d need to deal with tenants or property management agencies, repair and management companies and more taxes. This extra headache holds back people from pursuing such investments, even when the numbers clearly point to this alternative as a valid solution."),
+
+    br(),
     h4("Detailed Comparison"),
     p(strong("Table 1A - Initial years living as renters")),
     div(style = "width: 100%; max-width: 100%; overflow-x: auto; margin-bottom: 1.5rem; font-size: 12px;",
@@ -195,13 +216,6 @@ scenario1Content <- function(is_mobile) {
         renderDT({
           landlord_table_for_vis})
     ),
-    br(),
-    p("How is this possible? It might come as a surprise, but it’s really just numbers. By becoming landlords, they pay their own rent (1000€/month) and house expenses (110€/year) plus the bank loan (1000€/month) and loan from friends and family (200€/month). House expenses for the investment property are paid by the tenant."),
-    p("Altogether, their housing expenses (1000 + 110 + 1000 + 200= 2310€/month) in the first years are barely covered by the leftover salary after discounting living costs plus the lease income (2400 – 800 + 500 = 2100€/month). Income tax deductions from expenses with the investment property (100€/month) help significantly."),
-    p("The secret is time. While their incomes and expenses increase every year, the mortgage is fixed at least until refinancing 5-20 years later (Figure 6B). Every year their cashflow becomes more positive and, while all their available cash is re-directed to pay the flat in the first years, it slowly builds savings."),
-    p("From the investment perspective, they diversified their assets over the years, increasing financial robustness. For example, their own rent will increase every year but, so long as their leased property increases rent at a similar rate, they are immune to real estate market changes (Figure 6C)."),
-    p("Also, their income does not depend only on their salaries anymore, as they receive lease. Been less dependent on salary means that they could work less and try less hard for promotions. Although, they still live a restricted life saving every penny and higher salaries could still help."),
-    p("The downside of becoming a landlord is, of course, the increased complexity. They’d need to deal with tenants or property management agencies, repair and management companies and more taxes. This extra headache holds back people from pursuing such investments, even when the numbers clearly point to this alternative as a valid solution."),
     br(),
     br(),
   )

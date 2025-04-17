@@ -9,7 +9,7 @@ BaseCalculator <-
             },
 
             # Rounds a given number to 2 decimal places.
-            # 
+            #
             # Args:
             #   x: A numeric value to be rounded.
             #
@@ -64,7 +64,7 @@ BaseCalculator <-
             # Returns:
             #   A numeric value representing the total loan amount taken in the specified year.
             check_if_loan_taken = function(year, results) {
-              loan_taken <- sum(results[results$Year == year, grep("mortgage_principal", names(results), value = TRUE)])
+              loan_taken <- sum(results[results$Year == year, endsWith(names(results), "mortgage_principal")])
 
               return(loan_taken)
             }

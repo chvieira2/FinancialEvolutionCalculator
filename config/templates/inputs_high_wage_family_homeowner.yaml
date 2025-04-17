@@ -294,7 +294,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
-  id: a256937c-9821-4790-9dac-e2b2ba2ac904
+  id: b47c5373-c5ac-4ca8-a7d8-147d99c89538
   type: home
   inputs:
   - id: value_growth
@@ -305,7 +305,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 550000
+    value: 500000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
