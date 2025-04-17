@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.4.1",
+    "Version": "4.4.0",
     "Repositories": [
       {
         "Name": "CRAN",
@@ -1013,6 +1013,43 @@
       "NeedsCompilation": "no",
       "Author": "Richard Iannone [aut, cre] (<https://orcid.org/0000-0003-3925-190X>), Christophe Dervieux [ctb] (<https://orcid.org/0000-0003-4474-2498>), Winston Chang [ctb], Dave Gandy [ctb, cph] (Font-Awesome font), Posit Software, PBC [cph, fnd]",
       "Maintainer": "Richard Iannone <rich@posit.co>",
+      "Repository": "CRAN"
+    },
+    "formattable": {
+      "Package": "formattable",
+      "Version": "0.2.1",
+      "Source": "Repository",
+      "Title": "Create 'Formattable' Data Structures",
+      "Authors@R": "c( person(\"Kun\", \"Ren\", role = c(\"aut\", \"cre\"), email = \"ken@renkun.me\"), person(\"Kenton\", \"Russell\", role = \"aut\", email = \"kent.russell@timelyportfolio.com\") )",
+      "Description": "Provides functions to create formattable vectors and data frames. 'Formattable' vectors are printed with text formatting, and formattable data frames are printed with multiple types of formatting in HTML to improve the readability of data presented in tabular form rendered in web pages.",
+      "Depends": [
+        "R (> 3.0.2)"
+      ],
+      "Date": "2021-01-05",
+      "Imports": [
+        "methods",
+        "htmltools",
+        "htmlwidgets",
+        "knitr",
+        "rmarkdown"
+      ],
+      "License": "MIT + file LICENSE",
+      "LazyData": "true",
+      "URL": "https://renkun-ken.github.io/formattable/, https://github.com/renkun-ken/formattable",
+      "BugReports": "https://github.com/renkun-ken/formattable/issues",
+      "ByteCompile": "TRUE",
+      "Suggests": [
+        "testthat",
+        "DT",
+        "shiny",
+        "covr"
+      ],
+      "RoxygenNote": "7.1.1",
+      "VignetteBuilder": "knitr",
+      "Encoding": "UTF-8",
+      "NeedsCompilation": "no",
+      "Author": "Kun Ren [aut, cre], Kenton Russell [aut]",
+      "Maintainer": "Kun Ren <ken@renkun.me>",
       "Repository": "CRAN"
     },
     "fs": {
