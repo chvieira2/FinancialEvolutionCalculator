@@ -2,35 +2,25 @@ scenario1Content <- function(is_mobile) {
 
   couple_name <- "Gene and Jean"
 
-  main_scenario <- safelyLoadConfig(file.path("config", "templates", "inputs_low_wage_family_rent.yaml"))
-
-  # Dynamically create variables from the inputs
-  lapply(main_scenario, function(section) {
-    if (is.null(section$inputs) && length(section) > 0) section <- section[[1]] # For properties
-    lapply(section$inputs, function(input) {
-      assign(input$id, input$value, envir = .GlobalEnv)
-    }
-    )
-  })
-
-  landlord_scenario <- safelyLoadConfig(file.path("config", "templates", "inputs_low_wage_family_landlord.yaml"))
-  lapply(landlord_scenario, function(section) {
-    if (is.null(section$inputs) && length(section) > 0) section <- section[[1]] # For properties
-    lapply(section$inputs, function(input) {
-      assign(paste0("landlord_", input$id), input$value, envir = .GlobalEnv)
-    }
-    )
-  })
+  main_scenario <- safelyLoadConfig(file.path("config", "templates", "inputs_high_wage_family_homeowner.yaml"))
 
   # Generate the figures for this scenario
-  for (scenario in c("rent",
-                     "rent_higher_salary", "rent_lower_rent",
-                     "homeowner", "landlord")) {
-    scenario_name <- paste0("low_wage_family_", scenario)
+  for (scenario in c("rent", "homeowner", "landlord")) {
+    scenario_name <- paste0("high_wage_family_", scenario)
     config <- safelyLoadConfig(file.path("config", "templates",
                                          paste0("inputs_", scenario_name, ".yaml")))
     plot_data <- read.csv(file.path("article",
                                     paste0("calculations_", scenario_name, ".csv")))
+
+    # Dynamically create variables from the inputs
+    lapply(config, function(section) {
+      if (is.null(section$inputs) && length(section) > 0) section <- section[[1]] # For properties
+      lapply(section$inputs, function(input) {
+        assign(paste0(scenario, "_", input$id), input$value, envir = .GlobalEnv)
+      }
+      )
+    })
+
     assign(paste0("calculations_", scenario_name),
            plot_data)
 
@@ -81,7 +71,7 @@ scenario1Content <- function(is_mobile) {
   div(
     style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "padding-left: 15px",
 
-    h2(paste0(couple_name, ", the poverty trap")),
+    h2(paste0(couple_name, ", low income earners")),
     p(em(paste0(couple_name, " are a 30-years old poor family in Germany. Hard-working class, working jobs with low education requirements, forced to live away from city centres due to high living costs and the housing market."))),
 
     h3("Financial Goals"),

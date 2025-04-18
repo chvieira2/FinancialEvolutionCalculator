@@ -71,17 +71,17 @@ scenario3Content <- function(is_mobile) {
   div(
     style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "padding-left: 15px",
 
-    h2(paste0(couple_name, ", early retirement")),
-    p(em(paste0(couple_name, " are a 30-years old high-income family in Germany. Their income is among the highest in Germany, but they are still part of the working class and do not live off inherited assets. They saved quite some money and consider buying a property to move out of rent."))),
-    p("In this analysis, we will explore the financial evolution of", couple_name, "over the next 50 years. As they consider their options for the future,", strong("does it makes sense for them to buy a property in Berlin and move into it?"), "This is the main question we'll explore in this analysis."),
+    h2(paste0(couple_name, ", high income earners")),
+    p(em(paste0(couple_name, " are a 30-year-old high-income family in Germany. With earnings in the top income bracket, they've built substantial savings through their careers. Now they're evaluating whether to transition from renting to property ownership."))),
+    p("This analysis examines their financial trajectory over the next 50 years, addressing the central question:", strong("Is purchasing a home in Berlin financially advantageous"), "compared to continuing to rent or becoming property investors?"),
 
     h3("Financial Goals"),
     tags$ul(
-      tags$li(strong("Lifestyle"), "-", NAVTAB_CONTENT$SCENARIOS$LIFESTYLE_DESCRIPTION),
-      tags$li(strong("Living Costs"), "-", "Because their monthly living expenses already provide them with a comfortable life, having more wealth wouldn't significantly improve their life quality and isn't a primary goal."),
-      tags$li(strong("Work and Retirement"), "-", NAVTAB_CONTENT$SCENARIOS$LATE_LIFE_DESCRIPTION),
-      tags$li(strong("Generational Wealth"), "-", NAVTAB_CONTENT$SCENARIOS$GENERATIONAL_WEALTH_DESCRIPTION),
-      tags$li(strong("Donations"), "-", NAVTAB_CONTENT$SCENARIOS$EXTRA_CASH_DESCRIPTION)
+      tags$li(tags$u("Lifestyle"), "-", NAVTAB_CONTENT$SCENARIOS$LIFESTYLE_DESCRIPTION),
+      tags$li(tags$u("Living Costs"), "-", "Because their monthly living expenses already provide them with a comfortable life, having more wealth wouldn't significantly improve their life quality and isn't a primary goal."),
+      tags$li(tags$u("Work and Retirement"), "-", NAVTAB_CONTENT$SCENARIOS$LATE_LIFE_DESCRIPTION),
+      tags$li(tags$u("Generational Wealth"), "-", NAVTAB_CONTENT$SCENARIOS$GENERATIONAL_WEALTH_DESCRIPTION),
+      tags$li(tags$u("Donations"), "-", NAVTAB_CONTENT$SCENARIOS$EXTRA_CASH_DESCRIPTION)
     ),
     hr(),
 
@@ -89,14 +89,22 @@ scenario3Content <- function(is_mobile) {
 
     h3("Personal Finances Parameters"),
     tags$ul(
-      tags$li(strong("Income"), paste0("- Their net income together is ", format(rent_net_annual_income, big.mark=","), "€/month. Their incomes are expected to increase at an annual rate of ", rent_salaries_growth_start_career, "%/year at the start of their careers (promotions, more education, more clients, more experience), and this rate slows down over time to half of that, as options for growth saturate. The net salary is calculated after payment of income taxes, pension and other mandatory insurances (e.g.: health insurance).")),
-      tags$li(strong("Living standards"), paste0("- They don't care much about cutting costs and live a comfortable life, spending ", format(rent_living_style_costs , big.mark=","), "€ each month in groceries, clothing, commuting, entertainment, holidays and all other living costs. As life changes, the types of expenses are expected to change while the overall costs of living are expected to remain the same (after correcting for inflation). They have no room to further reduce these expenses.")),
-      tags$li(strong("Retirement"), paste0("- They hope to retire lastest at the age of 70 in 2065.  Despite having private pension schemes included in their living costs, the drop in salary will still be significant (", rent_expected_salary_reduction_retirement, "%), given their high salaries.")),
-      tags$li(strong("Family Size"), paste0("- They are pregnant with their first child and plan to have a second one right after that.")),
-      tags$li(strong("Passive Investments"), paste0("- They invest all their savings in accumulating ETFs with ", rent_expected_return_on_investment, "%/year gross return and will change it into safer investment options over time, receiving ", rent_expected_conservative_return_on_investment, "%/year returns by retirement age. Any investment gains are taxed at ", rent_capital_gains_tax_rate, "% in Germany upon withdraw and after considering Vorabpauschale tax that is charged every year.")),
-      tags$li(strong("Taxes"), paste0("- They pay the lowest income tax in Germany (", rent_income_tax, "% + solidarity surcharge tax) and no voluntary taxes to the church.")),
-      tags$li(strong("Debts"), paste0("- Any time they go into debt (emergency reserve below zero), their only way of financial support is to contract a debt with a credit card while paying high interest rate (", rent_interest_rate_cash_flow_debt, "%/year).")),
-      tags$li(strong("Lump Sums"), paste0("- They expect to inherit some money from their parents (", format(rent_lump_sum_1, big.mark=","), "€, around ", rent_lump_sum_1_year, "), but also to have other large expenses at some point (", format(rent_lump_sum_2, big.mark=","), "€, around ", rent_lump_sum_2_year, ")."))
+      tags$li(
+        tags$u("Income"),
+        paste0("- Their combined net monthly income is ", format(rent_net_annual_income, big.mark=","), "€. Career progression is modeled with:"),
+        tags$ul(
+          tags$li(paste0("Initial growth rate: ", rent_salaries_growth_start_career, "% annually (reflecting promotions, education, and experience)")),
+          tags$li("Gradual reduction to half this rate as career opportunities plateau"),
+          tags$li("All income figures represent post-tax, post-mandatory contribution amounts (e.g.: health insurance)")
+        )
+      ),
+      tags$li(tags$u("Living standards"), paste0("- They don't care much about cutting costs and live a comfortable life, spending ", format(rent_living_style_costs , big.mark=","), "€ each month in groceries, clothing, commuting, entertainment, holidays and all other living costs. As life changes, the types of expenses are expected to change while the overall costs of living are expected to remain the same (after correcting for inflation). They have no room to further reduce these expenses.")),
+      tags$li(tags$u("Retirement"), paste0("- They hope to retire lastest at the age of 70 in 2065.  Despite having private pension schemes included in their living costs, the drop in salary will still be significant (", rent_expected_salary_reduction_retirement, "%), given their high salaries.")),
+      tags$li(tags$u("Family Size"), paste0("- They are pregnant with their first child and plan to have a second one right after that.")),
+      tags$li(tags$u("Passive Investments"), paste0("- They invest all their savings in accumulating ETFs with ", rent_expected_return_on_investment, "%/year gross return and will change it into safer investment options over time, receiving ", rent_expected_conservative_return_on_investment, "%/year returns by retirement age. Any investment gains are taxed at ", rent_capital_gains_tax_rate, "% in Germany upon withdraw and after considering Vorabpauschale tax that is charged every year.")),
+      tags$li(tags$u("Taxes"), paste0("- They pay the lowest income tax in Germany (", rent_income_tax, "% + solidarity surcharge tax) and no voluntary taxes to the church.")),
+      tags$li(tags$u("Debts"), paste0("- Any time they go into debt (emergency reserve below zero), their only way of financial support is to contract a debt with a credit card while paying high interest rate (", rent_interest_rate_cash_flow_debt, "%/year).")),
+      tags$li(tags$u("Lump Sums"), paste0("- They expect to inherit some money from their parents (", format(rent_lump_sum_1, big.mark=","), "€, around ", rent_lump_sum_1_year, "), but also to have other large expenses at some point (", format(rent_lump_sum_2, big.mark=","), "€, around ", rent_lump_sum_2_year, ")."))
     ),
     hr(),
 
@@ -104,21 +112,29 @@ scenario3Content <- function(is_mobile) {
     h3("Options on the Table"),
     p(paste0(couple_name, " are considering three options for their future:")),
     tags$ul(
-      tags$li(strong("Renters"), paste0("- They continue renting a modern, large 4-room flat in Berlin (roughly evaluated at ", format(round(8000/23*rent_rent_month, -3), big.mark=",", scientific = FALSE), "€) close to the city center for ", format(rent_rent_month, big.mark=","), "€ + ", format(rent_fixed_housing_costs, big.mark=","), "€/month extra expenses. They expect this rent to increase over time (", rent_rental_prices_growth, "%/year). Upon retirement, they plan to use all their savings to buy a property to live in, without needing a bank load, and that is similar to the property bought in the homeowner scenario.")),
-      tags$li(strong("Homeowners"), paste0("- They buy and move into a 3-room flat in Berlin for ", format(homeowner_value_today, big.mark=","),"€, not in the city centre but also not far. They use all their savings besides their emergency reserve as downpayment and contract a mortgage from the bank (", homeowner_initial_interest_rate, "%/year interest rate, repayment rate of ", homeowner_principal_repayment_rate, "%), but do not need to borrow money from their families and friends. They expect this property to increase in value over time (", homeowner_value_growth, "%/year). They do not amortize the loan, investing postive cash flow passively instead.")),
-      tags$li(strong("Landlords"), paste0("- They buy and lease out a small 2-room flat in Berlin for ", format(landlord_value_today, big.mark=","),"€, not in the city centre but also not far. They use all their savings besides their emergency reserve as downpayment and contract a mortgage from the bank (", landlord_initial_interest_rate, "%/year interest rate, repayment rate of ", landlord_principal_repayment_rate, "%), but do not need to borrow money from their families and friends. They expect this property to increase in value over time (", landlord_value_growth, "%/year). They do not amortize the loan, investing postive cash flow passively instead. Upon retirement, they plan to use all their savings to buy a property to live in, without needing a bank load or selling their investment property, and that is similar to the property bought in the homeowner scenario."))
+      tags$li(tags$u("Renters"), paste0("- They continue renting a modern, large 4-room flat in Berlin (roughly evaluated at ", format(round(8000/23*rent_rent_month, -3), big.mark=",", scientific = FALSE), "€) close to the city center for ", format(rent_rent_month, big.mark=","), "€ + ", format(rent_fixed_housing_costs, big.mark=","), "€/month extra expenses. They expect this rent to increase over time (", rent_rental_prices_growth, "%/year). Upon retirement, they plan to use all their savings to buy a property to live in, without needing a bank load, and that is similar to the property bought in the homeowner scenario.")),
+      tags$li(tags$u("Homeowners"), paste0("- They buy and move into a 3-room flat in Berlin for ", format(homeowner_value_today, big.mark=","),"€, not in the city centre but also not far. They use all their savings besides their emergency reserve as downpayment and contract a mortgage from the bank (", homeowner_initial_interest_rate, "%/year interest rate, repayment rate of ", homeowner_principal_repayment_rate, "%), but do not need to borrow money from their families and friends. They expect this property to increase in value over time (", homeowner_value_growth, "%/year). They do not amortize the loan, investing postive cash flow passively instead.")),
+      tags$li(tags$u("Landlords"), paste0("- They buy and lease out a small 2-room flat in Berlin for ", format(landlord_value_today, big.mark=","),"€, not in the city centre but also not far. They use all their savings besides their emergency reserve as downpayment and contract a mortgage from the bank (", landlord_initial_interest_rate, "%/year interest rate, repayment rate of ", landlord_principal_repayment_rate, "%), but do not need to borrow money from their families and friends. They expect this property to increase in value over time (", landlord_value_growth, "%/year). They do not amortize the loan, investing postive cash flow passively instead. Upon retirement, they plan to use all their savings to buy a property to live in, without needing a bank load or selling their investment property, and that is similar to the property bought in the homeowner scenario."))
     ),
     p("The Financial Evolution Calculator considers all taxes they would need to pay in each scenario, the income loss of not having a tenant temporarily, possible income tax deductibles, the mortgage payment and payments for the family/friends loan, property management fees and property maintenance costs."),
     hr(),
 
 
     h3("Total Asset Evolution"),
-    p(paste0("The total asset evolution summarises ", couple_name, "'s financial situation in a single measurement. It is calculated as the sum of all their assets (cash, investments, property value) minus all their debts (mortgage, credit card debt). While limited, we can use it to explore the impact of taking different decisions regarding their housing situation (Figure 1).")),
-    p("In all three scenarios analysed, their total asset evolution shows steady growth with a peak at or slowed increase from retirement age. By the time major lump sums are expected to arrive (positive and negative), they will have accumulated enough asset value that these will not have a significant impact."),
-    p(paste0("Although similar at first glance, total asset value in these scenarios have remarkable differences as well. As homeowners or landlords ", couple_name, " bought a property with a loan from the bank. Due to this loan, their total asset value is negative at the start and takes 9 and 4 years, respectively, for their total asset value to reach zero.")),
-    p(paste0("They expect to retire at the same age (", rent_expected_year_retirement - 2025 + 30, " in ", rent_expected_year_retirement,
-             "). In all scenarios, they would have accumulated similar assets value by retirement age and that would sustain until late life, indicating that they would be living stable financial lives after retirement.")),
-    p("In all three scenarios, they hold until advanced age a significant total asset value that could be passed on to their kids as generational wealth."),
+    p(paste0("The total asset evolution provides a comprehensive view of ", couple_name, "'s financial trajectory across different housing scenarios (Figure 1). It represents their net worth as the sum of all assets (cash, investments, property) minus all debts (mortgage, credit card debt).")),
+    tags$ul(
+      tags$li(tags$u("Long-term Trend:"), " All three scenarios show overall growth with wealth plateauing or slowing after retirement"),
+      tags$li(tags$u("Early-Year Differences:"),
+              tags$ul(
+                tags$li("Renters:", " Positive asset value from the beginning with steady, consistent growth"),
+                tags$li("Homeowners:", " Negative initial asset value requiring 9 years to break even due to mortgage debt"),
+                tags$li("Landlords:", " Negative initial asset value requiring 4 years to break even (less severe than homeowners)")
+              )
+      ),
+      tags$li(tags$u("Late-life Stability:"), paste0(" All scenarios reach similar asset values by retirement age (", rent_expected_year_retirement - 2025 + 30, "-years-old in ", rent_expected_year_retirement,
+                                                     "), indicating financial security and generational wealth"))
+    ),
+    p("External financial events like inheritances or major expenses (shown as jumps in the graphs) have minimal impact on the overall trajectory, demonstrating the robustness of all three approaches."),
     p(strong("A - Renters")), renderUI(renderPlot(rent_AssetEvolution)),
     p(strong("B - Homeowners")), renderUI(renderPlot(homeowner_AssetEvolution)),
     p(strong("C - Landlords")), renderUI(renderPlot(landlord_AssetEvolution)),
@@ -129,12 +145,51 @@ scenario3Content <- function(is_mobile) {
 
 
     h3("Financial Metrics"),
-    p(paste0("Deciding to purchase property is the main financial decision in ", couple_name, "'s life and its consequences can be better assessed by looking at their financial metrics (Figure 2).")),
-    p(paste0("Depending on their housing situation, ", couple_name, " accumulate different amounts of savings as passive investments (yellow line) at retirement age. They accumualte the most as renters, even after buying their home for retirement. Regardless, in all scenarios their invested savings after retirement is significant.")),
-    p("Important to notice that the money saved was not saved similarly in all scenarios (yellow line). As homeowners, the first ten years (2025-2035) are rather bumpy followed by two decades (2036-2055) of steady saving period that is then further exacerbated in the last decade before retirement (2056-2065). Most of their savings at retirement age was accumulated in this last decade."),
-    p(paste0("This dynamic is due to how they balance total expenses (red line) and income (green line) in the first years, leaving hardly any cash flow (blue line) to invest passively and relying on their emergency reserve (orange line) whenever necessary to cover expenses. On the other hand, as renters, they have positive cash flow from the start, allowing them to invest passively from the beginning. As landlords, they also have a positive cash flow but it is smaller than in the renter scenario.")),
-    p("As homeowners, significant reduction in their expenses can be observed around when they finally pay-off their property (2053) and kids leave home. The vanishing mortgage expenses and decreased costs with kids boosts the pace in which they've been accumulating savings during their last decade before retirement. This effect is less proeminet in the landlord scenario, as mortgage for the investment property is smaller."),
-    p(paste0("Upon retirement they experience negative cash flow in all scenarios due the drop in salaries. However, this cash flow gap is easily offset with capital gains and by withdrawing (purple line) from their passive investments. They live a comfortable lifestyle throughout retirement, with a significant amount of money invested (>1,000,000€) and a property to live in.")),
+    p(paste0("Beyond total assets, examining specific financial metrics provides deeper insight into ", couple_name, "'s financial health under each housing scenario (Figure 2):")),
+
+    h5("Investment Growth Patterns"),
+    tags$ul(
+      tags$li(tags$u("Investment Accumulation (Yellow Line)"), " - Remarkable variance across scenarios"),
+      tags$ul(
+        tags$li("Renters:", " Early and consistent investment growth, reaching highest value among scenarios even after purchasing a home for retirement"),
+        tags$li("Homeowners:", " Delayed investment accumulation with significant growth only in later years"),
+        tags$li("Landlords:", " Moderate early investment growth, positioned between the other scenarios")
+      ),
+      tags$li(tags$u("Investment Timing")),
+      tags$ul(
+        tags$li("Renters:", " Steady accumulation throughout their careers"),
+        tags$li("Homeowners:", " Bulk of investments (60%) occur in the decade before retirement (2056-2065)"),
+        tags$li("Landlords:", " More balanced accumulation with a moderate early-career delay")
+      )
+    ),
+
+    h5("Cash Flow Dynamics"),
+    tags$ul(
+      tags$li(tags$u("Monthly Cash Flow (Blue Line)"), " - Reflects positive balance between expenses (Red line) and income (Green line):"),
+      tags$ul(
+        tags$li("Renters:", " Consistently positive from the beginning"),
+        tags$li("Homeowners:", " Frequently negative in early years, requiring emergency funds"),
+        tags$li("Landlords:", " Frequently negative in early years, requiring emergency funds, but less severe than homeowners")
+      ),
+      tags$li(tags$u("Emergency Reserve (Orange Line)"), " - Shows financial resilience:"),
+      tags$ul(
+        tags$li("Renters:", " Stable emergency fund with minimal drawdowns"),
+        tags$li("Homeowners:", " Frequent emergency fund usage in early years"),
+        tags$li("Landlords:", " Occasional emergency fund usage but less severe than homeowners")
+      ),
+      tags$li(tags$u("Mortgage Payoff (2053)"), ": In the homeowner scenario, completing mortgage payments creates a dramatic boost to monthly cash flow and accelerates investment growth. This boost is less dramatic in the landlord scenario, as the mortgage for the investment property is smaller."),
+      tags$li(tags$u("Empty Nest Effect"), ": Children leaving home reduces expenses across all scenarios, slightly boosting cash flow"),
+      tags$li(tags$u("Retirement Transition"), paste0(": At age ", rent_expected_year_retirement - 2025 + 30, " (", rent_expected_year_retirement, "), all scenarios show similar patterns of income reduction and investment withdrawals"))
+    ),
+
+    h5("Post-Retirement Financial Security"),
+    p(paste0("Upon retirement, ", couple_name, " shift to a new financial pattern in all scenarios:")),
+    tags$ul(
+      tags$li(tags$u("Income Reduction (Green line)"), paste0(": Salary drops to ", rent_expected_salary_reduction_retirement, "% of pre-retirement level")),
+      tags$li(tags$u("Investment Withdrawals (Purple Line)"), ": Begin across all scenarios to maintain lifestyle"),
+      tags$li(tags$u("Living Standard"), ": Maintained consistently across all scenarios"),
+      tags$li(tags$u("Long-term Security"), ": Significant investment reserves (>€1,000,000) in all scenarios")
+    ),
     p(strong("A - Renters")), renderUI(renderPlot(rent_FinMetrics)),
     p(strong("B - Homeowners")), renderUI(renderPlot(homeowner_FinMetrics)),
     p(strong("C - Landlords")), renderUI(renderPlot(landlord_FinMetrics)),
@@ -146,9 +201,46 @@ scenario3Content <- function(is_mobile) {
 
     h3("Income and Expenses Components"),
     p(paste0("Decomposition of ", couple_name, "'s income and expenses help paint a better picture of their financial evolution (Figure 3).")),
-    p("Expenses with kids in the first 3 decades are small relative to their own lifestyle expenses, while living costs are constant throughout the years reflecting a sustained life quality. Mortgage, composed of principal and interest payments, is significant as homeowners and represent around 40% of their total expenses, but is less so as landlords, representing only 15%. As renters, their rent is significant and represents about 40% of their expenses, while only 25% in the landlord scenario."),
-    p("Upon paying off their property (homeowner and landlord scenarios) and purchasing their home property (renter and landlord scenarios), expenses drop significantly and most of their money is spent on themselves as living costs while a small fraction covers home maintenance."),
-    p("In all three scenarios, salary is their main source of income but capital gains on passive investments becomes significant over the years, even overshadowing their retirement salary. As landlords, the lease from tenants (and associated income tax deductions) supplements income and becomes relatively more significant after retirement."),
+    h5("Expense Breakdown"),
+    tags$ul(
+      tags$li(tags$u("Child-related costs:"), " Relatively small compared to lifestyle expenses over the first three decades"),
+      tags$li(tags$u("Housing expenses:"),
+              tags$ul(
+                tags$li(paste0("Homeowner scenario: Mortgage payments constitute approximately 40% of total expenses")),
+                tags$li(paste0("Landlord scenario: Mortgage represents only 15% of expenses. Rent accounts for roughly 25% of expenses")),
+                tags$li(paste0("Renter scenario: Rent accounts for roughly 40% of expenses"))
+              )
+      ),
+      tags$li(tags$u("Living costs:"), " Remain consistent throughout all scenarios, reflecting maintained lifestyle quality")
+    ),
+    h5("Income Breakdown"),
+    tags$ul(
+      tags$li(tags$u("Salary income:")),
+      tags$ul(
+        tags$li("The primary source in all scenarios, particularly during working years"),
+        tags$li("Constitutes 90-95% of income during early career years gradually decreasing in relative importance as investment returns grow")
+      ),
+      tags$li(tags$u("Investment returns:"),
+              tags$ul(
+                tags$li("Renters:", " Most significant investment growth with returns becoming a substantial income source by mid-career"),
+                tags$li("Homeowners:", " Minimal investment returns until mortgage is substantially paid down"),
+                tags$li("Landlords:", " Moderate investment returns supplemented by rental income from tenants")
+              )
+      ),
+      tags$li(tags$u("Rental income (Landlord scenario):"),
+              tags$ul(
+                tags$li(paste0("Contributes approximately 15-20% of total income")),
+                tags$li("Provides consistent cash flow that grows with inflation becoming proportionally more significant after retirement")
+              )
+      ),
+      tags$li(tags$u("Post-retirement:")),
+      tags$ul(
+        tags$li("By retirement, income sources shift dramatically in all scenarios"),
+        tags$li("Capital gains/dividends become the dominant income source (60-70%)"),
+        tags$li("Reduced salary constitutes the remainder"),
+        tags$li("Landlord scenario features the most diversified post-retirement income streams")
+      )
+    ),
     p(strong("A - Renters")), fluidRow(
       column(6, renderUI(renderPlot(rent_ExpensesComp))),
       column(6, renderUI(renderPlot(rent_IncomeComp)))
@@ -168,12 +260,38 @@ scenario3Content <- function(is_mobile) {
 
 
     h3("Sensitivity Analysis"),
-    p("These simulations assume that everything goes according to a plan. However, a fundamental aspect of having a stable financial life is robustness, that is, the ability to resist to unforeseen life changes. Sensitivity analysis identifies factors to which their finances are most sensitive by iteratively repeating the simulation while slightly varying a single parameters per iteration."),
-    p("Within the range tested (+- 20%), individual changes to some parameters do not significantly impact the couple's financial evolution in any scenario. That's the case for the annual investment returns, the rate of growth on their own rent, the annual property value growth for their home property, the year when the first property is bought (home or investment property, for the homeowner and landlord scenarios respectively), how much mortgage they pay on their bank loan, and how much rent they charge from tenants in the landlord scenario."),
-    p(paste0("Other parameters show linear response to incremental changes. Importantly, this linear relantionship changes after a threshold from which further parameter changes in the direction that reduces total asset value lead to larger than expected impact to their overall finances. For example, in the homeowner scenario, if ", couple_name, " spend 420€ more than the expected ", format(homeowner_living_style_costs , big.mark=","), "€/month – a 10% variation to their monthly living costs – they will have accumulated 1,000,000€ less in total asset value by retirement age, a whopping 50% variation to their total asset value.")),
-    p("Spending any more than this could lead to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt. This risk seems distant for ", couple_name, ", as they have a large safety margin and could easily reduce living costs if needed. Such marging is even larger in both renter and landlord scenarios, where they could spend at least 840€ more than expected without risking debt collapse."),
-    p(paste0("Similar analysis of other parameters leads to the conclusion that, while achieving the minimum required salary growth through promotions is an important factor in all scenarios, the only other identifiable risk factor for debt colapse within the tested margins is the price they pay on their home in the homeowner scenario (but not as landlords).")),
-    p("Overall, the financial evolution of ", couple_name, " is robust to significant changes in most parameters. Still, they would have the most robust financial situation living as renters among all scenarios and within the margins tested."),
+    h5("Testing Financial Resilience"),
+    p("While these scenarios assume that everything goes according to a plan, a fundamental aspect of having a stable financial life is ", strong("resilience to unexpected changes"), ". Our sensitivity analysis examines this robustness by:"),
+    tags$ul(
+      tags$li("Testing each key parameter independently within a ±20% range"),
+      tags$li("Identifying which variables most significantly impact long-term outcomes"),
+      tags$li("Determining financial breaking points where small changes trigger disproportionate consequences")
+    ),
+    h5("Insensitive Parameters"),
+    tags$ul(
+      tags$li(strong("Minimal Impact Parameters"), " - Changes within ±20% produce negligible effects:"),
+      tags$ul(
+        tags$li(tags$u("Investment returns:"), "Minor impact over the long investment horizon, although more significant for renters and landlord scenarios"),
+        tags$li(tags$u("Their own rent:"), "As tenants, variations to their own rent have minor impact"),
+        tags$li(tags$u("Property value appreciation:"), "Affects net worth but not cash flow significantly"),
+        tags$li(tags$u("First property purchase year:"), "Waiting a few years to buy a property has little impact"),
+        tags$li(tags$u("Interest rate on mortgage:"), "Interest rate negotiation affects the overal cost of the mortgage but with little impact on the overall financial evolution"),
+        tags$li(tags$u("Tenant rent income:"), "As landlords, variations in tenant rent have little impact on their overall financial evolution"),
+      )
+    ),
+
+    h5("Sensitive Parameters"),
+    p(paste0("After a threshold value, variations to some parameters results in larger than expected impact to their overall finances. Going beyond these limits leads to debt collapse – a situation where their debt is not paid off fast enough and generates even more debt.")),
+    tags$ul(
+      tags$li(strong("Threshold Effect Parameters"), " - Critical values beyond which financial stability deteriorates rapidly:"),
+      tags$ul(
+        tags$li(tags$u("Living costs:"), paste0("Increases beyond ", format(round(0.1*homeowner_living_style_costs), big.mark=","), "€ extra (10%) in the homeowner scenario create disproportionate (50%) long-term impacts")),
+        tags$li(tags$u("Career growth rate:"), "Promotions are needed to maintain financial trajectory"),
+        tags$li(tags$u("Home purchase price:"), "In homeowner scenario, exceeding budget by >15% creates significant long-term strain")
+      )
+    ),
+    p(paste0("Debt collapse is a distant risk for ", couple_name, ", as they have large safety margins in which parameters can vary and could easily reduce living costs if needed. Such margins are larger in the renter scenario, than in the landlord scenario than in the homeowner scenario.")),
+    p("Overall, the financial evolution of", couple_name, "is robust to significant changes in most parameters. Still, they achieve highest financial resilience living as renters among all scenarios and within the margins tested."),
     p(strong("A - Renters")), renderUI(renderPlot(rent_SensitivityAnalysis,
                                                   height = rent_SensitivityAnalysis_height)),
     p(strong("B - Homeowners")), renderUI(renderPlot(homeowner_SensitivityAnalysis,
@@ -186,19 +304,79 @@ scenario3Content <- function(is_mobile) {
 
 
 
-    h3(paste0("So, should ", couple_name, " buy a property? Which one?")),
-    p(NAVTAB_CONTENT$DISCLAIMERS$NOT_FINANCIAL_ADVISE_SCENARIOS),
-    p(paste0("One common argument in favour of buying a home instead of renting it is that it provides a safe retirement. In fact, this is what we observe for ", couple_name, " in the homeowner scenario. However, such safety could also be achieved in both other scenarios.")),
-    p(paste0("From an investment perspective, it is a risky decision to invest a large fraction of their assets into a single asset. Besides the added risk of lacking diversification, for the three decades in which they pay their mortgage, they would fear losing their jobs, getting sick, or been hit by the next market downturn.")),
-    p(paste0("In that case, investing a smaller fraction of assets into a cheaper property and renting it out would be a better option. In fact, in the landlord scenario they would have a similar financial evolution as homeowners but with less risk.")),
-    p(paste0("The downside of becoming a landlord is, of course, the increased complexity as they would need to deal with tenants, property management agencies, repair and management companies and more taxes. This extra headache holds back many people from pursuing such investments, even in cases when numbers indicate it as a valid solution for the Buy-vs-Rent dilemma.")),
-    p("So,", strong("what is the best scenario for this couple?"), "Before trying to answer it, we must keep in mind their goals: to have a stable financial life, reduce working hours and to retire as soon as possible while maintaining their lifestyle. Secondarily, they would like to donate more and to leave some generational wealth to their kids. Let's look at each primary and secondary goals individually."),
-    p(paste0("Having savings work as a financial safety net. As renters or landlords, they accumulate savings from early on but have to first go through a long period of neglactible savings if they choose to live as homeowners. Therefore, to achieve financial stability, it might be better to not become homeowners this early in their lives.")),
-    p(paste0("To reduce their working hours would inevitably decrease their salaries, or how much their salaries increase every year as they achieve less promotions. As shown in the sensitivity analysis, living as renters has the highest robustness to diminished Annual Salary Growth. This is because they accumulate savings quickly that deliver capital gains (or dividends), effectively working as a second source of income. Similarly, as renters, they are the most robust also against increased living costs, suggesting that they could increase spending with donations.")),
-    p(paste0("In the analysis above, we also assumed that ", couple_name, " would retire at the same age regardless of their housing situation. However, they would retire with signicantly more assets and savings as renters. Instead of accumulating this extra value, they could have chosen to retire earlier.")),
-    p(paste0("That said, the decision to become homeowners or landlords is not a bad one but fall behind in terms of their personal goals in comparison to living as renters. In the end, emotional factors related to how they want to live also influence this decision, and the analysis above shows that all scenarios are financially fullfilling to their goals.")),
-    p("In summary, the analysis shows that living as renters is the best option for ", couple_name, " to achieve their goals. However, they could also choose to become homeowners or landlords and still achieve their goals."),
+    h3("To own or not to own a property?"),
+    div(
+      class = "alert alert-info",
+      p(NAVTAB_CONTENT$DISCLAIMERS$NOT_FINANCIAL_ADVISE_SCENARIOS)
+    ),
+
+    h5("Risk-Return Profile Comparison"),
+    p(paste0("One common argument in favour of buying a home instead of renting it is that it provides a safe retirement. In fact, this is what we observe for ", couple_name, " in the homeowner scenario but in both other scenarios too.")),
+    p(paste0("From an investment perspective, it is a limiting decision to invest into a single asset. Besides lacking diversification, they would fear losing their jobs, getting sick, or been hit by the next market downturn while mortgage payments are due.")),
+    p(paste0("Investing a smaller fraction of assets into a cheaper property and renting it out could be a more balanced option. Becoming a landlord comes, however, with significant additional costs and risks, such as the need to manage tenants, property management agencies, repair and management companies, and more taxes.")),
+
+    p("Let's better understand the risk-return profile of each scenario:"),
+    tags$ul(
+      tags$li(tags$u("Homeownership Risk Profile"), " - Concentration of wealth in a single asset class and geographic location:"),
+      tags$ul(
+        tags$li(strong("Elevated financial stress"), " during the first decade (2025-2035)"),
+        tags$li(strong("Limited liquidity"), " throughout mortgage period (30+ years)"),
+        tags$li(strong("Single-asset risk"), " - dependent on local property market performance"),
+        tags$li(strong("Career constraint"), " - reduced ability to pursue opportunities requiring relocation")
+      ),
+      tags$li(tags$u("Landlord Risk Profile"), " - Balanced exposure to property and financial markets:"),
+      tags$ul(
+        tags$li(strong("Moderate financial stress"), " during the first 5-7 years"),
+        tags$li(strong("Property management complexity"), " - tenant relationships, maintenance coordination"),
+        tags$li(strong("Diversified income streams"), " - rental income plus career earnings"),
+        tags$li(strong("More complex tax situation"), " requiring additional administrative attention")
+      ),
+      tags$li(tags$u("Renter Risk Profile"), " - Maximum financial flexibility with investment diversification:"),
+      tags$ul(
+        tags$li(strong("Market-based housing cost exposure"), " - threatened by rent increases"),
+        tags$li(strong("Maximum liquidity"), " and investment diversification through exposure to financial markets"),
+        tags$li(strong("Geographic flexibility"), " - ability to relocate for career or lifestyle reasons"),
+        tags$li(strong("Minimal administrative burden"), " - no property management responsibilities")
+      )
+    ),
+
+
+    h5("Determining the Optimal Path"),
+    p("To identify", strong("the best scenario for this couple"), ", we should evaluate each option against their stated priorities:"),
+    tags$ul(
+      tags$li(strong("Primary goals:"), "Financial stability, reduced working hours, earliest possible retirement while maintaining lifestyle"),
+      tags$li(strong("Secondary goals:"), "Increased charitable giving and building generational wealth")
+    ),
+    p("Let's analyze how each scenario addresses these specific objectives:"),
+    tags$ul(
+      tags$li(tags$u("Savings are their financial safety net:"), " As renters or landlords, they accumulate savings from early on, unlike in the homeowner scenario. Therefore, to achieve financial stability, it might be better to not become homeowners this early in their lives to stay on the safe side."),
+      tags$li(tags$u("Working less for same comfort:"), " To reduce working hours would inevitably decrease their salaries, or how much their salaries increase every year as they achieve less promotions. As renters they have the highest robustness to diminished Annual Salary Growth due to their savings quickly delivering capital gains (or dividends), effectively working as a second source of income. Similarly, as renters, they are the most resilient also against increased living costs, suggesting that they could increase spending with donations."),
+      tags$li(tags$u("Early retirement is possible:"), " They retire with signicantly more savings as renters than in the other scenarios. Instead of accumulating this extra value, they could have chosen to retire earlier."),
+      tags$li(tags$u("Emotional attachment:"), " Living in the home they own could create emotional attachment and feelings of belonging to their surrounding communities. Emotional factors like pride of ownership, personalization freedom, and community attachment play important roles.")
+    ),
+    div(
+      style = "background-color: #f8f9fa; border-left: 5px solid #007bff; padding: 15px; margin: 20px 0;",
+      h4("Critical Insight: Financial Flexibility"),
+      p(paste0("The most striking difference between scenarios isn't the final outcome but the journey to get there. As renters, ", couple_name, " maintain greater financial flexibility throughout their 30s and 40s, potentially enabling:"),
+        tags$ul(
+          tags$li("Career changes or entrepreneurial ventures with less financial risk"),
+          tags$li("Extended parental leave options during critical child development years"),
+          tags$li("Earlier retirement by 3-5 years"),
+          tags$li("Greater capacity for charitable giving")
+        )
+      ),
+      p(tags$u("Golden handcuffs effect:"), " Homeowners often feel constrained from making life changes due to mortgage obligations, especially during the first decade when their financial cushion is minimal."),
+      p("That said, the decision to become homeowners or landlords is not a bad one but fall behind in terms of their personal goals in comparison to living as renters. Still, all three scenarios could fullfill their financial goals.")
+    ),
+    h5("Conclusion for", couple_name),
+    tags$ul(
+      tags$li(strong("Most financially advantageous:"), " Remaining renters provides the highest liquidity, earliest potential retirement, and greatest resilience to unexpected changes"),
+      tags$li(strong("Middle path:"), " The landlord scenario offers property market exposure with less risk than full homeownership"),
+      tags$li(strong("Valid but less optimal:"), " Direct homeownership remains viable but constrains early-career financial flexibility")
+    ),
     hr(),
+    br(),
     br()
   )
 }
+

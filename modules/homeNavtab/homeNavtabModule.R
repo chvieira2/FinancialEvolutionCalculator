@@ -42,9 +42,9 @@ homeNavigationModuleServer <- function(id, is_mobile) {
       list(
         "Welcome" = structure("welcome_page", stopened = TRUE),
         "Calculator Parameters" = structure("parameters_page", stopened = TRUE),
-        "Scenario 1: the poverty trap" = structure("scenario_1", stopened = TRUE),
-        "Scenario 2: home-poor lifestyle" = structure("scenario_2", stopened = TRUE),
-        "Scenario 3: early retirement" = structure("scenario_3", stopened = TRUE),
+        "Scenario 1: Gene and Jean" = structure("scenario_1", stopened = TRUE),
+        "Scenario 2: Alex and Max" = structure("scenario_2", stopened = TRUE),
+        "Scenario 3: Jack and Beck" = structure("scenario_3", stopened = TRUE),
         "About" = structure("about_page", stopened = TRUE)
       )
     })
@@ -56,9 +56,9 @@ homeNavigationModuleServer <- function(id, is_mobile) {
       label_to_handle <- list(
         "Welcome" = "welcome_page",
         "Calculator Parameters" = "parameters_page",
-        "Scenario 1: the poverty trap" = "scenario_1",
-        "Scenario 2: home-poor lifestyle" = "scenario_2",
-        "Scenario 3: early retirement" = "scenario_3",
+        "Scenario 1: Gene and Jean" = "scenario_1",
+        "Scenario 2: Alex and Max" = "scenario_2",
+        "Scenario 3: Jack and Beck" = "scenario_3",
         "About" = "about_page"
       )
 
