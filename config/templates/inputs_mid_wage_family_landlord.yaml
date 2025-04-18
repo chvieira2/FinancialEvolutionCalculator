@@ -417,7 +417,7 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 30
     description: Monthly Hausgeld building insurance cost.
-  id: 957a9d14-1fad-4d72-b098-0094e91ce29f
+  id: 7ca1407b-45d7-401a-8404-1ad11aed53bf
 - name: property2
   type: home
   inputs:
@@ -429,7 +429,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 170000
+    value: 300000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
@@ -516,4 +516,4 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 50
     description: Monthly Hausgeld building insurance cost.
-  id: 4b7f7e51-24ea-4ddc-a884-98cc4be2530f
+  id: dc5c40a0-b67e-49a7-bcb5-505e5eb56ecb

@@ -26,8 +26,8 @@ STACKED_AREA_PLOT_CONFIGS <- list(
     title = "Expense Components Over The Years, inflation-corrected (thousands, €)",
     colors = c(
       # Living Expenses (warm orange/red family)
-      "Living Standard Costs" = "#FF7F50",         # Coral
-      "Kids-related living Costs" = "#E34234",     # Vermilion
+      "Living Costs" = "#FF7F50",         # Coral
+      "Kids-related Costs" = "#E34234",     # Vermilion
 
       # Renting Costs (blue family)
       "Rent" = "#4169E1",                          # Royal Blue
@@ -63,8 +63,8 @@ STACKED_AREA_PLOT_CONFIGS <- list(
       list(id = "rental_cost", label = "Rent"),
 
       # Home Expenses
-      list(id = "living_costs_family", label = "Kids-related living Costs"),
-      list(id = "living_standard_costs", label = "Living Standard Costs")
+      list(id = "living_costs_family", label = "Kids-related Costs"),
+      list(id = "living_standard_costs", label = "Living Costs")
     )
   )
 )
@@ -180,8 +180,22 @@ generateStackedAreaPlot <- function(plot_data, selected_ids = NULL, plot_type, l
       values_to = "Value"
     )
 
+  # Filter out components that have all zero values
+  non_zero_components <- plot_data_long %>%
+    group_by(Component) %>%
+    summarize(has_non_zero = sum(Value, na.rm = TRUE) != 0) %>%
+    filter(has_non_zero) %>%
+    pull(Component)
+
+  # Filter data to include only non-zero components
+  plot_data_long <- plot_data_long %>%
+    filter(Component %in% non_zero_components)
+
+  # Update selected labels to include only non-zero components
+  selected_labels <- selected_labels[selected_ids %in% non_zero_components]
+
   # Create a named vector for the label mapping
-  label_mapping <- setNames(selected_labels, selected_ids)
+  label_mapping <- setNames(selected_labels, selected_ids[selected_ids %in% non_zero_components])
 
   # Add labels to the data
   plot_data_long$ComponentLabel <- factor(
@@ -211,15 +225,16 @@ generateStackedAreaPlot <- function(plot_data, selected_ids = NULL, plot_type, l
         suffix = ""
       )
     ) +
+    guides(fill = guide_legend(ncol = 2)) +
     theme(
       strip.text = element_text(size = 14, face = "bold"),
       legend.position = if(legend_bool) "bottom" else "none",
+      legend.title = element_blank(),
       plot.margin = margin(t = 5, r = 5, b = 5, l = 5),
       axis.text.x = element_text(angle = 90, hjust = 1),
       axis.text = element_text(size = 9)
     )
 }
-
 
 if (sys.nframe() == 0) {
   source(file.path("R", "helper_functions.R"))
@@ -258,5 +273,6 @@ if (sys.nframe() == 0) {
     expenses_output_path <- file.path("article", paste0("ExpensesComp_", scenario, ".tif"))
     ggsave(expenses_output_path, plot = expenses_plot, width = 10, height = 6, dpi = 300)
     message(paste("Expenses plot saved to", expenses_output_path))
+    plot(expenses_plot)
   }
 }

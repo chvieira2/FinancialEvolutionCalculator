@@ -48,7 +48,7 @@ general_life:
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2057
+    value: 2065
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
@@ -417,9 +417,9 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 50
     description: Monthly Hausgeld building insurance cost.
-  id: c9f6640b-996b-4271-b6e0-156cf948260f
+  id: c034f752-10ae-4fc6-bc7f-aa959dfb7564
 - name: property2
-  id: f20d87e3-e0c3-4076-81a3-57f1378eae64
+  id: 5eb4c916-b5b3-457d-9316-613774676b87
   type: home
   inputs:
   - id: value_growth
@@ -435,7 +435,7 @@ properties:
   - id: purchase_year
     type: numericInput
     label: Year property purchase
-    value: 2057
+    value: 2065
     description: Year when the property will be purchased
   - id: sale_year
     type: numericInput

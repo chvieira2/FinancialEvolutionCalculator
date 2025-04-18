@@ -48,7 +48,7 @@ general_life:
   - id: expected_year_retirement
     type: numericInput
     label: Expected year of retirement
-    value: 2052
+    value: 2065
     description: The year you expect to retire.
   - id: expected_salary_reduction_retirement
     type: numericInput
@@ -294,7 +294,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
-  id: b47c5373-c5ac-4ca8-a7d8-147d99c89538
+  id: 0eaab206-1a1e-4d2c-aa02-7ba25e348caf
   type: home
   inputs:
   - id: value_growth
@@ -310,7 +310,7 @@ properties:
   - id: purchase_year
     type: numericInput
     label: Year property purchase
-    value: 2052
+    value: 2065
     description: Year when the property will be purchased
   - id: sale_year
     type: numericInput
