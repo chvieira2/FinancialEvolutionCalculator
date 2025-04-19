@@ -44,7 +44,6 @@ GeneralCalculator <-
                 self$results[self$results$Year == year, "accumulated_vorabpauschale_tax"] <- 0
               }
 
-              private$calculate_housing_cost_growth_inflation_corrected(year)
               private$calculate_housing_cost(year)
 
               return(self$results)
@@ -397,19 +396,6 @@ GeneralCalculator <-
 
             },
 
-            # Calculates the growth rate of housing costs adjusted for inflation.
-            #
-            # Args:
-            #   year: An integer representing the year for which the calculation is performed.
-            #
-            # Returns:
-            #   Updates the results data frame with the inflation-corrected housing cost growth rate.
-            calculate_housing_cost_growth_inflation_corrected = function(year) {
-              inflation <- self$results[self$results$Year == year, "inflation"]
-              value <- self$correct_by_inflation(self$params$fixed_housing_costs_change, inflation) * 100
-              self$results[self$results$Year == year, "housing_cost_growth_inflation_corrected"] <- self$round_to_2(value)
-            },
-
             # Calculates the housing cost for a given year.
             #
             # Args:
@@ -423,7 +409,7 @@ GeneralCalculator <-
               } else {
                 previous_year <- year - 1
                 previous_cost <- self$results[self$results$Year == previous_year, "housing_cost"]
-                growth_rate <- self$results[self$results$Year == previous_year, "housing_cost_growth_inflation_corrected"] / 100
+                growth_rate <- self$results[self$results$Year == previous_year, "inflation"] / 100
                 value <- previous_cost * (1 + growth_rate)
               }
               self$results[self$results$Year == year, "housing_cost"] <- self$round_to_2(value)

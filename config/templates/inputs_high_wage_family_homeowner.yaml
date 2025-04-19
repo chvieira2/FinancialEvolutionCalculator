@@ -137,12 +137,6 @@ rental:
     label: Fixed housing costs (Nebenkosten) (EUR/month)
     value: 330
     description: Monthly fixed housing costs.
-  - id: fixed_housing_costs_change
-    type: numericInput
-    label: Fixed housing costs (Nebenkosten) change rate (% per year)
-    value: 2.5
-    description: Annual change rate of the fixed housing costs (Nebenkosten). Usually
-      follows the inflation.
 passive_investing:
   title: Passive Investing
   inputs:
