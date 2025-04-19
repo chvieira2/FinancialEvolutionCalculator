@@ -271,7 +271,8 @@ R6Class("PropertyCalculator",
         sale_funds <- self$calculate_funds_from_property_sale(year, self$results, self$properties)
 
         # Deficit to replenish emergency reserve if needed
-        emergency_reserve_deficit <- self$params$savings_emergency_reserve - self$results[self$results$Year == previous_year, "savings_emergency_reserve"]
+        emergency_reserve_deficit <- self$results[self$results$Year == year, "emergency_fund_ceiling"] -
+          self$results[self$results$Year == previous_year, "savings_emergency_reserve"]
 
         emergency_reserve_deficit <- ifelse(emergency_reserve_deficit > 0,
                                             emergency_reserve_deficit,

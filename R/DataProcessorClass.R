@@ -251,7 +251,7 @@ if (sys.nframe() == 0) {
   if (TRUE) {
     source(file.path("R", "constants.R"))
     for (scenario in c(#"inputs_high_wage_family_landlord.yaml",
-                       TEMPLATE_SCENARIOS[1:2])) {
+                       TEMPLATE_SCENARIOS)) {
       scenario <- sub(".yaml*$", "", scenario)
       scenario <- sub("inputs_", "", scenario)
 

@@ -22,6 +22,7 @@ GeneralCalculator <-
               # General calculations (always performed)
               private$calculate_salaries_growth(year)
               private$calculate_salary(year)
+              private$calculate_emergency_fund_ceiling(year)
               private$calculate_living_costs_change_elternzeit(year)
               private$calculate_living_costs_family(year)
               private$calculate_living_costs(year)
@@ -98,6 +99,31 @@ GeneralCalculator <-
                 new_salary <- previous_salary * (1 + growth_rate/100)
                 self$results[self$results$Year == year, "salary"] <- self$round_to_2(new_salary)
               }
+            },
+
+            # Calculates the emergency fund ceiling for a given year.
+            #
+            # Args:
+            #   year: An integer representing the year for which the calculation is performed.
+            #
+            # Returns:
+            #   Updates the results data frame with the emergency fund ceiling
+            calculate_emergency_fund_ceiling = function(year) {
+              if (year == self$params$initial_year) {
+                # In the initial year, use the value provided in params
+                value <- self$params$savings_emergency_reserve
+              } else {
+                previous_year <- year - 1
+                previous_limit <- self$results[self$results$Year == previous_year, "emergency_fund_ceiling"]
+
+                # Use the same growth rate as salary to adjust the emergency fund limit
+                salary_growth_rate <- self$results[self$results$Year == previous_year, "salaries_growth_inflation_corrected"] / 100
+
+                # Calculate new limit by applying the same growth rate as salary
+                value <- previous_limit * (1 + salary_growth_rate)
+              }
+
+              self$results[self$results$Year == year, "emergency_fund_ceiling"] <- self$round_to_2(value)
             },
 
             # Calculates the change in living costs due to Elternzeit (parental leave).

@@ -145,7 +145,7 @@ R6Class("FinancialBalanceCalculator",
         emergency_reserve_deficit <- self$params$savings_emergency_reserve - self$results[self$results$Year == year, "savings_emergency_reserve"]
       } else {
         previous_year <- year - 1
-        emergency_reserve_deficit <- self$params$savings_emergency_reserve - self$results[self$results$Year == previous_year, "savings_emergency_reserve"]
+        emergency_reserve_deficit <- self$results[self$results$Year == year, "emergency_fund_ceiling"] - self$results[self$results$Year == previous_year, "savings_emergency_reserve"]
       }
 
       emergency_reserve_allocation <- min(cash_flow, max(0, emergency_reserve_deficit))
@@ -181,16 +181,20 @@ R6Class("FinancialBalanceCalculator",
         total_money_invested <- self$results[self$results$Year == previous_year, "passive_investment_total_invested_liquid"]
         capital_gains_tax <- self$results[self$results$Year == year, "capital_gains_tax_rate"] / 100
 
-        savings_emergency_reserve <- ifelse(cash_flow < 0,
-          ifelse(previous_savings_emergency_reserve + cash_flow > 0,
-            previous_savings_emergency_reserve + cash_flow,
-            ifelse(total_money_invested - abs(previous_savings_emergency_reserve + cash_flow) * (1 + capital_gains_tax) >= previous_savings_emergency_reserve + cash_flow,
-              0,
-              previous_savings_emergency_reserve + cash_flow
-            )
-          ),
-          min(previous_savings_emergency_reserve + cash_flow, self$params$savings_emergency_reserve)
-        ) + ifelse(previous_savings_emergency_reserve < 0, previous_savings_emergency_reserve * self$params$interest_rate_cash_flow_debt / 100, 0)
+        savings_emergency_reserve <-
+          ifelse(cash_flow < 0,
+                 ifelse(previous_savings_emergency_reserve + cash_flow > 0,
+                        previous_savings_emergency_reserve + cash_flow,
+                        ifelse(total_money_invested - abs(previous_savings_emergency_reserve + cash_flow) * (1 + capital_gains_tax) >= previous_savings_emergency_reserve + cash_flow,
+                               0,
+                               previous_savings_emergency_reserve + cash_flow
+                        )
+                 ),
+                 min(previous_savings_emergency_reserve + cash_flow, self$results[self$results$Year == year, "emergency_fund_ceiling"])
+          ) +
+          ifelse(previous_savings_emergency_reserve < 0,
+                 previous_savings_emergency_reserve * self$params$interest_rate_cash_flow_debt / 100,
+                 0)
       }
       self$results[self$results$Year == year, "savings_emergency_reserve"] <- self$round_to_2(savings_emergency_reserve)
     }
