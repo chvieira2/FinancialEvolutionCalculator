@@ -192,6 +192,7 @@ sidebarInputModuleServer <- function(id) {
       # Isolate the update to prevent circular reactions
       isolate({
         updated_config <- config()
+
         any_changes <- FALSE
 
         # Handle regular inputs

@@ -1,3 +1,41 @@
+#' Validate entire configuration
+#' @param config Configuration to validate
+#' @return List with is_valid and messages
+validateConfig <- function(config) {
+  messages <- character(0)
+
+  # Validate general life section
+  if (!is.null(config$general_life)) {
+    for (input in config$general_life$inputs) {
+      if (input$id == "net_annual_income") {
+        result <- validateNumericBounds(input$value, 0, NULL, "Net annual income")
+        if (!result$is_valid) messages <- c(messages, result$message)
+      }
+      if (input$id == "expected_year_retirement") {
+        result <- validateYear(input$value)
+        if (!result$is_valid) messages <- c(messages, result$message)
+      }
+    }
+  }
+
+  # Validate properties
+  if (!is.null(config$properties)) {
+    for (property in config$properties) {
+      result <- validateProperty(property)
+      if (!result$is_valid) {
+        messages <- c(messages,
+                      sprintf("Property '%s': %s", property$name, paste(result$messages, collapse = "; ")))
+      }
+    }
+  }
+
+  list(
+    is_valid = length(messages) == 0,
+    messages = messages
+  )
+}
+
+
 #' Validate numeric input within bounds
 #' @param value The input value
 #' @param min Minimum allowed value
@@ -85,43 +123,6 @@ validateProperty <- function(property) {
       }
       if (input$id == "loan_family_friends") {
         result <- validateCurrency(input$value, "Family loan amount")
-      }
-    }
-  }
-
-  list(
-    is_valid = length(messages) == 0,
-    messages = messages
-  )
-}
-
-#' Validate entire configuration
-#' @param config Configuration to validate
-#' @return List with is_valid and messages
-validateConfig <- function(config) {
-  messages <- character(0)
-
-  # Validate general life section
-  if (!is.null(config$general_life)) {
-    for (input in config$general_life$inputs) {
-      if (input$id == "net_annual_income") {
-        result <- validateNumericBounds(input$value, 0, NULL, "Net annual income")
-        if (!result$is_valid) messages <- c(messages, result$message)
-      }
-      if (input$id == "expected_year_retirement") {
-        result <- validateYear(input$value)
-        if (!result$is_valid) messages <- c(messages, result$message)
-      }
-    }
-  }
-
-  # Validate properties
-  if (!is.null(config$properties)) {
-    for (property in config$properties) {
-      result <- validateProperty(property)
-      if (!result$is_valid) {
-        messages <- c(messages,
-                      sprintf("Property '%s': %s", property$name, paste(result$messages, collapse = "; ")))
       }
     }
   }

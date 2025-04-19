@@ -2,6 +2,7 @@ library(R6)
 
 source(file.path("R", "calculators", "BaseCalculator.R"))
 source(file.path("R", "calculators", "GeneralCalculator.R"))
+source(file.path("R", "calculators", "ConfigDefaultSettingClass.R"))
 source(file.path("R", "calculators", "RentalCalculator.R"))
 source(file.path("R", "calculators", "PropertyCalculator.R"))
 source(file.path("R", "calculators", "FinancialBalanceCalculator.R"))
@@ -34,6 +35,10 @@ DataProcessor <-
                 initial_year = initial_year,
                 final_year = final_year
               )
+
+              # Validate config parameters before initialization
+              self$ConfigDefaultSetting <- ConfigDefaultSetting$new()
+              config <- self$ConfigDefaultSetting$check_parameters_within_bounds(config)
 
               # Initialize property parameters
               private$init_parameters(config)
@@ -245,7 +250,10 @@ DataProcessor <-
           lock_objects = FALSE  # This allows dynamic addition of fields
   )
 
-#### Test code ####
+
+
+
+
 if (sys.nframe() == 0) {
 
   if (TRUE) {

@@ -184,10 +184,6 @@ server <- function(input, output, session) {
     print(paste("Active tab:", active_tab()))  # Debugging: Print the active tab
   })
 
-  # Call the Home Navigation Module
-  homeNavigationModuleServer("home_navigation",
-                             if (is.null(isolate(input$is_mobile))) FALSE else isolate(input$is_mobile))
-
   # Debuggin helper for mobile
   observe({
     cat("Mobile detection:", input$is_mobile, "\n")
@@ -195,6 +191,10 @@ server <- function(input, output, session) {
       glue::glue("Screen: {input$dimension[1]}x{input$dimension[2]}")
     })
   })
+
+  # Call the Home Navigation Module
+  homeNavigationModuleServer("home_navigation",
+                             if (is.null(isolate(input$is_mobile))) FALSE else isolate(input$is_mobile))
 
   # Let the module handle the configuration
   reactive_config <- sidebarInputModuleServer("sidebar_inputs")

@@ -21,7 +21,11 @@ plotYearlyAssetProgressionModuleServer <- function(id, data, reactive_config, ye
     })
 
     output$YearlyAssetProgressionPlot <- renderPlot({
-      generateYearlyAssetProgressionPlot(filtered_data(), reactive_config())
+      # Validate config parameters before initialization
+      ConfigDefaultSetting <- ConfigDefaultSetting$new()
+      config <- ConfigDefaultSetting$check_parameters_within_bounds(isolate(reactive_config()))
+
+      generateYearlyAssetProgressionPlot(filtered_data(), config)
     })
   })
 }
