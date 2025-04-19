@@ -417,7 +417,7 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 30
     description: Monthly Hausgeld building insurance cost.
-  id: 7ca1407b-45d7-401a-8404-1ad11aed53bf
+  id: e20578e2-f422-4e9b-9b1c-e6beb1c746d6
 - name: property2
   type: home
   inputs:
@@ -429,7 +429,7 @@ properties:
   - id: value_today
     type: numericInput
     label: Home property price today (EUR)
-    value: 300000
+    value: 170000
     description: Current market value of the property
   - id: purchase_year
     type: numericInput
@@ -487,33 +487,33 @@ properties:
   - id: hausgeld_fees_total
     type: numericInput
     label: Hausgeld (EUR/month)
-    value: 330
+    value: 110
     description: 'Monthly Hausgeld fees total. Sum of all other Hausgeld fees and
       costs: Building maintenance, utilities, reserve fund contributions, property
       management fees, building insurance, etc.'
   - id: hausgeld_maintenance_costs
     type: numericInput
     label: Hausgeld - Building maintenance (EUR/month)
-    value: 75
+    value: 25
     description: Monthly Hausgeld building maintenance costs.
   - id: hausgeld_utilities
     type: numericInput
     label: Hausgeld - Utilities (EUR/month)
-    value: 125
+    value: 45
     description: Monthly Hausgeld utilities costs.
   - id: hausgeld_reserve_fund
     type: numericInput
     label: Hausgeld - Reserve fund contributions (EUR/month)
-    value: 40
+    value: 12.5
     description: Monthly Hausgeld reserve fund contributions.
   - id: hausgeld_house_management_fee
     type: numericInput
     label: Hausgeld - Property management fee (EUR/month)
-    value: 40
+    value: 12.5
     description: Monthly Hausgeld property management fee.
   - id: hausgeld_building_insurance
     type: numericInput
     label: Hausgeld - Building insurance (EUR/month)
-    value: 50
+    value: 15
     description: Monthly Hausgeld building insurance cost.
-  id: dc5c40a0-b67e-49a7-bcb5-505e5eb56ecb
+  id: 214c171f-66b5-470d-a799-947c13210f44

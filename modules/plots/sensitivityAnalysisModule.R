@@ -530,7 +530,7 @@ if (sys.nframe() == 0) {
   steps <- 9
   variation_range <- c(-20, 20)
 
-  for (scenario in TEMPLATE_SCENARIOS) {
+  for (scenario in TEMPLATE_SCENARIOS[1:2]) {
     scenario <- sub(".yaml*$", "", scenario)
     scenario <- sub("inputs_", "", scenario)
 

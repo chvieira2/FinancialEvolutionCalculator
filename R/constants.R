@@ -1,7 +1,6 @@
 TEMPLATE_SCENARIOS <- list(
   "Low-income family renting" = "inputs_low_wage_family_rent.yaml",
   "Low-income family with real estate as home" = "inputs_low_wage_family_homeowner.yaml",
-  "Low-income family with real estate as investment" = "inputs_low_wage_family_landlord.yaml",
 
   "Mid-income family renting" = "inputs_mid_wage_family_rent.yaml",
   "Mid-income family with real estate as home" = "inputs_mid_wage_family_homeowner.yaml",
