@@ -519,6 +519,10 @@ calculate_plot_heights <- function(selected_params, is_mobile, base_height = 350
   return(height)
 }
 
+
+
+
+
 if (sys.nframe() == 0) {
   RECALCULATE_SENSITIVITY <- TRUE
   source(file.path("R", "helper_functions.R"))
@@ -530,7 +534,7 @@ if (sys.nframe() == 0) {
   steps <- 9
   variation_range <- c(-20, 20)
 
-  for (scenario in TEMPLATE_SCENARIOS[1:2]) {
+  for (scenario in TEMPLATE_SCENARIOS[3:5]) {
     scenario <- sub(".yaml*$", "", scenario)
     scenario <- sub("inputs_", "", scenario)
 

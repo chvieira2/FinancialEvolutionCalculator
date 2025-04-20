@@ -150,7 +150,9 @@ ui <- bslib::page_navbar(
               sensitivityAnalysisModuleUI("sensitivity_analysis")
             )
           )
-        )
+        ),
+        br(),
+        br()
       )
     )
   ),

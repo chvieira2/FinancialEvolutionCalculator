@@ -11,7 +11,7 @@ general_life:
   - id: living_style_costs
     type: numericInput
     label: Living Standard costs (without housing costs) (EUR/month)
-    value: 950
+    value: 905
     description: Your monthly living expenses excluding housing. This include all
       other expenses, like holidays, clothes, dinning out, groceries, etc (NOT health
       insurance).
@@ -124,7 +124,7 @@ rental:
   - id: rent_month
     type: numericInput
     label: Rent (EUR/month)
-    value: 900
+    value: 910
     description: Monthly rent payment.
   - id: rental_prices_growth
     type: numericInput

@@ -124,7 +124,7 @@ rental:
   - id: rent_month
     type: numericInput
     label: Rent (EUR/month)
-    value: 1500
+    value: 1400
     description: Monthly rent payment.
   - id: rental_prices_growth
     type: numericInput
@@ -288,7 +288,7 @@ property_tax:
       marketing costs, and administrative expenses.
 properties:
 - name: property1
-  id: 3f9e72bd-5297-451c-bad1-c96faeff9019
+  id: 1e9cf659-f971-4641-849c-a232fffb7878
   type: home
   inputs:
   - id: value_growth

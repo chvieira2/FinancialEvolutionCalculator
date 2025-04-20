@@ -1,6 +1,6 @@
 parametersPageContent <- function(is_mobile) {
   div(
-    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "",
+    style = if(is_mobile) "padding-left: 15px; padding-right: 15px;" else "padding-left: 15px",
     h2("Calculator Parameters"),
     p("See below a detailed explanation of each parameter used by the Financial Evolution Calculator."),
     hr(),

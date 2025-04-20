@@ -124,7 +124,7 @@ rental:
   - id: rent_month
     type: numericInput
     label: Rent (EUR/month)
-    value: 1500
+    value: 1400
     description: Monthly rent payment.
   - id: rental_prices_growth
     type: numericInput
@@ -411,7 +411,7 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 30
     description: Monthly Hausgeld building insurance cost.
-  id: e20578e2-f422-4e9b-9b1c-e6beb1c746d6
+  id: b3cedf79-39bb-4b83-8026-381181f04998
 - name: property2
   type: home
   inputs:
@@ -510,4 +510,4 @@ properties:
     label: Hausgeld - Building insurance (EUR/month)
     value: 15
     description: Monthly Hausgeld building insurance cost.
-  id: 214c171f-66b5-470d-a799-947c13210f44
+  id: 14d854ed-b835-4710-b08f-cff429064dcb
