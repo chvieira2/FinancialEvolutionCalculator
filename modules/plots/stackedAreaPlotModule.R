@@ -247,7 +247,7 @@ if (sys.nframe() == 0) {
     # Define test parameters
     config <- safelyLoadConfig(file.path("config", "templates",
                                          paste0("inputs_", scenario, ".yaml")))
-    plot_data <- read.csv(file.path("article",
+    plot_data <- read.csv(file.path("article", "calculations",
                                     paste0("calculations_", scenario, ".csv")))
 
     # Generate and save income plot
@@ -258,7 +258,7 @@ if (sys.nframe() == 0) {
       legend_bool = TRUE  # Enable legend for standalone plots
     )
 
-    income_output_path <- file.path("article", paste0("IncomeComp_", scenario, ".tif"))
+    income_output_path <- file.path("article", "figures", paste0("IncomeComp_", scenario, ".png"))
     ggsave(income_output_path, plot = income_plot, width = 10, height = 6, dpi = 300)
     message(paste("Income plot saved to", income_output_path))
 
@@ -270,9 +270,8 @@ if (sys.nframe() == 0) {
       legend_bool = TRUE  # Enable legend for standalone plots
     )
 
-    expenses_output_path <- file.path("article", paste0("ExpensesComp_", scenario, ".tif"))
+    expenses_output_path <- file.path("article", "figures", paste0("ExpensesComp_", scenario, ".png"))
     ggsave(expenses_output_path, plot = expenses_plot, width = 10, height = 6, dpi = 300)
     message(paste("Expenses plot saved to", expenses_output_path))
-    plot(expenses_plot)
   }
 }

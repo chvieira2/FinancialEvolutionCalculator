@@ -259,7 +259,7 @@ if (sys.nframe() == 0) {
   if (TRUE) {
     source(file.path("R", "constants.R"))
     for (scenario in c(#"inputs_high_wage_family_landlord.yaml",
-                       TEMPLATE_SCENARIOS[3:5])) {
+                       TEMPLATE_SCENARIOS)) {
       scenario <- sub(".yaml*$", "", scenario)
       scenario <- sub("inputs_", "", scenario)
 
@@ -268,7 +268,7 @@ if (sys.nframe() == 0) {
       # Define test parameters
       config <- safelyLoadConfig(file.path("config", "templates",
                                            paste0("inputs_", scenario, ".yaml")))
-      output_path <- file.path("article",
+      output_path <- file.path("article", "calculations",
                                paste0("calculations_", scenario, ".csv"))
 
 

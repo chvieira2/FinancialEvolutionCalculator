@@ -165,15 +165,15 @@ if (sys.nframe() == 0) {
     # Define test parameters
     config <- safelyLoadConfig(file.path("config", "templates",
                                          paste0("inputs_", scenario, ".yaml")))
-    plot_data <- read.csv(file.path("article",
+    plot_data <- read.csv(file.path("article", "calculations",
                                     paste0("calculations_", scenario, ".csv")))
-    output_path <- file.path("article",
-                             paste0("FinMetrics_", scenario,".tif"))
+    output_path <- file.path("article", "figures",
+                             paste0("FinMetrics_", scenario,".png"))
 
 
     # Generate the plot
     message("Generating test plot...")
-    test_plot <- generateFinancialMetricsPlot(plot_data, default_metrics)
+    test_plot <- generateFinancialMetricsPlot(plot_data)
 
     # Save the plot
     ggsave(output_path, plot = test_plot, width = 10, height = 6, dpi = 300)

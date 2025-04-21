@@ -395,10 +395,10 @@ if (sys.nframe() == 0) {
     # Define test parameters
     config <- safelyLoadConfig(file.path("config", "templates",
                                          paste0("inputs_", scenario, ".yaml")))
-    plot_data <- read.csv(file.path("article",
+    plot_data <- read.csv(file.path("article", "calculations",
                                     paste0("calculations_", scenario, ".csv")))
-    output_path <- file.path("article",
-                             paste0("AssetEvolution_", scenario,".tif"))
+    output_path <- file.path("article", "figures",
+                             paste0("AssetEvolution_", scenario,".png"))
 
     # Generate the plot
     message("Generating test plot...")

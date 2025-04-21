@@ -524,7 +524,7 @@ calculate_plot_heights <- function(selected_params, is_mobile, base_height = 350
 
 
 if (sys.nframe() == 0) {
-  RECALCULATE_SENSITIVITY <- TRUE
+  RECALCULATE_SENSITIVITY <- FALSE
   source(file.path("R", "helper_functions.R"))
   source(file.path("R", "constants.R"))
   source(file.path("R", "DataProcessorClass.R"))
@@ -534,7 +534,7 @@ if (sys.nframe() == 0) {
   steps <- 9
   variation_range <- c(-20, 20)
 
-  for (scenario in TEMPLATE_SCENARIOS[3:5]) {
+  for (scenario in TEMPLATE_SCENARIOS) {
     scenario <- sub(".yaml*$", "", scenario)
     scenario <- sub("inputs_", "", scenario)
 
@@ -543,7 +543,7 @@ if (sys.nframe() == 0) {
                                          paste0("inputs_", scenario, ".yaml")))
 
 
-    sens_results_path <- file.path("article", paste0("SensitivityResults_", scenario, ".RData"))
+    sens_results_path <- file.path("article", "figures", paste0("SensitivityResults_", scenario, ".RData"))
     if (file.exists(sens_results_path) & !RECALCULATE_SENSITIVITY) {
       message(paste("Loading", sens_results_path))
       load(sens_results_path)
@@ -636,7 +636,7 @@ if (sys.nframe() == 0) {
     )
 
     # Save the plot
-    output_path <- file.path("article", paste0("Sensitivity_", scenario, ".tif"))
+    output_path <- file.path("article", "figures", paste0("Sensitivity_", scenario, ".png"))
     ggsave(output_path, plot = sensitivity_plot, width = 12, height = 8, dpi = 300)
     message(paste("Sensitivity plot saved to", output_path))
 
