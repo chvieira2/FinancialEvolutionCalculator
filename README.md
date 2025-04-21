@@ -49,4 +49,4 @@ Future updates may include performance enhancements, additional modules, and exp
 
 
 ## License & Acknowledgments
-This project is released under [Your License Here]. Special thanks to the Posit team for providing the free hosting server and to all contributors who have helped develop and refine this application. Special thanks to the professional financial advisors that helped me understand the field.
+This project is released under [MIT license](LICENSE). Special thanks to the Posit team for providing the free hosting server and to all contributors who have helped develop and refine this application. Special thanks to the professional financial advisors that helped me understand the field.
