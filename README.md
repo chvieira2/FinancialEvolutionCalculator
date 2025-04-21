@@ -1,6 +1,6 @@
 # FinancialEvolutionCalculator
 
-An user-friendly RShiny application designed to simulate the financial evolution year-by-year based on paramter values inserted by the user.
+An user-friendly RShiny application designed to simulate the financial evolution year-by-year based on parameter values inserted by the user.
 
 
 ## Introduction
