@@ -7,8 +7,8 @@ scenario1Content <- function(is_mobile) {
     scenario_name <- paste0("low_wage_family_", scenario)
     config <- safelyLoadConfig(file.path("config", "templates",
                                          paste0("inputs_", scenario_name, ".yaml")))
-    plot_data <- read.csv(file.path("article",
-                                    paste0("calculations_", scenario_name, ".csv")))
+    plot_data <- read.csv(file.path("article", "calculations",
+                    paste0("calculations_", scenario_name, ".csv")))
 
     # Dynamically create variables from the inputs
     lapply(config, function(section) {
@@ -56,7 +56,7 @@ scenario1Content <- function(is_mobile) {
            ))
 
     if (scenario %in% c("rent", "homeowner")) {
-      load(file.path("article", paste0("SensitivityResults_", scenario_name, ".RData")))
+      load(file.path("article", "figures", paste0("SensitivityResults_", scenario_name, ".RData")))
       assign(paste0(scenario, "_SensitivityAnalysis_height"),
              calculate_plot_heights(final_results$selected_parameters,
                                     is_mobile)
