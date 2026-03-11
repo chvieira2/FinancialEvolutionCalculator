@@ -75,7 +75,7 @@ sidebarInputModuleUI <- function(id) {
       selectInput(
         ns("template_selector"),
         label = NULL,
-        choices = names(TEMPLATE_SCENARIOS),
+        choices = c("No template (uploaded/custom)" = "", names(TEMPLATE_SCENARIOS)),
         selected = DEFAULT_TEMPLATE,
         width = "100%"
       )
@@ -102,11 +102,11 @@ sidebarInputModuleUI <- function(id) {
             placeholder = NULL
           )
         ),
-        # Save button
-        downloadButton(
-          ns("save_scenario"),
-          "Save Current Scenario",
-          class = "btn-default save-scenario-btn"
+        actionButton(
+          inputId = ns("apply_updates"),
+          label = "Update main panel",
+          class = "btn-primary",
+          width = "100%"
         )
       )
     ),
@@ -119,6 +119,16 @@ sidebarInputModuleUI <- function(id) {
       id = ns("static_inputs_container"),
       static_inputs,
       propertyManagementUI(ns("property_management"), initial_config = initial_config)
+    ),
+
+    div(
+      style = "margin-top: 12px; margin-bottom: 8px;",
+      # Save button
+      downloadButton(
+        ns("save_scenario"),
+        "Save Current Scenario",
+        class = "btn-default save-scenario-btn"
+      )
     )
   )
 }
@@ -131,14 +141,19 @@ sidebarInputModuleServer <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
-    # Initialize configuration with default template
-    config <- reactiveVal({
+    # Draft config is updated as the user edits sidebar values.
+    draft_config <- reactiveVal({
       template_file <- TEMPLATE_SCENARIOS[[DEFAULT_TEMPLATE]]
       safelyLoadConfig(file.path("config", "templates", template_file))
     })
 
+    # Applied config is only updated when user clicks the update button.
+    applied_config <- reactiveVal(isolate(draft_config()))
+
     # Handle template selection
     observeEvent(input$template_selector, {
+      req(nzchar(input$template_selector))
+
       template_file <- TEMPLATE_SCENARIOS[[input$template_selector]]
 
       tryCatch({
@@ -156,7 +171,11 @@ sidebarInputModuleServer <- function(id) {
             }
 
             # Replace the entire configuration
-            config(template_config)
+            draft_config(template_config)
+            applied_config(template_config)
+
+            # Clear uploaded scenario selection when a template is applied.
+            shinyjs::reset("scenario_file")
 
             # Update UI inputs
             updateInputs(template_config)
@@ -186,12 +205,14 @@ sidebarInputModuleServer <- function(id) {
 
     # Handle input changes
     observe({
+      req(draft_config())
+
       # Get all input values that have changed
       current_inputs <- reactiveValuesToList(input)
 
       # Isolate the update to prevent circular reactions
       isolate({
-        updated_config <- config()
+        updated_config <- draft_config()
 
         any_changes <- FALSE
 
@@ -236,7 +257,7 @@ sidebarInputModuleServer <- function(id) {
         }
 
         if (any_changes) {
-          config(updated_config)
+          draft_config(updated_config)
         }
       })
     })
@@ -264,8 +285,12 @@ sidebarInputModuleServer <- function(id) {
           validation_result <- validateConfig(uploaded_config)
 
           if (validation_result$is_valid) {
-            # Completely replace the configuration in one go
-            config(uploaded_config)
+            # Replace the draft configuration; main panel updates only on apply.
+            draft_config(uploaded_config)
+            applied_config(uploaded_config)
+
+            # Clear template selection to indicate custom uploaded scenario.
+            updateSelectInput(session, "template_selector", selected = "")
 
             # Update regular inputs
             for (section in names(uploaded_config)) {
@@ -303,19 +328,26 @@ sidebarInputModuleServer <- function(id) {
         paste0("financial_scenario_", format(Sys.time(), "%Y%m%d_%H%M%S"), ".yaml")
       },
       content = function(file) {
-        # Get current configuration
-        current_config <- isolate(config())
+        # Save the current draft values from the sidebar.
+        current_config <- isolate(draft_config())
 
         # Write to YAML file
         yaml::write_yaml(current_config, file)
       }
     )
 
-    # Call the property management module server
-    propertyManagementServer("property_management", config)
+    # Apply sidebar changes to the main panel on demand.
+    observeEvent(input$apply_updates, {
+      req(draft_config())
+      applied_config(isolate(draft_config()))
+      showNotification("Main panel updated", type = "message", duration = 2)
+    })
 
-    # Return the config reactive value
-    return(config)
+    # Call the property management module server
+    propertyManagementServer("property_management", draft_config)
+
+    # Return only the applied configuration to control when the main panel updates.
+    return(applied_config)
   })
 }
 
